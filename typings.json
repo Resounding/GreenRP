@@ -1,0 +1,45 @@
+{
+    "name": "greenrp",
+    "dependencies": {
+        "aurelia-binding": "github:aurelia/binding",
+        "aurelia-bootstrapper": "github:aurelia/bootstrapper",
+        "aurelia-dependency-injection": "github:aurelia/dependency-injection",
+        "aurelia-event-aggregator": "github:aurelia/event-aggregator",
+        "aurelia-fetch-client": "github:aurelia/fetch-client",
+        "aurelia-framework": "github:aurelia/framework",
+        "aurelia-history": "github:aurelia/history",
+        "aurelia-history-browser": "github:aurelia/history-browser",
+        "aurelia-loader": "github:aurelia/loader",
+        "aurelia-logging": "github:aurelia/logging",
+        "aurelia-logging-console": "github:aurelia/logging-console",
+        "aurelia-metadata": "github:aurelia/metadata",
+        "aurelia-pal": "github:aurelia/pal",
+        "aurelia-pal-browser": "github:aurelia/pal-browser",
+        "aurelia-path": "github:aurelia/path",
+        "aurelia-polyfills": "github:aurelia/polyfills",
+        "aurelia-route-recognizer": "github:aurelia/route-recognizer",
+        "aurelia-router": "github:aurelia/router",
+        "aurelia-task-queue": "github:aurelia/task-queue",
+        "aurelia-templating": "github:aurelia/templating",
+        "aurelia-templating-binding": "github:aurelia/templating-binding",
+        "aurelia-templating-resources": "github:aurelia/templating-resources",
+        "aurelia-templating-router": "github:aurelia/templating-router",
+        "bluebird": "registry:npm/bluebird#3.4.1+20160811213708"
+    },
+    "globalDependencies": {
+        "es6-shim": "registry:dt/es6-shim#0.31.2+20160602141504",
+        "jquery": "registry:dt/jquery#1.10.0+20160704162008",
+        "moment": "registry:dt/moment#2.8.0+20160316155526",
+        "moment-node": "registry:dt/moment-node#2.11.1+20160511043338",
+        "pouchdb": "registry:dt/pouchdb#5.4.4+20160724064500",
+        "toastr": "registry:dt/toastr#2.1.1+20160510010435",
+        "underscore": "registry:dt/underscore#1.7.0+20160805164035",
+        "whatwg-fetch": "registry:dt/whatwg-fetch#0.0.0+20160728142841"
+    },
+    "globalDevDependencies": {
+        "angular-protractor": "registry:dt/angular-protractor#1.5.0+20160425143459",
+        "jasmine": "registry:dt/jasmine#2.2.0+20160505161446",
+        "node": "registry:dt/node",
+        "selenium-webdriver": "registry:dt/selenium-webdriver#2.44.0+20160317120654"
+    }
+}
