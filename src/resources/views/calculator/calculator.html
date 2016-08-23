@@ -1,0 +1,57 @@
+<template>
+    <ai-dialog id="calculator">
+        <ai-dialog-body>
+            <form class="ui form segment">
+                <h4 class="ui dividing header">Requested Order</h4>
+                <div class="two fields">
+                    <div class="field">
+                        <label for="customer">Customer</label>
+                        <select name="customer" id="customer">
+                            <option value="">Choose Customer</option>
+                            <option repeat.for="c of customers" value="${c.name}">${c.name}</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Arrival Date</label>
+                        <div class="calendar">
+                            <span>${dateDisplay}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="two fields">
+                    <div class="field">
+                        <label for="plant">Plant</label>
+                        <select name="plant" id="plant">
+                            <option value="">Choose Plant</option>
+                            <option repeat.for="p of plants" value="${p.name}">${p.name}</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="quantity">Quantity</label>
+                        <input type="number" id="quantity" name="quantity" value.bind="order.quantity" required>
+                    </div>
+                </div>
+
+                <div class="ui divider"></div>
+
+                <div class="ui checkbox">
+                    <input type="checkbox" name="partial-space" checked.bind="partialSpace">
+                </div>
+
+                <table class="ui table">
+                    <thead>
+                        <tr>
+                            <th class="center aligned">Event</th>
+                            <th class="center aligned">Week</th>
+                            <th class="center aligned">Tables</th>
+                            <th class="center aligned" repeat.for="z of calculator.zones">${z.name}</th>
+                        </tr>
+                    </thead>
+                </table>
+            </form>
+        </ai-dialog-body>
+        <ai-dialog-footer>
+            <button click.trigger="controller.cancel()">Cancel</button>
+        </ai-dialog-footer>
+    </ai-dialog>
+</template>

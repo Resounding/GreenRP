@@ -10,6 +10,10 @@
     top: 50px;
 }
 
+.ui.popup.calendar:focus {
+    outline: none;
+}
+
 @media only screen and (max-width: 767px) {
     // on mobile, eliminate margin on main menu
     #main-menu > .ui.container {
@@ -29,5 +33,24 @@
 @media only screen and (min-width: 768px) {
     .hide-desktop {
         display: none !important;
+    }
+}
+
+// Calculator modal
+ai-dialog-container,
+ai-dialog-container > div,
+ai-dialog-container > div > div,
+ai-dialog-container > div > div > ai-dialog {
+    height: 100%;
+    width: 100%;
+}
+#calculator form {
+    height: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+
+    .calendar {
+        cursor: pointer;
+        padding: 5px;
     }
 }

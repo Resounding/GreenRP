@@ -1,5 +1,3 @@
-import {Promise} from 'bluebird';
-
 interface FindRequest {
     selector?: any;
     fields?: string[];

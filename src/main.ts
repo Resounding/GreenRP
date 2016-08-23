@@ -11,7 +11,8 @@ import {Configuration} from './resources/services/configuration'
 
 export function configure(aurelia: Aurelia) {
     aurelia.use
-        .standardConfiguration();
+        .standardConfiguration()
+        .plugin('aurelia-dialog');
 
     if (Configuration.isDebug()) {
         aurelia.use.developmentLogging();
