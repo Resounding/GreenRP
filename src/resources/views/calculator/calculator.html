@@ -1,4 +1,6 @@
 <template>
+    <require from="../controls/escape-quotes-value-converter"></require>
+
     <ai-dialog id="calculator">
         <ai-dialog-body>
             <form class="ui form segment">
@@ -23,12 +25,12 @@
                         <label for="plant">Plant</label>
                         <select name="plant" id="plant">
                             <option value="">Choose Plant</option>
-                            <option repeat.for="p of plants" value="${p.name}">${p.name}</option>
+                            <option repeat.for="p of plants" value.bind="p.name | escapeQuotes">${p.name}</option>
                         </select>
                     </div>
                     <div class="field">
                         <label for="quantity">Quantity</label>
-                        <input type="number" id="quantity" name="quantity" value.bind="order.quantity" required>
+                        <input type="number" id="quantity" name="quantity" value.bind="calculator.order.quantity" required>
                     </div>
                 </div>
 
@@ -47,6 +49,22 @@
                             <th class="center aligned" repeat.for="z of calculator.zones">${z.name}</th>
                         </tr>
                     </thead>
+                    <tbody>
+                        <tr repeat.for="week of calculator.weeks">
+                            <td>
+                                <div class="ui ribbon label" if.bind="week.events.length">
+                                    <div repeat.for="event of week.events">
+                                        ${event.name} (${event.date | dateFormat: 'ddd, MMM D'})
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="center aligned">${week.week.week}</td>
+                            <td class="center aligned">${week.week.getAvailable()}</td>
+                            <td class="center aligned" repeat.for="z of week.week.zones | keys">
+                                ${week.week.zones[z].available}
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </form>
         </ai-dialog-body>

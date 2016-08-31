@@ -18,7 +18,7 @@ export class Database {
     init() {
         if (localDB === null) {
             localDB = new PouchDB(this.config.app_database_name);
-            populate(localDB);
+            //populate(localDB);
         }
 
         if (this.auth.isAuthenticated()) {

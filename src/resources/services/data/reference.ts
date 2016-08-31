@@ -3,6 +3,10 @@ import {Database} from '../database';
 import {Customer} from '../../models/customer';
 import {Plant} from '../../models/plant';
 import {Zone} from '../../models/zone';
+import {Season} from '../../models/season';
+import {Week} from "../../models/week";
+import {ReferenceData} from '../reference-data';
+import {PropagationTime} from "../../models/propagation-time";
 
 @autoinject()
 export class Reference {
@@ -25,7 +29,7 @@ export class Reference {
 
             this.database.db.get('plants')
                 .then(result => {
-                    const plants = _.sortBy(result.plants, (plant:Plant) => plant.name.toLowerCase());
+                    const plants = _.sortBy(result.plants, (plant:Plant) => plant.crop.toLowerCase() + plant.size);
                     resolve(plants);
                 })
                 .catch(reject);
@@ -41,5 +45,32 @@ export class Reference {
                 })
                 .catch(reject);
         });
+    }
+
+    seasons():Promise<Season[]> {
+        return new Promise((resolve, reject) => {
+
+            this.database.db.get('seasons')
+                .then(result => {
+                    resolve(result.seasons);
+                })
+                .catch(reject);
+        });
+    }
+
+    weeks():Promise<Week[]> {
+        const weeks = new ReferenceData().weeks;
+        return Promise.resolve(weeks);
+    }
+
+    propagationTimes():Promise<PropagationTime[]> {
+        return new Promise((resolve, reject) => {
+
+            this.database.db.get('propagation-times')
+                .then(result => {
+                    resolve(result.propagationTimes);
+                })
+                .catch(reject);
+        })
     }
 }

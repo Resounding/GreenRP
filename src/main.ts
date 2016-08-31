@@ -12,7 +12,8 @@ import {Configuration} from './resources/services/configuration'
 export function configure(aurelia: Aurelia) {
     aurelia.use
         .standardConfiguration()
-        .plugin('aurelia-dialog');
+        .plugin('aurelia-dialog')
+        .globalResources(['./resources/views/controls/date-format-value-converter', './resources/views/controls/keys-value-converter']);
 
     if (Configuration.isDebug()) {
         aurelia.use.developmentLogging();
