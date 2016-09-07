@@ -3,12 +3,13 @@ import {DialogController} from 'aurelia-dialog';
 import {log} from '../../services/log';
 import {Reference} from '../../services/data/reference';
 import {OrderCalculator} from '../../services/domain/order-calculator';
+import {OrdersService} from "../../services/data/orders-service";
 import {Plant} from '../../models/plant';
 import {Customer} from '../../models/customer';
 import {Season} from '../../models/season';
 import {Zone} from "../../models/zone";
 import {Week} from "../../models/week";
-import {PropagationTime} from "../../models/propagation-time";
+import {SeasonTime} from "../../models/season-time";
 
 @autoinject()
 export class Calculator {
@@ -18,7 +19,7 @@ export class Calculator {
     calculator:OrderCalculator;
     partialSpace:boolean = false;
 
-    constructor(private controller:DialogController, private element:Element, reference:Reference) {
+    constructor(private ordersService:OrdersService, private controller:DialogController, private element:Element, reference:Reference) {
         controller.settings.lock = true;
         controller.settings.position = position;
 
@@ -32,7 +33,8 @@ export class Calculator {
         let zones:Zone[],
             seasons:Season[],
             weeks:Week[],
-            propagationTimes:PropagationTime[];
+            propagationTimes:SeasonTime[],
+            flowerTimes:SeasonTime[];
         Promise.all([
             reference.seasons().then(result => {
                 seasons = result;
@@ -45,9 +47,12 @@ export class Calculator {
             }),
             reference.propagationTimes().then(result => {
                 propagationTimes = result;
+            }),
+            reference.flowerTimes().then(result => {
+                flowerTimes = result;
             })
         ]).then(() => {
-            this.calculator = new OrderCalculator(zones, weeks, seasons, propagationTimes);
+            this.calculator = new OrderCalculator(zones, weeks, seasons, propagationTimes, flowerTimes);
         });
 
 
@@ -88,6 +93,14 @@ export class Calculator {
     onDateChange(value:string) {
         this.calculator.setArrivalDate(moment(value).toDate());
         log.debug(this.season);
+    }
+
+    createOrder(zone:Zone) {
+        this.calculator.order.zone = zone;
+        this.ordersService.create(this.calculator.order)
+            .then(result => {
+                this.controller.close(true, result);
+            });
     }
 }
 

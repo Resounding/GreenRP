@@ -1,5 +1,6 @@
 <template>
     <require from="../controls/escape-quotes-value-converter"></require>
+    <require from="./event-view"></require>
 
     <ai-dialog id="calculator">
         <ai-dialog-body>
@@ -30,7 +31,7 @@
                     </div>
                     <div class="field">
                         <label for="quantity">Quantity</label>
-                        <input type="number" id="quantity" name="quantity" value.bind="calculator.order.quantity" required>
+                        <input type="number" id="quantity" name="quantity" value.bind="calculator.orderQuantity | integer & debounce" required>
                     </div>
                 </div>
 
@@ -53,15 +54,21 @@
                         <tr repeat.for="week of calculator.weeks">
                             <td>
                                 <div class="ui ribbon label" if.bind="week.events.length">
-                                    <div repeat.for="event of week.events">
-                                        ${event.name} (${event.date | dateFormat: 'ddd, MMM D'})
-                                    </div>
+                                    <event-view repeat.for="event of week.events" event.bind="event" calculator.bind="calculator"></event-view>
                                 </div>
                             </td>
                             <td class="center aligned">${week.week.week}</td>
-                            <td class="center aligned">${week.week.getAvailable()}</td>
+                            <td class="center aligned">${week.tables}</td>
                             <td class="center aligned" repeat.for="z of week.week.zones | keys">
                                 ${week.week.zones[z].available}
+                            </td>
+                        </tr>
+                        <tr show.bind="calculator.order.stickDate">
+                            <td colspan="3">&nbsp;</td>
+                            <td class="center aligned" repeat.for="z of calculator.zones">
+                                <button click.trigger="createOrder(z)" class="basic ui icon button">
+                                    <i class="checkmark box icon"></i>
+                                </button>
                             </td>
                         </tr>
                     </tbody>

@@ -120,7 +120,7 @@ export class ReferenceData {
     };
 
     get weeks():Week[] {
-        const start = moment().startOf('week'),
+        const start = moment().startOf('isoWeek'),
             zones:WeekZones =  {
             A: {
                 zone: {
@@ -170,7 +170,7 @@ export class ReferenceData {
 
                 return {
                     _id: date.toWeekNumberId(),
-                    year: date.year(),
+                    year: date.isoWeekYear(),
                     week: date.isoWeek(),
                     zones: zones
                 };

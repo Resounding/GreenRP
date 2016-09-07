@@ -6,7 +6,7 @@ import {Zone} from '../../models/zone';
 import {Season} from '../../models/season';
 import {Week} from "../../models/week";
 import {ReferenceData} from '../reference-data';
-import {PropagationTime} from "../../models/propagation-time";
+import {SeasonTime} from "../../models/season-time";
 
 @autoinject()
 export class Reference {
@@ -63,12 +63,23 @@ export class Reference {
         return Promise.resolve(weeks);
     }
 
-    propagationTimes():Promise<PropagationTime[]> {
+    propagationTimes():Promise<SeasonTime[]> {
         return new Promise((resolve, reject) => {
 
             this.database.db.get('propagation-times')
                 .then(result => {
                     resolve(result.propagationTimes);
+                })
+                .catch(reject);
+        })
+    }
+
+    flowerTimes():Promise<SeasonTime[]> {
+        return new Promise((resolve, reject) => {
+
+            this.database.db.get('flower-times')
+                .then(result => {
+                    resolve(result.flowerTimes);
                 })
                 .catch(reject);
         })

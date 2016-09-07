@@ -1,6 +1,6 @@
 interface CuttingsPerTable {
     tight: number;
-    half: number;
+    half?: number;
     full: number
 }
 
@@ -11,7 +11,6 @@ export interface Plant {
     cuttingsPerPot:number;
     cuttingsPerTable:CuttingsPerTable;
     hasLightsOut:boolean;
-    weeksFromLightsOutToFlower:number;
 }
 
 export class PlantDocument implements Plant {
@@ -21,7 +20,6 @@ export class PlantDocument implements Plant {
     cuttingsPerPot:number;
     cuttingsPerTable:CuttingsPerTable;
     hasLightsOut:boolean;
-    weeksFromLightsOutToFlower:number;
 
     constructor(args?:Plant) {
         if(args) {
@@ -36,3 +34,11 @@ export class Crops {
     static Cyclamen:string = 'Cyclamen';
     static Gerbera:string = 'Gerbera';
 }
+
+export class Spacings {
+    static Tight:string = 'tight';
+    static Half:string = 'half';
+    static Full:string = 'full';
+}
+
+export type SpacingOptions = 'tight' | 'half' | 'full';

@@ -33,7 +33,7 @@ describe('season selector', () => {
     it('selects the right season', () => {
         const date = new Date(2017, 2, 7),
             m = moment(date),
-            year = m.year(),
+            year = m.isoWeekYear(),
             week =  m.isoWeek();
 
         expect(year).toBe(2017);
@@ -111,7 +111,7 @@ describe('season selector', () => {
         const date = new Date(2016, 11, 31),
             m = moment(date),
             week = m.isoWeek(),
-            year = m.year(),
+            year = m.isoWeekYear(),
             season = selector.get(date, Crops.Mums);
 
         expect(year).toEqual(2016);

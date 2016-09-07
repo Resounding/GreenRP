@@ -13,7 +13,11 @@ export function configure(aurelia: Aurelia) {
     aurelia.use
         .standardConfiguration()
         .plugin('aurelia-dialog')
-        .globalResources(['./resources/views/controls/date-format-value-converter', './resources/views/controls/keys-value-converter']);
+        .globalResources([
+            './resources/views/controls/date-format-value-converter',
+            './resources/views/controls/keys-value-converter',
+            './resources/views/controls/integer-value-converter'
+        ]);
 
     if (Configuration.isDebug()) {
         aurelia.use.developmentLogging();

@@ -1,4 +1,4 @@
-import {WeekDocument} from '../../../models/week';
+import {Week} from '../../../models/week';
 
 export interface Event {
     name:string;
@@ -6,13 +6,15 @@ export interface Event {
 }
 
 export interface CalculatorWeek {
-    week:WeekDocument;
+    week:Week;
     events: Event[];
+    tables: number;
 }
 
 export class Events {
     static StickEvent:string = 'Stick';
     static LightsOutEventName:string = 'Lights Out';
+    static SpacingEventName:string = 'Space';
     static FlowerEventName:string = 'Flower';
     static ShipEventName:string = 'Ship Date';
 }

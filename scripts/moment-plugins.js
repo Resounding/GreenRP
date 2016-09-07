@@ -4,7 +4,7 @@
     const moment = this.moment;
 
     moment.fn.toWeekNumberId = function() {
-        const year = this.year(),
+        const year = this.isoWeekYear(),
             week = this.isoWeek();
 
         return `week:${year}.${week}`;
