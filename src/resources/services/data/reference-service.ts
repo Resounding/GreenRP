@@ -9,7 +9,7 @@ import {ReferenceData} from '../reference-data';
 import {SeasonTime} from "../../models/season-time";
 
 @autoinject()
-export class Reference {
+export class ReferenceService {
     constructor(private database:Database) { }
 
     customers():Promise<Customer[]> {

@@ -38,7 +38,9 @@
         "source": "test\\unit\\**\\*.ts"
     },
     "paths": {
-        "root": "src"
+        "root": "src",
+        "themeSrc": "node_modules\\semantic-ui-css\\themes\\default\\assets\\fonts\\*.*",
+        "themeDest": "themes/default/assets/fonts/"
     },
     "testFramework": {
         "id": "jasmine",

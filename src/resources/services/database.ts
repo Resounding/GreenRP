@@ -3,7 +3,6 @@ import {EventAggregator} from 'aurelia-event-aggregator';
 import {Configuration} from './configuration';
 import {Authentication} from './authentication';
 import {log} from './log';
-import {ReferenceData} from './reference-data';
 
 let localDB: PouchDB = null;
 let remoteDB: PouchDB = null;
@@ -18,7 +17,7 @@ export class Database {
     init() {
         if (localDB === null) {
             localDB = new PouchDB(this.config.app_database_name);
-            //populate(localDB);
+            populate(localDB);
         }
 
         if (this.auth.isAuthenticated()) {
@@ -63,16 +62,16 @@ export class Database {
 }
 
 function populate(db: PouchDB) {
-    const data = new ReferenceData(),
-        keys = Object.keys(data);
-
-    for(let key of keys) {
-        const val = data[key];
-        db.get(val._id)
-            .catch(err => {
-                if(err.status === 404) {
-                    db.put(val);
-                }
-            })
-    }
+    // const data = new ReferenceData(),
+    //     keys = Object.keys(data);
+    //
+    // for(let key of keys) {
+    //     const val = data[key];
+    //     db.get(val._id)
+    //         .catch(err => {
+    //             if(err.status === 404) {
+    //                 db.put(val);
+    //             }
+    //         })
+    // }
 }

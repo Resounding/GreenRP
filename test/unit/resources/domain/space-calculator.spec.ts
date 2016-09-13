@@ -1,5 +1,6 @@
 import {SpaceCalculator} from "../../../../src/resources/services/domain/space-calculator";
-import {Order, OrderDocument} from "../../../../src/resources/models/order";
+import {CalculatorOrder} from "../../../../src/resources/services/domain/models/calculator-order";
+import {Order} from "../../../../src/resources/models/order";
 import {Plant, Crops} from "../../../../src/resources/models/plant";
 
 describe('the space calculator', () => {
@@ -31,7 +32,7 @@ describe('the space calculator', () => {
 
 
     beforeEach(() => {
-        order = new OrderDocument({
+        order = new CalculatorOrder({
             stickDate: new Date(2017, 3, 17),
             lightsOutDate: new Date(2017, 4, 8),
             flowerDate: new Date(2017, 6, 3),

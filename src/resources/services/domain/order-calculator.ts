@@ -4,35 +4,32 @@ import {SeasonSelector} from "./season-selector";
 import {TimeSelector} from "./time-selector";
 import {SpaceCalculator} from './space-calculator';
 import {CalculatorWeek, Events, Event} from './models/calculator-week';
+import {CalculatorOrder} from './models/calculator-order';
+import {CalculatorZone} from "./models/calculator-zone";
 import {Zone} from '../../models/zone';
 import {Season} from '../../models/season';
-import {OrderDocument} from "../../models/order";
-import {Week, WeekDocument} from '../../models/week';
+import {Week, WeekDocument, WeekZones} from '../../models/week';
 import {Plant} from "../../models/plant";
 import {SeasonTime} from "../../models/season-time";
+import {CapacityWeek} from "../../models/capacity-week";
 
 interface WeekMap {
     [id:string]: WeekDocument
 }
 
-const _order:OrderDocument = new OrderDocument();
+const _order:CalculatorOrder = new CalculatorOrder();
 let _weeks:CalculatorWeek[] = [];
 
 export class OrderCalculator {
-    zones:Zone[];
+    zones:CalculatorZone[];
     season:Season;
-    allWeeks:WeekMap = { };
     seasonSelector:SeasonSelector;
     propagationTimeSelector:TimeSelector;
     flowerTimeSelector:TimeSelector;
     spaceCalculator:SpaceCalculator;
 
-    constructor(zones:Zone[], allWeeks:Week[], seasons:Season[], private propagationTimes:SeasonTime[], private flowerTimes:SeasonTime[]) {
-        this.zones = _.sortBy(zones, z => z.name.toLowerCase());
-        const sortedWeeks = _.sortBy(allWeeks, w => w.year * 100 + w.week);
-        sortedWeeks.forEach(week => {
-            this.allWeeks[week._id] = new WeekDocument(week);
-        });
+    constructor(zones:Zone[], private allWeeks:Map<string, CapacityWeek>, seasons:Season[], private propagationTimes:SeasonTime[], private flowerTimes:SeasonTime[]) {
+        this.zones = _.sortBy(zones, z => z.name.toLowerCase()).map(z => new CalculatorZone(z));
         this.seasonSelector = new SeasonSelector(seasons);
         this.propagationTimeSelector = new TimeSelector(propagationTimes);
         this.flowerTimeSelector = new TimeSelector(flowerTimes);
@@ -87,13 +84,17 @@ export class OrderCalculator {
         return this;
     }
 
-    get order():OrderDocument {
+    get order():CalculatorOrder {
         return _order;
     }
 
     @computedFrom('plant', 'order.quantity', 'order.arrivalDate', 'order.flowerDate', 'order.lightsOutDate', 'order.stickDate')
     get weeks():CalculatorWeek[] {
         return _weeks;
+    }
+
+    public getOrderDocument() {
+        return this.order.toOrderDocument(this.weeks);
     }
 
     private resetWeeks() {
@@ -105,19 +106,19 @@ export class OrderCalculator {
             stickWeek = this.getStickWeek();
 
         if(shipWeek) {
-            log.debug(`Ship Week: ${shipWeek._id}`);
-            const tables = this.spaceCalculator.getTables(shipWeek._id);
+            const tables = this.spaceCalculator.getTables(shipWeek._id),
+                zones = this.getZones(shipWeek, tables);
             weeks.push({
                 week: shipWeek,
                 events: [{
                     name: Events.ShipEventName,
                     date: _order.arrivalDate
                 }],
-                tables: tables
+                tables: tables,
+                zones: zones
             });
 
             if(flowerWeek){
-                log.debug(`Flower week: ${flowerWeek._id}`);
                 const flowerEvent:Event = {
                     name: Events.FlowerEventName,
                     date: _order.flowerDate
@@ -125,11 +126,13 @@ export class OrderCalculator {
                 if(flowerWeek._id === shipWeek._id) {
                     weeks[0].events.unshift(flowerEvent);
                 } else {
-                    const tables = this.spaceCalculator.getTables(flowerWeek._id);
+                    const tables = this.spaceCalculator.getTables(flowerWeek._id),
+                        zones = this.getZones(flowerWeek, tables);
                     weeks.unshift({
                         week: flowerWeek,
                         events: [flowerEvent],
-                        tables: tables
+                        tables: tables,
+                        zones: zones
                     });
                 }
             } else {
@@ -140,21 +143,22 @@ export class OrderCalculator {
         }
 
         if(lightsOutWeek) {
-            log.debug(`Lights-out week: ${lightsOutWeek._id}`);
             const lightsOutDate = moment(_order.lightsOutDate),
                 lightsOutId = lightsOutDate.toWeekNumberId(),
                 flowerDate = moment(_order.flowerDate),
                 loopDate = flowerDate.add(-1, 'week');
             while(loopDate.isSameOrAfter(lightsOutDate)) {
                 let id = loopDate.toWeekNumberId(),
-                    week = this.allWeeks[id];
+                    week = this.allWeeks.get(id);
 
                 if(week) {
-                    const tables = this.spaceCalculator.getTables(week._id);
+                    const tables = this.spaceCalculator.getTables(week._id),
+                        zones = this.getZones(week, tables);
                     const calculatorWeek:CalculatorWeek = {
                         week: week,
                         events: [],
-                        tables: tables
+                        tables: tables,
+                        zones: zones
                     };
 
                     if(week._id === lightsOutId) {
@@ -189,14 +193,16 @@ export class OrderCalculator {
 
                     while(loopDate.isSameOrAfter(stickDate)){
                         let id = loopDate.toWeekNumberId(),
-                            week = this.allWeeks[id];
+                            week = this.allWeeks.get(id);
 
                         if(week) {
-                            const tables = this.spaceCalculator.getTables(week._id);
+                            const tables = this.spaceCalculator.getTables(week._id),
+                                zones = this.getZones(week, tables);
                             const calculatorWeek = {
                                 week: week,
                                 events: [],
-                                tables: tables
+                                tables: tables,
+                                zones: zones
                             };
 
                             if(week._id === stickWeek._id) {
@@ -217,6 +223,7 @@ export class OrderCalculator {
             log.debug('No stick week');
         }
 
+        this.zones.forEach(z => z.weeks = weeks);
         _weeks = weeks;
     }
 
@@ -227,7 +234,7 @@ export class OrderCalculator {
         }
 
         const id = moment(_order.arrivalDate).toWeekNumberId(),
-            week = this.allWeeks[id];
+            week = this.allWeeks.get(id);
 
         return week;
     }
@@ -247,7 +254,7 @@ export class OrderCalculator {
         if(!_order.flowerDate) return null;
 
         const id = moment(_order.flowerDate).toWeekNumberId(),
-            week = this.allWeeks[id];
+            week = this.allWeeks.get(id);
 
         return week;
     }
@@ -277,7 +284,7 @@ export class OrderCalculator {
         if(!_order.lightsOutDate) return null;
 
         const id = moment(_order.lightsOutDate).toWeekNumberId(),
-            week = this.allWeeks[id];
+            week = this.allWeeks.get(id);
 
         return week;
     }
@@ -307,7 +314,7 @@ export class OrderCalculator {
 
     private getStickWeek():Week {
         const id = moment(_order.stickDate).toWeekNumberId(),
-            week = this.allWeeks[id];
+            week = this.allWeeks.get(id);
 
         return week;
     }
@@ -315,6 +322,17 @@ export class OrderCalculator {
     private getSeason():Season {
         const season = this.seasonSelector.get(_order.arrivalDate, _order.plant.crop);
         return season;
+    }
+
+    private getZones(week:Week, tables:number):WeekZones {
+        const zones = { },
+            keys = Object.keys(week.zones);
+        for(const key of keys) {
+            const zone = _.clone(week.zones[key]);
+            zone.available -= tables;
+            zones[key] = zone;
+        }
+        return zones;
     }
 
     static FLOWER_LEAD_TIME:number = 4;

@@ -1,8 +1,23 @@
-import {Plant, Customer} from '../services/data/reference';
 import {Zone} from "./zone";
+import {Customer} from "./customer";
+import {Plant} from "./plant";
+
+export interface OrderWeek {
+    year:number;
+    week:number;
+    tables:number;
+    available:number;
+}
+
+export interface OrderZone extends Zone {
+    weeks:OrderWeek[];
+}
 
 export interface Order {
-    arrivalDate;
+    _id:string;
+    _rev:string;
+    type:string;
+    arrivalDate:Date;
     flowerDate:Date;
     lightsOutDate:Date;
     stickDate:Date;
@@ -13,19 +28,19 @@ export interface Order {
 }
 
 export class OrderDocument implements Order {
-    arrivalDate:Date = null;
-    flowerDate:Date = null;
-    lightsOutDate:Date = null;
-    stickDate:Date = null;
-    quantity:number = 0;
-    customer:Customer = null;
-    plant:Plant = null;
-    zone:Zone = null;
-
     _id:string;
-    rev:string;
+    _rev:string;
+    type:string;
+    arrivalDate:Date;
+    flowerDate:Date;
+    lightsOutDate:Date;
+    stickDate:Date;
+    quantity:number;
+    customer:Customer;
+    plant:Plant;
+    zone:OrderZone;
 
-    constructor(args?:Order) {
+    constructor(args?:Order){
         if(args) {
             _.extend(this, args);
         }
@@ -34,7 +49,13 @@ export class OrderDocument implements Order {
             const arrival = moment(this.arrivalDate),
                 weekNumber = arrival.isoWeek(),
                 year = arrival.isoWeekYear();
-            this._id = `order:${year}:${this.plant.size}${this.customer.abbreviation}${weekNumber}`;
+            this._id = `${OrderDocument.OrderDocumentType}:${year}:${this.plant.size}${this.customer.abbreviation}${weekNumber}`;
+        }
+
+        if(!this.type) {
+            this.type = OrderDocument.OrderDocumentType;
         }
     }
+
+    static OrderDocumentType:string = 'order';
 }

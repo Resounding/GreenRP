@@ -1,3 +1,16 @@
 <template>
     <h1>Welcome home</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Week</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr repeat.for="key,value of weeks">
+                <td>${key}</td>
+            </tr>
+        </tbody>
+    </table>
 </template>

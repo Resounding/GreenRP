@@ -14,11 +14,23 @@ export class OrdersService {
         return this.database.db.put(orderDoc)
             .then((result:PouchUpdateResponse) => {
                 if(result.ok) {
-                    orderDoc.rev = result.rev;
+                    orderDoc._rev = result.rev;
                     resolve(orderDoc);
                 } else {
                     reject(new Error('Order was not saved.'));
                 }
+            })
+            .catch(reject);
+        });
+    }
+
+    getAll():Promise<Order[]> {
+
+        return new Promise((resolve, reject) => {
+            this.database.db.find({ selector: { type: { '$eq': OrderDocument.OrderDocumentType }}})
+            .then((result) => {
+                const docs = result.docs.map(doc => new OrderDocument(doc));
+                resolve(docs);
             })
             .catch(reject);
         });

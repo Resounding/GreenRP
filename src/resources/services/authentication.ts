@@ -66,7 +66,7 @@ export class Authentication {
         });
     }
 
-    logout():Promise {
+    logout():Promise<any> {
         user_info = null;
         localStorage[storage_key] = null;
         this.app.setRoot(this.config.login_root);

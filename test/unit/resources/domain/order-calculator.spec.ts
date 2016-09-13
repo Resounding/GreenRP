@@ -6,6 +6,7 @@ import {Week} from "../../../../src/resources/models/week";
 import {Season} from "../../../../src/resources/models/season";
 import {Plant, Crops} from "../../../../src/resources/models/plant";
 import {SeasonTime} from "../../../../src/resources/models/season-time";
+import {CapacityWeek} from "../../../../src/resources/models/capacity-week";
 
 describe('the order calculator', () => {
     let calculator:OrderCalculator,
@@ -14,26 +15,26 @@ describe('the order calculator', () => {
             { name: 'B', tables: 100, autoSpace: false },
             { name: 'C', tables: 100, autoSpace: false }
         ],
-        weeks:Week[] = [
-            {_id: 'week:2017.1', year: 2017, week: 1, zones: {
+        weeks:Map<string, CapacityWeek> = new Map<string, CapacityWeek>([
+            ['week:2017.1', new CapacityWeek({_id: 'week:2017.1', year: 2017, week: 1, zones: {
                 A: { zone: zones[0], available: 10 },
                 B: { zone: zones[1], available: 5 },
                 C: { zone: zones[2], available: 50
                 }
-            }},
-            {_id: 'week:2017.2', year: 2017, week: 2, zones: {
+            }})],
+            ['week:2017.2', new CapacityWeek({_id: 'week:2017.2', year: 2017, week: 2, zones: {
                 A: { zone: zones[0], available: 20 },
                 B: { zone: zones[1], available: 0 },
                 C: { zone: zones[2], available: 10
                 }
-            }},
-            {_id: 'week:2017.1', year: 2017, week: 3, zones: {
+            }})],
+            ['week:2017.3', new CapacityWeek({_id: 'week:2017.1', year: 2017, week: 3, zones: {
                 A: { zone: zones[0], available: 5 },
                 B: { zone: zones[1], available: 5 },
                 C: { zone: zones[2], available: 5
                 }
-            }}
-        ],
+            }})]
+        ]),
         seasons:Season[] = [
 
         ],
@@ -162,7 +163,9 @@ describe('the order calculator', () => {
             }
         ];
 
-        weeks = new ReferenceData().weeks;
+        let rawWeeks = new ReferenceData().weeks;
+        weeks = new Map<string, CapacityWeek>();
+        rawWeeks.forEach(w => weeks.set(w._id, new CapacityWeek(w)));
         calculator = new OrderCalculator(zones, weeks, seasons, propagationTimes, flowerTimes);
 
         calculator.setArrivalDate(date);
@@ -195,7 +198,10 @@ describe('the order calculator', () => {
             }
         ];
 
-        weeks = new ReferenceData().weeks;
+        let rawWeeks = new ReferenceData().weeks;
+        weeks = new Map<string, CapacityWeek>();
+        rawWeeks.forEach(w => weeks.set(w._id, new CapacityWeek(w)));
+
         calculator = new OrderCalculator(zones, weeks, seasons, propagationTimes, flowerTimes);
 
         calculator.setArrivalDate(date);
@@ -230,7 +236,10 @@ describe('the order calculator', () => {
             }
         ];
 
-        weeks = new ReferenceData().weeks;
+        let rawWeeks = new ReferenceData().weeks;
+        weeks = new Map<string, CapacityWeek>();
+        rawWeeks.forEach(w => weeks.set(w._id, new CapacityWeek(w)));
+
         calculator = new OrderCalculator(zones, weeks, seasons, propagationTimes, flowerTimes);
 
         calculator.setArrivalDate(date);
@@ -293,7 +302,10 @@ describe('the order calculator', () => {
             }
         ];
 
-        weeks = new ReferenceData().weeks;
+        let rawWeeks = new ReferenceData().weeks;
+        weeks = new Map<string, CapacityWeek>();
+        rawWeeks.forEach(w => weeks.set(w._id, new CapacityWeek(w)));
+
         calculator = new OrderCalculator(zones, weeks, seasons, propagationTimes, flowerTimes);
 
         calculator.setArrivalDate(date);
@@ -306,7 +318,8 @@ describe('the order calculator', () => {
 describe('changing date', () => {
     let calculator:OrderCalculator,
         zones:Zone[] = [],
-        weeks:Week[] = new ReferenceData().weeks,
+        rawWeeks = new ReferenceData().weeks,
+        weeks = new Map<string, CapacityWeek>(),
         seasons:Season[] = [
             {
                 name: 'spring',
@@ -343,6 +356,8 @@ describe('changing date', () => {
         arrival = new Date(2017, 6, 7); // Friday, July 7, 2017
 
     beforeEach(() => {
+        rawWeeks.forEach(w => weeks.set(w._id, new CapacityWeek(w)));
+
         calculator = new OrderCalculator(zones, weeks, seasons, propagationTimes, flowerTimes)
             .setPlant(plant)
             .setArrivalDate(arrival);

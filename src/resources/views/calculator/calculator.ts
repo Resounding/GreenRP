@@ -1,15 +1,18 @@
-import {autoinject, computedFrom} from 'aurelia-framework';
-import {DialogController} from 'aurelia-dialog';
+import {autoinject} from 'aurelia-framework';
+import {DialogController, DialogService, DialogResult} from 'aurelia-dialog';
 import {log} from '../../services/log';
-import {Reference} from '../../services/data/reference';
-import {OrderCalculator} from '../../services/domain/order-calculator';
+import {ReferenceService} from '../../services/data/reference-service';
+import {CapacityService} from '../../services/data/capacity-service';
+import {OrderCalculator, CalculatorZone} from '../../services/domain/order-calculator';
 import {OrdersService} from "../../services/data/orders-service";
+import {Prompt} from '../controls/prompt';
 import {Plant} from '../../models/plant';
 import {Customer} from '../../models/customer';
 import {Season} from '../../models/season';
-import {Zone} from "../../models/zone";
-import {Week} from "../../models/week";
-import {SeasonTime} from "../../models/season-time";
+import {Zone} from '../../models/zone';
+import {Week} from '../../models/week';
+import {SeasonTime} from '../../models/season-time';
+import {CapacityWeek} from '../../models/capacity-week';
 
 @autoinject()
 export class Calculator {
@@ -19,37 +22,40 @@ export class Calculator {
     calculator:OrderCalculator;
     partialSpace:boolean = false;
 
-    constructor(private ordersService:OrdersService, private controller:DialogController, private element:Element, reference:Reference) {
+    constructor(private ordersService:OrdersService, referenceService:ReferenceService, capacityService:CapacityService, private dialogService:DialogService, private controller:DialogController, private element:Element) {
         controller.settings.lock = true;
         controller.settings.position = position;
 
-        reference.customers().then(result => {
+        referenceService.customers().then(result => {
             this.customers = result;
         });
-        reference.plants().then(result => {
+        referenceService.plants().then(result => {
             this.plants = result;
         });
 
         let zones:Zone[],
             seasons:Season[],
-            weeks:Week[],
+            weeks:Map<string, CapacityWeek>,
             propagationTimes:SeasonTime[],
             flowerTimes:SeasonTime[];
         Promise.all([
-            reference.seasons().then(result => {
+            referenceService.seasons().then(result => {
                 seasons = result;
             }),
-            reference.zones().then(result => {
+            referenceService.zones().then(result => {
                 zones = result;
             }),
-            reference.weeks().then(result => {
+            referenceService.weeks().then(result => {
                 weeks = result;
             }),
-            reference.propagationTimes().then(result => {
+            referenceService.propagationTimes().then(result => {
                 propagationTimes = result;
             }),
-            reference.flowerTimes().then(result => {
+            referenceService.flowerTimes().then(result => {
                 flowerTimes = result;
+            }),
+            capacityService.getCapacityWeeks().then(result => {
+                weeks = result;
             })
         ]).then(() => {
             this.calculator = new OrderCalculator(zones, weeks, seasons, propagationTimes, flowerTimes);
@@ -95,12 +101,31 @@ export class Calculator {
         log.debug(this.season);
     }
 
-    createOrder(zone:Zone) {
-        this.calculator.order.zone = zone;
-        this.ordersService.create(this.calculator.order)
-            .then(result => {
-                this.controller.close(true, result);
-            });
+    createOrder(zone:CalculatorZone) {
+
+        const saver = () => {
+            this.calculator.order.zone = zone;
+
+            this.ordersService.create(this.calculator.getOrderDocument())
+                .then(result => {
+                    this.controller.close(true, result);
+                })
+                .catch(error => {
+                    console.log(error);
+                    alert(error);
+                });
+        };
+
+        if(zone.canFit) {
+            saver();
+        } else {
+            this.dialogService.open({ viewModel: Prompt, model: `This order will put zone ${zone.name} over capacity. Are you sure you want to schedule this order?` })
+                .then((result:DialogResult) => {
+                    if(result.wasCancelled) return;
+
+                    saver();
+                });
+        }
     }
 }
 

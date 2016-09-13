@@ -10,7 +10,8 @@ export default gulp.series(
   gulp.parallel(
     transpile,
     processMarkup,
-    processCSS
+    processCSS,
+    copyTheme
   ),
   writeBundles
 );
@@ -21,4 +22,9 @@ function readProjectConfiguration() {
 
 function writeBundles() {
   return build.dest();
+}
+
+function copyTheme() {
+    return gulp.src(project.paths.themeSrc)
+        .pipe(gulp.dest(project.paths.themeDest));
 }

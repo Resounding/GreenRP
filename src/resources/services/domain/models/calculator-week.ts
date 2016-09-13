@@ -1,4 +1,4 @@
-import {Week} from '../../../models/week';
+import {Week, WeekZones} from '../../../models/week';
 
 export interface Event {
     name:string;
@@ -9,6 +9,7 @@ export interface CalculatorWeek {
     week:Week;
     events: Event[];
     tables: number;
+    zones: WeekZones;
 }
 
 export class Events {
