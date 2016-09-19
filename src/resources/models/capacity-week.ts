@@ -1,7 +1,9 @@
 import {Week} from "./week";
 import {OrderDocument, OrderWeek} from "./order";
+import {Zone} from "./zone";
 
 interface CapacityWeekZone {
+    zone:Zone;
     tables:number;
     available:number;
 }
@@ -24,9 +26,11 @@ export class CapacityWeek implements Week {
         const keys:string[] = Object.keys(week.zones);
 
         keys.forEach((key:string) => {
-            const tables = week.zones[key].zone.tables;
+            const zone =  week.zones[key].zone,
+                tables = zone.tables;
 
             this.zones[key] = {
+                zone: zone,
                 tables: tables,
                 available: tables
             };

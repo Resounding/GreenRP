@@ -2,7 +2,7 @@ import {autoinject} from 'aurelia-framework';
 import {DialogController, DialogService, DialogResult} from 'aurelia-dialog';
 import {log} from '../../services/log';
 import {ReferenceService} from '../../services/data/reference-service';
-import {CapacityService} from '../../services/data/capacity-service';
+import {CapacityService} from '../../services/domain/capacity-service';
 import {OrderCalculator, CalculatorZone} from '../../services/domain/order-calculator';
 import {OrdersService} from "../../services/data/orders-service";
 import {Prompt} from '../controls/prompt';
@@ -10,9 +10,9 @@ import {Plant} from '../../models/plant';
 import {Customer} from '../../models/customer';
 import {Season} from '../../models/season';
 import {Zone} from '../../models/zone';
-import {Week} from '../../models/week';
 import {SeasonTime} from '../../models/season-time';
 import {CapacityWeek} from '../../models/capacity-week';
+import {EventAggregator} from "aurelia-event-aggregator";
 
 @autoinject()
 export class Calculator {
@@ -22,7 +22,11 @@ export class Calculator {
     calculator:OrderCalculator;
     partialSpace:boolean = false;
 
-    constructor(private ordersService:OrdersService, referenceService:ReferenceService, capacityService:CapacityService, private dialogService:DialogService, private controller:DialogController, private element:Element) {
+    static OrderCreatedEvent:string = 'Order Created';
+
+    constructor(private ordersService:OrdersService, referenceService:ReferenceService, capacityService:CapacityService,
+                private dialogService:DialogService, private controller:DialogController, private element:Element,
+                private events:EventAggregator) {
         controller.settings.lock = true;
         controller.settings.position = position;
 
@@ -35,7 +39,7 @@ export class Calculator {
 
         let zones:Zone[],
             seasons:Season[],
-            weeks:Map<string, CapacityWeek>,
+            weeks:Map<string, CapacityWeek> = new Map(),
             propagationTimes:SeasonTime[],
             flowerTimes:SeasonTime[];
         Promise.all([
@@ -44,9 +48,6 @@ export class Calculator {
             }),
             referenceService.zones().then(result => {
                 zones = result;
-            }),
-            referenceService.weeks().then(result => {
-                weeks = result;
             }),
             referenceService.propagationTimes().then(result => {
                 propagationTimes = result;
@@ -86,7 +87,7 @@ export class Calculator {
 
     get dateDisplay():string {
         let display = 'Choose Date';
-        if(_.isDate(this.calculator.order.arrivalDate)) {
+        if(this.calculator && _.isDate(this.calculator.order.arrivalDate)) {
             display = moment(this.calculator.order.arrivalDate).format('ddd, MMM Do');
         }
         return display;
@@ -109,6 +110,8 @@ export class Calculator {
             this.ordersService.create(this.calculator.getOrderDocument())
                 .then(result => {
                     this.controller.close(true, result);
+
+                    this.events.publish(Calculator.OrderCreatedEvent);
                 })
                 .catch(error => {
                     console.log(error);

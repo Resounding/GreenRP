@@ -1,12 +1,11 @@
-import {ReferenceData} from '../../../../src/resources/services/reference-data';
-import {OrderCalculator} from '../../../../src/resources/services/domain/order-calculator';
-import {Events, CalculatorWeek} from "../../../../src/resources/services/domain/models/calculator-week";
-import {Zone} from '../../../../src/resources/models/zone';
-import {Week} from "../../../../src/resources/models/week";
-import {Season} from "../../../../src/resources/models/season";
-import {Plant, Crops} from "../../../../src/resources/models/plant";
-import {SeasonTime} from "../../../../src/resources/models/season-time";
-import {CapacityWeek} from "../../../../src/resources/models/capacity-week";
+import {ReferenceData} from '../../../../../src/resources/services/reference-data';
+import {OrderCalculator} from '../../../../../src/resources/services/domain/order-calculator';
+import {Events, CalculatorWeek} from "../../../../../src/resources/services/domain/models/calculator-week";
+import {Zone} from '../../../../../src/resources/models/zone';
+import {Season} from "../../../../../src/resources/models/season";
+import {Plant, Crops} from "../../../../../src/resources/models/plant";
+import {SeasonTime} from "../../../../../src/resources/models/season-time";
+import {CapacityWeek} from "../../../../../src/resources/models/capacity-week";
 
 describe('the order calculator', () => {
     let calculator:OrderCalculator,

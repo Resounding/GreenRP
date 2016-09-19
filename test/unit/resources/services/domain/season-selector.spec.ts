@@ -1,6 +1,6 @@
-import {Season} from '../../../../src/resources/models/season';
-import {Crops} from '../../../../src/resources/models/plant';
-import {SeasonSelector} from '../../../../src/resources/services/domain/season-selector';
+import {Season} from '../../../../../src/resources/models/season';
+import {Crops} from '../../../../../src/resources/models/plant';
+import {SeasonSelector} from '../../../../../src/resources/services/domain/season-selector';
 
 describe('season selector', () => {
     let selector:SeasonSelector,

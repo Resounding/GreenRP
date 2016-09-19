@@ -34,6 +34,10 @@
             <a repeat.for="item of router.navigation" href.bind="item.href" class="item ${item.isActive? 'active' : ''}">
                 ${item.title}
             </a>
+            <a type="button" class="item" click.trigger="showCalculator()">
+                <i class="icon plus"></i>
+                New Order
+            </a>
         </div>
     </div>
 </template>

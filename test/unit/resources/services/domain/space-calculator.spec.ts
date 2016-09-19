@@ -1,7 +1,7 @@
-import {SpaceCalculator} from "../../../../src/resources/services/domain/space-calculator";
-import {CalculatorOrder} from "../../../../src/resources/services/domain/models/calculator-order";
-import {Order} from "../../../../src/resources/models/order";
-import {Plant, Crops} from "../../../../src/resources/models/plant";
+import {SpaceCalculator} from "../../../../../src/resources/services/domain/space-calculator";
+import {CalculatorOrder} from "../../../../../src/resources/services/domain/models/calculator-order";
+import {Order} from "../../../../../src/resources/models/order";
+import {Plant, Crops} from "../../../../../src/resources/models/plant";
 
 describe('the space calculator', () => {
     let mum:Plant = {

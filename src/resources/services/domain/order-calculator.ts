@@ -17,8 +17,8 @@ interface WeekMap {
     [id:string]: WeekDocument
 }
 
-const _order:CalculatorOrder = new CalculatorOrder();
-let _weeks:CalculatorWeek[] = [];
+let _order:CalculatorOrder,
+    _weeks:CalculatorWeek[];
 
 export class OrderCalculator {
     zones:CalculatorZone[];
@@ -29,6 +29,9 @@ export class OrderCalculator {
     spaceCalculator:SpaceCalculator;
 
     constructor(zones:Zone[], private allWeeks:Map<string, CapacityWeek>, seasons:Season[], private propagationTimes:SeasonTime[], private flowerTimes:SeasonTime[]) {
+        _order = new CalculatorOrder();
+        _weeks = [];
+
         this.zones = _.sortBy(zones, z => z.name.toLowerCase()).map(z => new CalculatorZone(z));
         this.seasonSelector = new SeasonSelector(seasons);
         this.propagationTimeSelector = new TimeSelector(propagationTimes);

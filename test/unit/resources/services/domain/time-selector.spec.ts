@@ -1,6 +1,6 @@
-import {TimeSelector} from "../../../../src/resources/services/domain/time-selector";
-import {Season} from "../../../../src/resources/models/season";
-import {SeasonTime, SeasonTimeSeasons} from "../../../../src/resources/models/season-time";
+import {TimeSelector} from "../../../../../src/resources/services/domain/time-selector";
+import {Season} from "../../../../../src/resources/models/season";
+import {SeasonTime} from "../../../../../src/resources/models/season-time";
 
 class Plants {
     static Mums = '4.5" Mums';
