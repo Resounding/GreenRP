@@ -3,7 +3,7 @@ import {CapacityService} from "../../services/domain/capacity-service";
 import {CapacityWeek} from "../../models/capacity-week";
 import {ReferenceService} from "../../services/data/reference-service";
 import {Zone} from "../../models/zone";
-import {EventAggregator} from "aurelia-event-aggregator";
+import {EventAggregator, Subscription} from "aurelia-event-aggregator";
 import {Calculator} from "../calculator/calculator";
 import {DialogService} from "aurelia-dialog";
 import {ZoneDetail, ZoneDetailModel} from "../zones/zone-detail";
@@ -14,9 +14,10 @@ export class Index {
     weeks:Map<string, CapacityWeek>;
     zones:Zone[];
     year:number = new Date().getFullYear();
+    orderCreatedSubscription:Subscription;
 
     constructor(referenceService:ReferenceService, private capacityService:CapacityService,
-                private events:EventAggregator, private dialogService:DialogService) {
+                private events:EventAggregator, private dialogService:DialogService, private element:Element) {
 
         referenceService.zones()
             .then(result => {
@@ -28,7 +29,8 @@ export class Index {
     }
 
     activate(params) {
-        this.events.subscribe(Calculator.OrderCreatedEvent, this.load.bind(this));
+
+        this.orderCreatedSubscription = this.events.subscribe(Calculator.OrderCreatedEvent, this.load.bind(this));
 
         if('year' in params) {
             const yearParam:number = parseInt(params.year);
@@ -38,6 +40,10 @@ export class Index {
         }
 
         this.load();
+    }
+
+    deactivate() {
+        this.orderCreatedSubscription.dispose();
     }
 
     load() {
@@ -52,7 +58,9 @@ export class Index {
 
     showZoneDetails(zone:Zone) {
         const model:ZoneDetailModel = { year: this.year, zone: zone };
-        this.dialogService.open({ viewModel: ZoneDetail, model: model });
+        //this.dialogService.open({ viewModel: ZoneDetail, model: model });
+        //$('.sidebar', this.element).sidebar('show');
+        this.events.publish(ZoneDetail.ShowZoneDetailEvent, model);
     }
 
     @computedFrom('year')

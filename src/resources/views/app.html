@@ -1,10 +1,16 @@
 <template>
     <require from="styles/styles.css"></require>
     <require from="./controls/nav-bar"></require>
+    <require from="./zones/zone-detail"></require>
 
     <nav-bar router.bind="router"></nav-bar>
 
-    <div class="ui main container">
-        <router-view></router-view>
+    <div class="pusher">
+        <div class="ui main container">
+            <router-view></router-view>
+        </div>
+    </div>
+    <div id="zone-detail-sidebar" class="ui right sidebar very wide">
+        <zone-detail></zone-detail>
     </div>
 </template>

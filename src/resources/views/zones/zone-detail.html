@@ -1,11 +1,7 @@
 <template>
-    <ai-dialog>
-        <ai-dialog-body>
-            <h1>This is the zone detail page for ${zone.name} for ${year}</h1>
-        </ai-dialog-body>
+    <button type="button" class="ui icon button basic" click.delegate="close()">
+        <i class="close icon"></i>
+    </button>
 
-        <ai-dialog-footer>
-            <button click.trigger="controller.cancel()" class="ui button basic">Close</button>
-        </ai-dialog-footer>
-    </ai-dialog>
+    <h1>This is the zone detail page for ${zone.name} for ${year}</h1>
 </template>
