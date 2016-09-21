@@ -27,8 +27,7 @@ export default gulp.series(
     copyTheme,
     copyMisc,
     revAppBundle,
-    revVendorBundle,
-    replaceVendorBundleRef,
+    revVendorBundle
     //replaceAppBundleRef
 );
 
@@ -80,18 +79,6 @@ function revAppBundle() {
         .pipe(gulp.dest(project.paths.export + 'scripts/'));
 }
 
-function revVendorBundle() {
-    // how do I use the 'stage & prod' values from the
-    if(env !== 'prod') {
-        console.log(`Rev not required for ${env}.`);
-        return Promise.resolve();
-    }
-
-    return gulp.src(project.paths['vendor-bundle'])
-        .pipe(rev())
-        .pipe(gulp.dest(project.paths.export + 'scripts/'));
-}
-
 function replaceAppBundleRef() {
     const manifest = gulp.src(project.paths.export + 'scripts/rev-manifest.json');
     //manifest["app-bundle"] = manifest["app-bundle.js"].replace('.js', '');
@@ -104,14 +91,14 @@ function replaceAppBundleRef() {
         .pipe(gulp.dest(project.paths.export));
 }
 
-function replaceVendorBundleRef() {
+function revVendorBundle() {
     // how do I use the 'stage & prod' values from the
     if(env !== 'prod') {
         console.log(`Rev not required for ${env}.`);
         return Promise.resolve();
     }
 
-    console.log('Running replace vendor bundle');
+    console.log('Running rev');
 
     return gulp.src('./index.html')
         .pipe(usemin({
