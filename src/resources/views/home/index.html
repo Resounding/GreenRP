@@ -29,7 +29,9 @@
             </thead>
             <tbody>
                 <tr repeat.for="key,value of weeks">
-                    <td>${value.week}</td>
+                    <td>
+                        <button class="ui basic button" click.delegate="showWeekDetails(week)">${value.week}</button>
+                    </td>
                     <td repeat.for="zone of zones">${value.zones[zone.name].available}</td>
                 </tr>
             </tbody>

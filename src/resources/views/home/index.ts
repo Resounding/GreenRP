@@ -7,6 +7,7 @@ import {EventAggregator, Subscription} from "aurelia-event-aggregator";
 import {Calculator} from "../calculator/calculator";
 import {DialogService} from "aurelia-dialog";
 import {ZoneDetail, ZoneDetailModel} from "../zones/zone-detail";
+import {WeekDetail} from "../weeks/week-detail";
 
 
 @autoinject()
@@ -58,9 +59,11 @@ export class Index {
 
     showZoneDetails(zone:Zone) {
         const model:ZoneDetailModel = { year: this.year, zone: zone };
-        //this.dialogService.open({ viewModel: ZoneDetail, model: model });
-        //$('.sidebar', this.element).sidebar('show');
         this.events.publish(ZoneDetail.ShowZoneDetailEvent, model);
+    }
+
+    showWeekDetails(week:CapacityWeek) {
+        this.events.publish(WeekDetail.ShowWeekDetailEvent);
     }
 
     @computedFrom('year')

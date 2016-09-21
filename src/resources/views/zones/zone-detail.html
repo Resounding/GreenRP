@@ -9,13 +9,15 @@
         <thead>
             <tr>
                 <th>Week</th>
+                <th repeat.for="plant of model.plants">${plant}</th>
+                <th>Available</th>
             </tr>
         </thead>
         <tbody>
-            <tr repeat.for="[key,value] of orders">
-                <td>${value.weekNumber}</td>
-                <td repeat.for="[name,plant] of value.plants">${plant.tables}</td>
-                <td>${value.available}</td>
+            <tr repeat.for="week of model.weeks">
+                <td>${week.weekNumber}</td>
+                <td repeat.for="plant of week.plants">${plant}</td>
+                <td>${week.available}</td>
             </tr>
         </tbody>
     </table>
