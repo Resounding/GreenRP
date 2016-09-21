@@ -40,7 +40,14 @@
     "paths": {
         "root": "src",
         "themeSrc": "node_modules\\semantic-ui-css\\themes\\default\\assets\\fonts\\*.*",
-        "themeDest": "themes/default/assets/fonts/"
+        "themeDest": "themes/default/assets/fonts/",
+        "export": "export/",
+        "assets": {
+            "images": "./images/*.png",
+            "theme": "node_modules/semantic-ui-css/themes/**/*.*",
+            "misc": ["./manifest.json", "browserconfig.xml", "favicon.ico"]
+        },
+        "app-bundle": "scripts/app-bundle.js"
     },
     "testFramework": {
         "id": "jasmine",
@@ -71,7 +78,8 @@
         },
         "options": {
             "minify": "stage & prod",
-            "sourcemaps": "dev & stage"
+            "sourcemaps": "dev & stage",
+            "requirejs-main": "aurelia-bootstrapper"
         },
         "bundles": [
             {
@@ -79,7 +87,8 @@
                 "source": [
                     "[**/*.js]",
                     "**/*.{css,html}"
-                ]
+                ],
+                "rev": "stage & prod"
             },
             {
                 "name": "vendor-bundle.js",

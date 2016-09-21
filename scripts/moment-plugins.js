@@ -7,7 +7,7 @@
         const year = this.isoWeekYear(),
             week = this.isoWeek();
 
-        return `week:${year}.${week}`;
+        return 'week:' + year + '.' + week;
     };
 
     moment.fn.addWeeksAndDays = function(value) {
