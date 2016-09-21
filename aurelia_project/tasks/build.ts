@@ -7,7 +7,7 @@ import * as vinylPaths from 'vinyl-paths';
 import * as rev from 'gulp-rev';
 import * as revReplace from 'gulp-rev-replace';
 import * as uglify from 'gulp-uglify';
-import * as minifyHtml from 'gulp-minify-html';
+//import * as minifyHtml from 'gulp-minify-html';
 import * as usemin from 'gulp-usemin';
 import {build, CLIOptions} from 'aurelia-cli';
 import * as project from '../aurelia.json';
@@ -28,6 +28,7 @@ export default gulp.series(
     copyMisc,
     revAppBundle,
     revVendorBundle,
+    replaceVendorBundleRef,
     //replaceAppBundleRef
 );
 
@@ -79,6 +80,18 @@ function revAppBundle() {
         .pipe(gulp.dest(project.paths.export + 'scripts/'));
 }
 
+function revVendorBundle() {
+    // how do I use the 'stage & prod' values from the
+    if(env !== 'prod') {
+        console.log(`Rev not required for ${env}.`);
+        return Promise.resolve();
+    }
+
+    return gulp.src(project.paths['vendor-bundle'])
+        .pipe(rev())
+        .pipe(gulp.dest(project.paths.export + 'scripts/'));
+}
+
 function replaceAppBundleRef() {
     const manifest = gulp.src(project.paths.export + 'scripts/rev-manifest.json');
     //manifest["app-bundle"] = manifest["app-bundle.js"].replace('.js', '');
@@ -91,14 +104,14 @@ function replaceAppBundleRef() {
         .pipe(gulp.dest(project.paths.export));
 }
 
-function revVendorBundle() {
+function replaceVendorBundleRef() {
     // how do I use the 'stage & prod' values from the
     if(env !== 'prod') {
         console.log(`Rev not required for ${env}.`);
         return Promise.resolve();
     }
 
-    console.log('Running rev');
+    console.log('Running replace vendor bundle');
 
     return gulp.src('./index.html')
         .pipe(usemin({

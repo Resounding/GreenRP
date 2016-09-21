@@ -47,7 +47,8 @@
             "theme": "node_modules/semantic-ui-css/themes/**/*.*",
             "misc": ["./manifest.json", "browserconfig.xml", "favicon.ico"]
         },
-        "app-bundle": "scripts/app-bundle.js"
+        "app-bundle": "scripts/app-bundle.js",
+        "vendor-bundle": "scripts/vendor-bundle.js"
     },
     "testFramework": {
         "id": "jasmine",
