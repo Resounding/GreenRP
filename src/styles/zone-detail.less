@@ -1,15 +1,31 @@
+@sidebar-width: 80%;
+
 #zone-detail-sidebar {
     margin-top: 70px !important;
 
     & > zone-detail {
         background-color: white;
-        height: 100%;
+        height: calc(100vh ~"- 100px");
+        overflow-y: auto;
         display: block;
         margin: 5px;
         padding: 5px;
 
         button {
-            float: right;
+            position: absolute;
+            top: 10px;
+            right: 10px;
         }
     }
+}
+
+.ui[class*="super wide"].left.sidebar,
+.ui[class*="super wide"].right.sidebar {
+    width: @sidebar-width;
+}
+
+.ui.visible[class*="super wide"].right.sidebar ~ .fixed,
+.ui.visible[class*="super wide"].right.sidebar ~ .pusher {
+    -webkit-transform: translate3d(-@sidebar-width, 0, 0);
+    transform: translate3d(-@sidebar-width, 0, 0);
 }

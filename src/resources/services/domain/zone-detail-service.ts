@@ -1,8 +1,9 @@
 import {autoinject} from 'aurelia-framework';
 import {ReferenceData} from '../reference-data';
 import {Plant} from "../../models/plant";
-import {Order} from "../../models/order";
+import {Order, OrderDocument} from "../../models/order";
 import {Zone} from "../../models/zone";
+import {Week} from "../../models/week";
 
 interface ZoneWeek {
     weekNumber:number;
@@ -20,24 +21,59 @@ export class ZoneDetailService {
 
     constructor(private referenceData:ReferenceData) { }
 
-    createModel(plants:Plant[], orders:Order[], year:number, zone:Zone):ZoneDetailModel {
+    createModel(plants:Plant[], orders:OrderDocument[], year:number, zone:Zone):ZoneDetailModel {
 
-        const sortedPlants = plants.sort(p => p.name.toLowerCase() + p.size),
+        const
+            sortedPlants = _.sortBy(plants, p => p.name.toLowerCase() + p.size),
             plantNames = _.pluck(sortedPlants, 'name'),
+            plantOrders = plantNames.reduce((memo:Map<string, Map<string,number>>, plantName:string) => {
+                if(!memo.has(plantName)) {
+                    memo.set(plantName, new Map<string,number>());
+                }
+                return memo;
+            }, new Map<string, Map<string,number>>()),
+            zoneOrders = orders
+                .filter((o:OrderDocument) => o.zone.name === zone.name)
+                .reduce((memo:Map<string, Map<string,number>>, o:OrderDocument) => {
+                    o.zone.weeks.forEach(w => {
+                        const id = `week:${w.year}.${w.week}`,
+                            plantWeek = memo.get(o.plant.name);
+
+                        if(!plantWeek.has(id)) {
+                            plantWeek.set(id, 0);
+                        }
+
+                        const wasUsed = plantWeek.get(id),
+                            isUsed = wasUsed + w.tables;
+
+                        plantWeek.set(id, isUsed);
+                    });
+                    return memo;
+                }, plantOrders),
             weeks =  this.referenceData.weeks
                 .filter(w => w.year === year)
-                .sort(w => w.week)
+                .sort((a:Week, b:Week) => {
+                    return a.week - b.week;
+                })
                 .map(w => {
+                    let available:number = zone.tables;
                     return {
                         weekNumber: w.week,
-                        plants: sortedPlants.map(p => 0),
-                        available: 0
+                        plants: plantNames.map(p => {
+                            const weeks = zoneOrders.get(p),
+                                tables = weeks.has(w._id) ? weeks.get(w._id) : 0;
+
+                            available -= tables;
+                            return tables;
+                        }),
+                        available: available
                     };
                 });
 
         const model = {
             plants: plantNames,
-            weeks: weeks
+            weeks: weeks,
+            zone: zone
         };
 
         return model;

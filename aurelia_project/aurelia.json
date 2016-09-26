@@ -59,7 +59,8 @@
             {
                 "id": "web",
                 "displayName": "Web",
-                "output": "scripts"
+                "output": "scripts",
+                "index": "index.html"
             }
         ],
         "loader": {
@@ -80,7 +81,8 @@
         "options": {
             "minify": "stage & prod",
             "sourcemaps": "dev & stage",
-            "requirejs-main": "aurelia-bootstrapper"
+            "requirejs-main": "aurelia-bootstrapper",
+            "rev": "stage & prod"
         },
         "bundles": [
             {
@@ -88,8 +90,7 @@
                 "source": [
                     "[**/*.js]",
                     "**/*.{css,html}"
-                ],
-                "rev": "stage & prod"
+                ]
             },
             {
                 "name": "vendor-bundle.js",

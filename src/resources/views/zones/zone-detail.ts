@@ -22,7 +22,8 @@ export class ZoneDetail {
         this.showZoneDetailSubscription = this.events.subscribe(ZoneDetail.ShowZoneDetailEvent, this.show.bind(this));
 
         $('#zone-detail-sidebar').sidebar({
-            closable: false
+            closable: false,
+            scrollLock: true
         });
     }
 
