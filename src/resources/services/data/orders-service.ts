@@ -1,31 +1,18 @@
 import {autoinject} from 'aurelia-framework';
 import {Order, OrderDocument} from '../../models/order';
 import {Database} from '../database';
-import {Zone} from "../../models/zone";
-import {ReferenceData} from "../reference-data";
-
-export interface ZoneWeekPlant {
-    name: string;
-    tables:number;
-}
-
-export interface ZoneWeek {
-    weekNumber:number;
-    available:number;
-    plants:Map<string,ZoneWeekPlant>;
-}
 
 @autoinject()
 export class OrdersService {
 
-    constructor(private database:Database, private referenceData:ReferenceData) { }
+    constructor(private database:Database) { }
 
     create(order:Order):Promise<Order> {
         const orderDoc = new OrderDocument(order);
 
         return new Promise((resolve, reject) => {
         return this.database.db.put(orderDoc)
-            .then((result:PouchUpdateResponse) => {
+            .then((result:PouchDB.Core.Response) => {
                 if(result.ok) {
                     orderDoc._rev = result.rev;
                     resolve(orderDoc);

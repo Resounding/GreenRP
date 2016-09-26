@@ -3,6 +3,8 @@ import {EventAggregator} from 'aurelia-event-aggregator';
 import {Configuration} from './configuration';
 import {Authentication} from './authentication';
 import {log} from './log';
+import {OrderDocument} from "../models/order";
+import {ZoneDocument} from "../models/zone";
 
 let localDB: PouchDB = null;
 let remoteDB: PouchDB = null;
@@ -43,6 +45,19 @@ export class Database {
                 .on('change', change => {
                     log.info('Sync change');
                     log.debug(change);
+                    if(change.direction === 'pull' && _.isArray(change.change.docs)) {
+
+                        let ordersSynced:boolean = _.any(change.change.docs, doc => doc.type === OrderDocument.OrderDocumentType),
+                            zonesSynced:boolean = _.any(change.change.docs, doc => doc._id === 'zones');
+
+                        if(ordersSynced) {
+                            this.events.publish(Database.OrdersSyncChangeEvent);
+                        }
+
+                        if(zonesSynced) {
+                            this.events.publish(Database.ZonesSyncChangeEvent);
+                        }
+                    }
                 })
                 .on('paused', info => {
                     log.info('Sync paused');
@@ -62,6 +77,9 @@ export class Database {
     get db() {
         return localDB;
     }
+
+    static OrdersSyncChangeEvent:string = 'OrdersSyncChangeEvent';
+    static ZonesSyncChangeEvent:string = 'ZonesSyncChangeEvent';
 }
 
 function populate(db: PouchDB) {
