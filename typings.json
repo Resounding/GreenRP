@@ -32,7 +32,7 @@
         "jquery": "registry:dt/jquery#1.10.0+20160704162008",
         "moment": "registry:dt/moment#2.8.0+20160316155526",
         "moment-node": "registry:dt/moment-node#2.11.1+20160511043338",
-        "pouchdb": "registry:dt/pouchdb#5.4.4+20160724064500",
+        "pouchdb-core": "registry:dt/pouchdb-core#5.4.4+20160919190957",
         "toastr": "registry:dt/toastr#2.1.1+20160510010435",
         "underscore": "registry:dt/underscore#1.7.0+20160805164035",
         "whatwg-fetch": "registry:dt/whatwg-fetch#0.0.0+20160728142841"
