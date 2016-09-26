@@ -40,15 +40,7 @@
     "paths": {
         "root": "src",
         "themeSrc": "node_modules\\semantic-ui-css\\themes\\default\\assets\\fonts\\*.*",
-        "themeDest": "themes/default/assets/fonts/",
-        "export": "export/",
-        "assets": {
-            "images": "./images/*.png",
-            "theme": "node_modules/semantic-ui-css/themes/**/*.*",
-            "misc": ["./manifest.json", "browserconfig.xml", "favicon.ico"]
-        },
-        "app-bundle": "scripts/app-bundle.js",
-        "vendor-bundle": "scripts/vendor-bundle.js"
+        "themeDest": "themes/default/assets/fonts/"
     },
     "testFramework": {
         "id": "jasmine",
