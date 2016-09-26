@@ -14,19 +14,19 @@
             "./typings/**/*.d.ts",
             "./custom_typings/**/*.d.ts"
         ],
-        "source": "src\\**\\*.ts"
+        "source": "src/**/*.ts"
     },
     "markupProcessor": {
         "id": "none",
         "displayName": "None",
         "fileExtension": ".html",
-        "source": "src\\**\\*.html"
+        "source": "src/**/*.html"
     },
     "cssProcessor": {
         "id": "less",
         "displayName": "Less",
         "fileExtension": ".less",
-        "source": "src\\**\\*.less"
+        "source": "src/**/*.less"
     },
     "editor": {
         "id": "webstorm",
@@ -35,7 +35,7 @@
     "unitTestRunner": {
         "id": "karma",
         "displayName": "Karma",
-        "source": "test\\unit\\**\\*.ts"
+        "source": "test/unit/**/*.ts"
     },
     "paths": {
         "root": "src",
