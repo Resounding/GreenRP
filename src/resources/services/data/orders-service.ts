@@ -24,7 +24,7 @@ export class OrdersService {
         });
     }
 
-    getAll():Promise<Order[]> {
+    getAll():Promise<OrderDocument[]> {
 
         return new Promise((resolve, reject) => {
             this.database.db.find({ selector: { type: { '$eq': OrderDocument.OrderDocumentType }}})

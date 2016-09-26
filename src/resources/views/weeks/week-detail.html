@@ -5,5 +5,48 @@
         <i class="close icon"></i>
     </button>
 
-    <h1>Hello, week detail!</h1>
+    <div class="ui form">
+        <div class="fields">
+            <div class="six wide inline field">
+                <label>Dates:</label>
+                <div class="calendar start">
+                    <span>${startDateDisplay}</span>
+                </div>
+                &ndash;
+                <div class="calendar end">
+                    <span>${endDateDisplay}</span>
+                </div>
+            </div>
+            <div class="four wide inline field">
+                <label for="zones">Zone</label>
+                <select id="zones" name="zones" value.bind="filter.zone">
+                    <option value="">All Zones</option>
+                    <option repeat.for="zone of zones" value="${zone}">${zone}</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <table class="ui table">
+        <thead>
+            <tr>
+                <th>Batch</th>
+                <th>Plant</th>
+                <th>Pots</th>
+                <th>Tables</th>
+                <th>Ship Week</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr repeat.for="order of orders">
+                <td>
+                    <a href="#">${order.batch}</a>
+                </td>
+                <td>${order.plant}</td>
+                <td>${order.pots}</td>
+                <td>${order.tables}</td>
+                <td>${order.shipWeek}</td>
+            </tr>
+        </tbody>
+    </table>
 </template>

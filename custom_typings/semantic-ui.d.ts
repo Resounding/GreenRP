@@ -7,6 +7,8 @@ interface visibilityOptions {
 
 interface dropdownOptions {
     allowAdditions?: boolean;
+    forceSelection?: boolean;
+    placeholder?: string;
     onChange?(changed:string):void;
     onAdd?(added:string)
 }
