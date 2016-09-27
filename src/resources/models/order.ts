@@ -47,13 +47,42 @@ export class OrderDocument implements Order {
 
         if(!this._id && this.customer && this.plant && this.arrivalDate) {
             const arrival = moment(this.arrivalDate),
-                weekNumber = arrival.isoWeek(),
-                year = arrival.isoWeekYear();
-            this._id = `${OrderDocument.OrderDocumentType}:${year}:${this.plant.size}${this.customer.abbreviation}${weekNumber}`;
+                week = arrival.isoWeek(),
+                year = arrival.isoWeekYear(),
+                day = arrival.isoWeekday();
+            this._id = `${this.plant.abbreviation}${this.customer.abbreviation}${year}-${week}-${day}`;
         }
 
         if(!this.type) {
             this.type = OrderDocument.OrderDocumentType;
+        }
+
+        if(this.arrivalDate) {
+            const arrivalDate = moment(this.arrivalDate);
+            if(arrivalDate.isValid()) {
+                this.arrivalDate = arrivalDate.toDate();
+            }
+        }
+
+        if(this.flowerDate) {
+            const flowerDate = moment(this.flowerDate);
+            if(flowerDate.isValid()) {
+                this.flowerDate = flowerDate.toDate();
+            }
+        }
+
+        if(this.lightsOutDate) {
+            const lightsOutDate = moment(this.lightsOutDate);
+            if(lightsOutDate.isValid()) {
+                this.lightsOutDate = lightsOutDate.toDate();
+            }
+        }
+
+        if(this.stickDate) {
+            const stickDate = moment(this.stickDate);
+            if(stickDate.isValid()) {
+                this.stickDate = stickDate.toDate();
+            }
         }
     }
 
