@@ -39,8 +39,7 @@
     },
     "paths": {
         "root": "src",
-        "themeSrc": "node_modules\\semantic-ui-css\\themes\\default\\assets\\fonts\\*.*",
-        "themeDest": "themes/default/assets/fonts/"
+        "theme": "node_modules/semantic-ui-css/themes/**/*.*"
     },
     "testFramework": {
         "id": "jasmine",

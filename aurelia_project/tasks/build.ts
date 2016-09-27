@@ -12,6 +12,7 @@ export default gulp.series(
         processMarkup,
         processCSS
     ),
+    copyTheme,
     writeBundles
 );
 
@@ -21,4 +22,9 @@ function readProjectConfiguration() {
 
 function writeBundles() {
     return build.dest();
+}
+
+function copyTheme() {
+    return gulp.src(project.paths.theme)
+        .pipe(gulp.dest('themes/'));
 }
