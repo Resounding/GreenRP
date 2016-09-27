@@ -55,6 +55,70 @@ describe('week detail service', () => {
         });
     });
 
+    describe('week detail order', () => {
+        it('maps the properties from the order', () => {
+            const order = new OrderDocument({
+                    _id: 'order:6M:Weg:2017-12-3',
+                    _rev: '1',
+                    type: 'order',
+                    arrivalDate: new Date(2017, 2, 22),
+                    flowerDate: new Date(2017, 2, 17),
+                    lightsOutDate: new Date(2017, 1, 24),
+                    stickDate: new Date(2017, 0, 20),
+                    quantity: 10000,
+                    customer: {name: 'Wegmans', abbreviation: 'Weg'},
+                    plant: {
+                        name: '6" Mums', crop: 'Mums', size: '6"', cuttingsPerPot: 5, cuttingsPerTable: {
+                            "tight": 1600,
+                            "half": 1100,
+                            "full": 525
+                        }, hasLightsOut: true
+                    },
+                    zone: {
+                        name: 'A', tables: 325, autoSpace: false, weeks: [
+                            {year: 2017, week: 3, tables: 7, available: 318},
+                            {year: 2017, week: 4, tables: 7, available: 318},
+                            {year: 2017, week: 5, tables: 7, available: 318},
+                            {year: 2017, week: 6, tables: 7, available: 318},
+                            {year: 2017, week: 7, tables: 7, available: 318},
+                            {year: 2017, week: 8, tables: 20, available: 305},
+                            {year: 2017, week: 9, tables: 20, available: 305},
+                            {year: 2017, week: 10, tables: 20, available: 305},
+                            {year: 2017, week: 11, tables: 20, available: 305},
+                            {year: 2017, week: 12, tables: 20, available: 305}
+                        ]
+                    }
+                }),
+                filter = new WeekDetailFilter(),
+                week = {_id: 'week:2017.12', year: 2017, week: 12, zones: null};
+
+            let wdo = new WeekDetailOrder(order, filter);
+
+            expect(wdo.batch).toEqual('6M:Weg:2017-12-3');
+            expect(wdo.plant).toEqual('6" Mums');
+            expect(wdo.pots).toEqual(10000);
+            expect(wdo.shipWeek).toEqual(12);
+
+            // end date not set on filter
+            expect(wdo.isShippingThisWeek).toEqual(false);
+            expect(wdo.isFloweringThisWeek).toEqual(false);
+
+            // filter ends on shipping week
+            filter.endDate = new Date(2017, 2, 20);
+            wdo = new WeekDetailOrder(order, filter);
+            expect(wdo.isShippingThisWeek).toEqual(true);
+            expect(wdo.isFloweringThisWeek).toEqual(false);
+            expect(wdo.tables).toEqual(20);
+
+            // filter ends on stick week
+            filter.endDate = new Date(2017, 1, 1);
+            wdo = new WeekDetailOrder(order, filter);
+            expect(wdo.isShippingThisWeek).toEqual(false);
+            expect(wdo.isFloweringThisWeek).toEqual(false);
+            expect(wdo.tables).toEqual(7);
+        });
+    });
+
     describe('week detail service', () => {
         let orders: OrderDocument[] = [
             new OrderDocument({
@@ -201,69 +265,16 @@ describe('week detail service', () => {
             filter.zone = 'B/C';
             expect(service.filter(filter).length).toEqual(1);
         });
-    });
 
-    describe('week detail order', () => {
-        it('maps the properties from the order', () => {
-            const order = new OrderDocument({
-                    _id: 'order:6M:Weg:2017-12-3',
-                    _rev: '1',
-                    type: 'order',
-                    arrivalDate: new Date(2017, 2, 22),
-                    flowerDate: new Date(2017, 2, 17),
-                    lightsOutDate: new Date(2017, 1, 24),
-                    stickDate: new Date(2017, 0, 20),
-                    quantity: 10000,
-                    customer: {name: 'Wegmans', abbreviation: 'Weg'},
-                    plant: {
-                        name: '6" Mums', crop: 'Mums', size: '6"', cuttingsPerPot: 5, cuttingsPerTable: {
-                            "tight": 1600,
-                            "half": 1100,
-                            "full": 525
-                        }, hasLightsOut: true
-                    },
-                    zone: {
-                        name: 'A', tables: 325, autoSpace: false, weeks: [
-                            {year: 2017, week: 3, tables: 7, available: 318},
-                            {year: 2017, week: 4, tables: 7, available: 318},
-                            {year: 2017, week: 5, tables: 7, available: 318},
-                            {year: 2017, week: 6, tables: 7, available: 318},
-                            {year: 2017, week: 7, tables: 7, available: 318},
-                            {year: 2017, week: 8, tables: 20, available: 305},
-                            {year: 2017, week: 9, tables: 20, available: 305},
-                            {year: 2017, week: 10, tables: 20, available: 305},
-                            {year: 2017, week: 11, tables: 20, available: 305},
-                            {year: 2017, week: 12, tables: 20, available: 305}
-                        ]
-                    }
-                }),
-                filter = new WeekDetailFilter(),
-                week = {_id: 'week:2017.12', year: 2017, week: 12, zones: null};
+        it('sorts by descendings ship week', () => {
+            const
+                sortedOrders = _.sortBy(orders, o => o.customer.name),
+                service = new WeekDetailService(sortedOrders),
+                weeks = service.filter(new WeekDetailFilter());
 
-            let wdo = new WeekDetailOrder(order, filter);
-
-            expect(wdo.batch).toEqual('6M:Weg:2017-12-3');
-            expect(wdo.plant).toEqual('6" Mums');
-            expect(wdo.pots).toEqual(10000);
-            expect(wdo.shipWeek).toEqual(12);
-
-            // end date not set on filter
-            expect(wdo.isShippingThisWeek).toEqual(false);
-            expect(wdo.isFloweringThisWeek).toEqual(false);
-
-            // filter ends on shipping week
-            filter.endDate = new Date(2017, 2, 20);
-            wdo = new WeekDetailOrder(order, filter);
-            expect(wdo.isShippingThisWeek).toEqual(true);
-            expect(wdo.isFloweringThisWeek).toEqual(false);
-            expect(wdo.tables).toEqual(20);
-
-            // filter ends on stick week
-            filter.endDate = new Date(2017, 1, 1);
-            wdo = new WeekDetailOrder(order, filter);
-            expect(wdo.isShippingThisWeek).toEqual(false);
-            expect(wdo.isFloweringThisWeek).toEqual(false);
-            expect(wdo.tables).toEqual(7);
+            expect(weeks[0].shipWeek).toEqual(12);
+            expect(weeks[1].shipWeek).toEqual(13);
+            expect(weeks[2].shipWeek).toEqual(40);
         });
     });
 });

@@ -35,7 +35,7 @@ export class WeekDetailOrder {
     pots:number;
     cases:number;
     tables:number;
-    shipWeek:number;
+    shipWeek:string;
     isShippingThisWeek:boolean;
     isFloweringThisWeek:boolean;
 
@@ -78,6 +78,7 @@ export class WeekDetailService {
         return this.orders
             .filter(zones)
             .filter(dates)
+            .sort(sortOrder)
             .map(o => new WeekDetailOrder(o, filter));
 
         function dates(order:OrderDocument):boolean {
@@ -91,6 +92,10 @@ export class WeekDetailService {
             if(!filter.zone) return true;
 
             return filter.zone === order.zone.name;
+        }
+
+        function sortOrder(a:OrderDocument, b:OrderDocument):number {
+            return a.arrivalDate - b.arrivalDate;
         }
     }
 }
