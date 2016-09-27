@@ -6,6 +6,7 @@ interface CuttingsPerTable {
 
 export interface Plant {
     name:string;
+    abbreviation:string;
     crop:string;
     size:string;
     cuttingsPerPot:number;
@@ -15,6 +16,7 @@ export interface Plant {
 
 export class PlantDocument implements Plant {
     name:string;
+    abbreviation:string;
     crop:string;
     size:string;
     cuttingsPerPot:number;
