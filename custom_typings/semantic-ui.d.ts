@@ -49,4 +49,5 @@ interface JQuery {
   form(options?: Object | string, message?:string) : JQuery;
   checkbox(options?: Object | string, message?:string) : JQuery;
   sidebar(options?: sidebarOptions | string) : JQuery;
+  popup(options?:string) : JQuery;
 }

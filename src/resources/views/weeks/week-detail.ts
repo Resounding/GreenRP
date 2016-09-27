@@ -27,7 +27,8 @@ export class WeekDetail {
         this.showWeekDetailSubscription = this.events.subscribe(WeekDetail.ShowWeekDetailEvent, this.show.bind(this));
 
         $('#week-detail-sidebar').sidebar({
-            closable: false
+            closable: false,
+            onShow: this.onShow.bind(this)
         });
 
         $('[name=zones]', this.element).dropdown({
@@ -36,10 +37,14 @@ export class WeekDetail {
             onChange: this.refresh.bind(this)
         });
         $('.calendar.start', this.element).calendar({
+            debug: true,
+            verbose: true,
             type: 'date',
             onChange: this.onStartChange.bind(this)
         });
         $('.calendar.end', this.element).calendar({
+            debug: true,
+            verbose: true,
             type: 'date',
             onChange: this.onEndChange.bind(this)
         });
@@ -62,11 +67,21 @@ export class WeekDetail {
     }
 
     close() {
+        $('i', this.element).popup('destroy');
         $('#week-detail-sidebar').sidebar('hide');
     }
 
     refresh() {
+        $('i', this.element).popup('destroy');
         this.orders = this.weekDetailService.filter(this.filter);
+        window.setTimeout(() => {
+            $('i', this.element).popup();
+        });
+    }
+
+    onShow() {
+        $('.calendar', this.element).calendar('popup', 'show');
+        $('.calendar', this.element).calendar('popup', 'hide');
     }
 
     onStartChange(value:string) {

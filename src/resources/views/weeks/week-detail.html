@@ -33,19 +33,21 @@
                 <th>Batch</th>
                 <th>Plant</th>
                 <th>Pots</th>
-                <th>Tables</th>
-                <th>Ship Week</th>
+                <th class="center aligned">Tables</th>
+                <th class="center aligned">Ship Week</th>
             </tr>
         </thead>
         <tbody>
             <tr repeat.for="order of orders" class="${order.isShippingThisWeek ? 'positive' : ''}">
                 <td>
                     <a href="#">${order.batch}</a>
+                    <i class="truck icon" show.bind="order.isShippingThisWeek" title="This orders ships this week"></i>
+                    <i class="envira gallery icon" show.bind="order.isFloweringThisWeek" title="This orders flowers this week"></i>
                 </td>
                 <td>${order.plant}</td>
-                <td>${order.pots}</td>
-                <td>${order.tables}</td>
-                <td>${order.shipWeek}</td>
+                <td class="right aligned">${order.pots}</td>
+                <td class="center aligned">${order.tables}</td>
+                <td class="center aligned">${order.shipWeek}</td>
             </tr>
         </tbody>
     </table>
