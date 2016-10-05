@@ -29,7 +29,7 @@
                     </div>
                     <div class="field">
                         <label for="quantity">Quantity</label>
-                        <input type="number" id="quantity" name="quantity" value.bind="calculator.order.quantity" required>
+                        <input type="number" id="quantity" name="quantity" value.bind="calculator.orderQuantity & debounce" required>
                     </div>
                 </div>
 
@@ -61,28 +61,32 @@
                                 ${week.zones[z].available}
                             </td>
                         </tr>
-                        <tr show.bind="calculator.order.stickDate">
+                    </tbody>
+                    <tfoot>
+                        <tr>
                             <td colspan="3">&nbsp;</td>
-                            <td class="center aligned" repeat.for="zone of calculator.zones">
-                                <button click.trigger="createOrder(zone)" class="basic ui icon button">
-                                    <i class="checkmark box icon" show.bind="zone.canFit"></i>
-                                    <i class="warning sign box icon" hide.bind="zone.canFit"></i>
+                            <td class="center aligned" repeat.for="z of calculator.zones">
+                                <button click.trigger="setZone(z)" class="basic ui toggle icon button"
+                                    class.bind="(z.name===calculator.order.zone.name) ? 'active' : ''"
+                                    data-tooltip="${(z.name===calculator.order.zone.name) ? 'Clicking save will move the order to this zone.' : 'Click to move the order to this zone.'}">
+                                    <i class="checkmark box icon" show.bind="z.canFit"></i>
+                                    <i class="warning sign box icon" hide.bind="z.canFit"></i>
                                 </button>
                             </td>
                         </tr>
-                    </tbody>
+                    </tfoot>
                 </table>
 
             </form>
         </ai-dialog-body>
         <ai-dialog-footer>
             <button class="ui basic red button left floated" click.delegate="delete()">
-                <i class="trash icon"></i>
+                <i class="trash button icon"></i>
             </button>
 
             <button class="ui basic button" click.delegate="cancel()">Cancel</button>
             <button class="ui basic primary button" click.delegate="save()">
-                <i class="save icon"></i>
+                <i class="save button icon"></i>
                 Save
             </button>
         </ai-dialog-footer>

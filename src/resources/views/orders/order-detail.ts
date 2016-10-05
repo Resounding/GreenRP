@@ -3,6 +3,7 @@ import {DialogController, DialogService, DialogResult} from 'aurelia-dialog';
 import {Prompt} from "../controls/prompt";
 import {CapacityService} from '../../services/domain/capacity-service';
 import {OrderCalculator} from '../../services/domain/order-calculator';
+import {CalculatorZone} from '../../services/domain/models/calculator-zone';
 import {OrdersService} from "../../services/data/orders-service";
 import {ReferenceService} from '../../services/data/reference-service';
 import {CapacityWeek} from "../../models/capacity-week";
@@ -15,6 +16,7 @@ import {Zone} from "../../models/zone";
 export class OrderDetail {
     calculator:OrderCalculator;
     populatePromise:Promise<any>;
+    zone:CalculatorZone;
 
     constructor(private orderService:OrdersService, private referenceService:ReferenceService, private capacityService:CapacityService,
         private element:Element, private dialogService:DialogService, private controller:DialogController) {
@@ -56,7 +58,7 @@ export class OrderDetail {
                 initialDate: this.calculator.order.arrivalDate,
                 onChange: this.onDateChange.bind(this)
             }).calendar('set date', this.calculator.order.arrivalDate);
-        });
+        });        
     }
 
     detached() {
@@ -69,6 +71,10 @@ export class OrderDetail {
 
     print() {
         alert('Not yet!');
+    }
+
+    setZone(zone:CalculatorZone) {
+        this.calculator.order.zone = zone;
     }
 
     delete() {

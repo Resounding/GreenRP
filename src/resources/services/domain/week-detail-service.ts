@@ -33,7 +33,6 @@ export class WeekDetailOrder {
     batch:string;
     plant:string;
     pots:number;
-    cases:number;
     tables:number;
     shipWeek:string;
     isShippingThisWeek:boolean;
@@ -62,7 +61,16 @@ export class WeekDetailOrder {
             flowerWeek = flowerDate.isoWeek(),
             flowerYear = flowerDate.isoWeekYear();
         this.isFloweringThisWeek = (flowerWeek == filterWeek && flowerYear === filterYear);
+    }
 
+    get cases():number {
+        let cases = 0;
+        //TODO: get this from the database
+        if(this.order.plant && this.pots) {
+            let potsPerCase:number = this.order.plant.size === '6"' ? 8 : 12;
+            cases = Math.ceil(potsPerCase / this.pots);
+        }
+        return cases;
     }
 }
 

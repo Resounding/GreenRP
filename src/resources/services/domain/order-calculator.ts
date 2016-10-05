@@ -64,6 +64,15 @@ export class OrderCalculator {
         return this;
     }
 
+    get orderQuantity():number {
+        let quantity = 0;
+
+        if(_order) {
+            quantity = numeral(_order.quantity).value();
+        }
+        return quantity;
+    }
+
     set orderQuantity(quantity:number) {
         _order.quantity = quantity;
         this.resetWeeks();
