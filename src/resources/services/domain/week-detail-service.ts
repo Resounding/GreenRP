@@ -39,7 +39,7 @@ export class WeekDetailOrder {
     isShippingThisWeek:boolean;
     isFloweringThisWeek:boolean;
 
-    constructor(order:OrderDocument, filter:WeekDetailFilter) {
+    constructor(private order:OrderDocument, filter:WeekDetailFilter) {
         this.batch = order._id.replace(/^order:/, '');
         this.plant = order.plant.name;
         this.pots = order.quantity;

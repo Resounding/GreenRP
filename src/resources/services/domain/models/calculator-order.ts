@@ -16,6 +16,7 @@ export class CalculatorOrder implements Order {
     customer:Customer = null;
     plant:Plant = null;
     zone:Zone = null;
+    isCancelled:boolean;
 
     constructor(args?:any) {
         if(args) {
@@ -49,7 +50,8 @@ export class CalculatorOrder implements Order {
             quantity: this.quantity,
             customer: this.customer,
             plant: this.plant,
-            zone: zone
+            zone: zone,
+            isCancelled: this.isCancelled
         }
     }
 }

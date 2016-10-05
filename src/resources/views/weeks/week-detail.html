@@ -7,22 +7,34 @@
 
     <div class="ui form">
         <div class="fields">
-            <div class="six wide inline field">
+            <div class="inline field">
                 <label>Dates:</label>
                 <div class="calendar start">
-                    <span>${startDateDisplay}</span>
+                    <span class="date-display">${startDateDisplay}</span>
                 </div>
                 &ndash;
                 <div class="calendar end">
-                    <span>${endDateDisplay}</span>
+                    <span class="date-display">${endDateDisplay}</span>
                 </div>
             </div>
-            <div class="four wide inline field">
-                <label for="zones">Zone</label>
+            <div class="inline field">
+                <label for="zones">Zone:</label>
                 <select id="zones" name="zones" value.bind="filter.zone">
                     <option value="">All Zones</option>
                     <option repeat.for="zone of zones" value="${zone}">${zone}</option>
                 </select>
+            </div>
+            <div class="inline field">
+                <a href="#" class="report-link" click.delegate="notYet()">
+                    <i class="file pdf outline icon"></i>
+                    Flowering
+                </a>
+            </div>
+            <div class="inline field">
+                <a href="#" class="report-link" click.delegate="notYet()">
+                    <i class="file pdf outline icon"></i>
+                    Planting
+                </a>
             </div>
         </div>
     </div>
@@ -32,21 +44,21 @@
             <tr>
                 <th>Batch</th>
                 <th>Plant</th>
-                <th>Pots</th>
+                <th class="right aligned">Pots</th>
                 <th class="center aligned">Tables</th>
                 <th class="center aligned">Ship Week</th>
             </tr>
         </thead>
         <tbody>
             <tr repeat.for="order of orders" class="${order.isShippingThisWeek ? 'positive' : ''}">
-                <td>
-                    <a href="#">${order.batch}</a>
+                <td class="batch">
+                    <a click.delegate="detail(order.order)">${order.batch}</a>
                     <i class="truck icon" show.bind="order.isShippingThisWeek" title="This orders ships this week"></i>
                     <i class="envira gallery icon" show.bind="order.isFloweringThisWeek" title="This orders flowers this week"></i>
                 </td>
                 <td>${order.plant}</td>
-                <td class="right aligned">${order.pots}</td>
-                <td class="center aligned">${order.tables}</td>
+                <td class="right aligned">${order.pots|numericFormat}</td>
+                <td class="center aligned">${order.tables|numericFormat}</td>
                 <td class="center aligned">${order.shipWeek}</td>
             </tr>
         </tbody>

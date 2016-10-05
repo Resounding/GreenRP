@@ -16,6 +16,7 @@
     "gulp": "github:gulpjs/gulp#4.0",
     "jquery": "^3.1.0",
     "moment": "^2.14.1",
+    "numeral": "^1.5.3",
     "pouchdb": "^6.0.5",
     "pouchdb-find": "^0.10.3",
     "semantic-ui": "github:mdehoog/Semantic-UI#2c10c1f",

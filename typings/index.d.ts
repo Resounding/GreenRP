@@ -5,6 +5,7 @@
 /// <reference path="globals/moment-node/index.d.ts" />
 /// <reference path="globals/moment/index.d.ts" />
 /// <reference path="globals/node/index.d.ts" />
+/// <reference path="globals/numeraljs/index.d.ts" />
 /// <reference path="globals/pouchdb-browser/index.d.ts" />
 /// <reference path="globals/pouchdb-core/index.d.ts" />
 /// <reference path="globals/pouchdb/index.d.ts" />

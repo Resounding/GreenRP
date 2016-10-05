@@ -12,8 +12,9 @@ export class EventViewCustomElement {
     attached() {
         $('.calendar', this.element).calendar({
             type: 'date',
+            initialDate: this.event.date,
             onChange: this.onDateChange.bind(this)
-        });
+        }).calendar('set date', this.event.date);
     }
 
     detached() {
@@ -25,15 +26,28 @@ export class EventViewCustomElement {
         switch(this.event.name) {
             case Events.LightsOutEventName:
             case Events.SpacingEventName:
-                this.calculator.setLightsOutDate(date);
+                if(isDifferent(this.calculator.order.lightsOutDate)) {
+                    this.calculator.setLightsOutDate(date);
+                }
                 break;
             case Events.FlowerEventName:
-                this.calculator.setFlowerDate(date);
+                if(isDifferent(this.calculator.order.flowerDate)) {
+                    this.calculator.setFlowerDate(date);
+                }
                 break;
             case Events.StickEvent:
-                this.calculator.setStickDate(date);
+                if(isDifferent(this.calculator.order.stickDate)) {
+                    this.calculator.setStickDate(date);
+                }
+                break;
             case Events.ShipEventName:
-                this.calculator.setArrivalDate(date);
+                if(isDifferent(this.calculator.order.arrivalDate)) {
+                    this.calculator.setArrivalDate(date);
+                }
+        }
+        
+        function isDifferent(compare:Date):boolean {
+            return !moment(compare).isSame(date);
         }
     }
 }

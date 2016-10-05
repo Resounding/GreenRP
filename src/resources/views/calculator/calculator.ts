@@ -1,10 +1,11 @@
-import {autoinject} from 'aurelia-framework';
+import {autoinject, computedFrom} from 'aurelia-framework';
 import {DialogController, DialogService, DialogResult} from 'aurelia-dialog';
 import {log} from '../../services/log';
 import {ReferenceService} from '../../services/data/reference-service';
 import {CapacityService} from '../../services/domain/capacity-service';
-import {OrderCalculator, CalculatorZone} from '../../services/domain/order-calculator';
+import {OrderCalculator} from '../../services/domain/order-calculator';
 import {OrdersService} from "../../services/data/orders-service";
+import {CalculatorZone} from "../../services/domain/models/calculator-zone";
 import {Prompt} from '../controls/prompt';
 import {Plant} from '../../models/plant';
 import {Customer} from '../../models/customer';
@@ -22,8 +23,6 @@ export class Calculator {
     calculator:OrderCalculator;
     partialSpace:boolean = false;
 
-    static OrderCreatedEvent:string = 'Order Created';
-
     constructor(private ordersService:OrdersService, referenceService:ReferenceService, capacityService:CapacityService,
                 private dialogService:DialogService, private controller:DialogController, private element:Element,
                 private events:EventAggregator) {
@@ -39,7 +38,7 @@ export class Calculator {
 
         let zones:Zone[],
             seasons:Season[],
-            weeks:Map<string, CapacityWeek> = new Map(),
+            weeks:Map<string, CapacityWeek> = new Map<string,CapacityWeek>(),
             propagationTimes:SeasonTime[],
             flowerTimes:SeasonTime[];
         Promise.all([
@@ -85,6 +84,7 @@ export class Calculator {
         $('.calendar', this.element).calendar('destroy');
     }
 
+    @computedFrom('calculator.order.arrivalDate')
     get dateDisplay():string {
         let display = 'Choose Date';
         if(this.calculator && _.isDate(this.calculator.order.arrivalDate)) {
@@ -109,9 +109,7 @@ export class Calculator {
 
             this.ordersService.create(this.calculator.getOrderDocument())
                 .then(result => {
-                    this.controller.close(true, result);
-
-                    this.events.publish(Calculator.OrderCreatedEvent);
+                    this.controller.close(true, result);                    
                 })
                 .catch(error => {
                     console.log(error);

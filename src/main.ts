@@ -15,8 +15,8 @@ export function configure(aurelia: Aurelia) {
         .plugin('aurelia-dialog')
         .globalResources([
             './resources/views/controls/date-format-value-converter',
-            './resources/views/controls/keys-value-converter',
-            './resources/views/controls/integer-value-converter'
+            './resources/views/controls/numeric-format-value-converter',
+            './resources/views/controls/keys-value-converter'
         ]);
 
     if (Configuration.isDebug()) {

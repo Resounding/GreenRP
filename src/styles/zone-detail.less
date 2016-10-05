@@ -1,4 +1,4 @@
-@sidebar-width: 80%;
+@zone-detail-sidebar-width: 80%;
 
 #zone-detail-sidebar {
     margin-top: 70px !important;
@@ -20,13 +20,13 @@
     }
 }
 
-.ui[class*="super wide"].left.sidebar,
-.ui[class*="super wide"].right.sidebar {
-    width: @sidebar-width;
+.ui[class*="super-duper wide"].left.sidebar,
+.ui[class*="super-duper wide"].right.sidebar {
+    width: @zone-detail-sidebar-width;
 }
 
-.ui.visible[class*="super wide"].right.sidebar ~ .fixed,
-.ui.visible[class*="super wide"].right.sidebar ~ .pusher {
-    -webkit-transform: translate3d(-@sidebar-width, 0, 0);
-    transform: translate3d(-@sidebar-width, 0, 0);
+.ui.visible[class*="super-duper wide"].right.sidebar ~ .fixed,
+.ui.visible[class*="super-duper wide"].right.sidebar ~ .pusher {
+    -webkit-transform: translate3d(-@zone-detail-sidebar-width, 0, 0);
+    transform: translate3d(-@zone-detail-sidebar-width, 0, 0);
 }

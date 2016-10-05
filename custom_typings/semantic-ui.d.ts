@@ -16,6 +16,7 @@ interface dropdownOptions {
 interface calendarOptions {
     type?: string;
     onChange?(e:string):void;
+    initialDate?:Date;
 }
 
 interface modalOptions {

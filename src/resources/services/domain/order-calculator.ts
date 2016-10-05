@@ -12,6 +12,7 @@ import {Week, WeekDocument, WeekZones} from '../../models/week';
 import {Plant} from "../../models/plant";
 import {SeasonTime} from "../../models/season-time";
 import {CapacityWeek} from "../../models/capacity-week";
+import {OrderDocument} from "../../models/order";
 
 interface WeekMap {
     [id:string]: WeekDocument
@@ -28,8 +29,8 @@ export class OrderCalculator {
     flowerTimeSelector:TimeSelector;
     spaceCalculator:SpaceCalculator;
 
-    constructor(zones:Zone[], private allWeeks:Map<string, CapacityWeek>, seasons:Season[], private propagationTimes:SeasonTime[], private flowerTimes:SeasonTime[]) {
-        _order = new CalculatorOrder();
+    constructor(zones:Zone[], private allWeeks:Map<string, CapacityWeek>, seasons:Season[], private propagationTimes:SeasonTime[], private flowerTimes:SeasonTime[], order?:OrderDocument) {
+        _order = new CalculatorOrder(order);
         _weeks = [];
 
         this.zones = _.sortBy(zones, z => z.name.toLowerCase()).map(z => new CalculatorZone(z));
@@ -37,6 +38,10 @@ export class OrderCalculator {
         this.propagationTimeSelector = new TimeSelector(propagationTimes);
         this.flowerTimeSelector = new TimeSelector(flowerTimes);
         this.spaceCalculator = new SpaceCalculator(_order);
+
+        if(order && _.isDate(order.arrivalDate)){
+            this.setArrivalDate(order.arrivalDate);
+        }
     }
 
     setArrivalDate(date:Date):OrderCalculator {
@@ -62,7 +67,6 @@ export class OrderCalculator {
     set orderQuantity(quantity:number) {
         _order.quantity = quantity;
         this.resetWeeks();
-        return this;
     }
 
     setFlowerDate(date:Date):OrderCalculator {
@@ -142,7 +146,7 @@ export class OrderCalculator {
                 log.debug('No flower week');
             }
         } else {
-            log.debug('No ship week');
+            log.debug('No ship week!');
         }
 
         if(lightsOutWeek) {

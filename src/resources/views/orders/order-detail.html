@@ -1,19 +1,25 @@
 <template>
-    <require from="styles/calculator.css"></require>
-    <require from="../controls/escape-quotes-value-converter"></require>
-    <require from="./event-view"></require>
+    <require from="styles/order-detail.css"></require>
+    <require from="../calculator/event-view"></require>
 
-    <ai-dialog id="calculator">
+    <ai-dialog id="order-detail">
+        <ai-dialog-header>
+            <h2>Order ${calculator.order._id}</h2>
+            <button class="ui basic button" click.delegate="print()">
+                <i class="print icon"></i>
+                Print Order
+            </button>
+        </ai-dialog-header>
         <ai-dialog-body>
-            <form class="ui form segment">
-                <h4 class="ui dividing header">Requested Order</h4>
+            <form class="ui form segment">                
                 <div class="two fields">
                     <div class="field">
-                        <label for="customer">Customer</label>
-                        <select name="customer" id="customer">
-                            <option value="">Choose Customer</option>
-                            <option repeat.for="c of customers" value="${c.name}">${c.name}</option>
-                        </select>
+                        <label>Customer</label>
+                        <p>${calculator.order.customer.name}</p>
+                    </div>
+                    <div class="field">
+                        <label>Plant</label>
+                        <p>${calculator.order.plant.name}</p>
                     </div>
                     <div class="field">
                         <label>Arrival Date</label>
@@ -21,18 +27,9 @@
                             <span class="date-display">${dateDisplay}</span>
                         </div>
                     </div>
-                </div>
-                <div class="two fields">
-                    <div class="field">
-                        <label for="plant">Plant</label>
-                        <select name="plant" id="plant">
-                            <option value="">Choose Plant</option>
-                            <option repeat.for="p of plants" value.bind="p.name | escapeQuotes">${p.name}</option>
-                        </select>
-                    </div>
                     <div class="field">
                         <label for="quantity">Quantity</label>
-                        <input type="number" id="quantity" name="quantity" value.bind="calculator.orderQuantity & debounce" required>
+                        <input type="number" id="quantity" name="quantity" value.bind="calculator.order.quantity" required>
                     </div>
                 </div>
 
@@ -75,10 +72,19 @@
                         </tr>
                     </tbody>
                 </table>
+
             </form>
         </ai-dialog-body>
         <ai-dialog-footer>
-            <button click.trigger="controller.cancel()">Cancel</button>
+            <button class="ui basic red button left floated" click.delegate="delete()">
+                <i class="trash icon"></i>
+            </button>
+
+            <button class="ui basic button" click.delegate="cancel()">Cancel</button>
+            <button class="ui basic primary button" click.delegate="save()">
+                <i class="save icon"></i>
+                Save
+            </button>
         </ai-dialog-footer>
     </ai-dialog>
 </template>

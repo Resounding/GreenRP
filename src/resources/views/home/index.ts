@@ -1,10 +1,11 @@
 import {autoinject, computedFrom} from 'aurelia-framework';
+import {EventAggregator, Subscription} from "aurelia-event-aggregator";
 import {CapacityService} from "../../services/domain/capacity-service";
 import {CapacityWeek} from "../../models/capacity-week";
 import {Database} from '../../services/database';
 import {ReferenceService} from "../../services/data/reference-service";
+import {OrdersService} from '../../services/data/orders-service';
 import {Zone} from "../../models/zone";
-import {EventAggregator, Subscription} from "aurelia-event-aggregator";
 import {Calculator} from "../calculator/calculator";
 import {ZoneDetail, ZoneDetailModel} from "../zones/zone-detail";
 import {WeekDetail} from "../weeks/week-detail";
@@ -15,6 +16,7 @@ export class Index {
     zones:Zone[];
     year:number = new Date().getFullYear();
     orderCreatedSubscription:Subscription;
+    orderDeletedSubscription:Subscription;
     ordersSyncChangeSubscription:Subscription;
     zonesSyncChangedSubscription:Subscription;
 
@@ -23,7 +25,8 @@ export class Index {
 
     activate(params) {
 
-        this.orderCreatedSubscription = this.events.subscribe(Calculator.OrderCreatedEvent, this.load.bind(this));
+        this.orderCreatedSubscription = this.events.subscribe(OrdersService.OrderCreatedEvent, this.load.bind(this));
+        this.orderDeletedSubscription = this.events.subscribe(OrdersService.OrderDeletedEvent, this.load.bind(this));
         this.ordersSyncChangeSubscription = this.events.subscribe(Database.OrdersSyncChangeEvent, this.load.bind(this));
 
         if('year' in params) {

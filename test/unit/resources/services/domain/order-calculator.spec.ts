@@ -6,6 +6,7 @@ import {Season} from "../../../../../src/resources/models/season";
 import {Plant, Crops} from "../../../../../src/resources/models/plant";
 import {SeasonTime} from "../../../../../src/resources/models/season-time";
 import {CapacityWeek} from "../../../../../src/resources/models/capacity-week";
+import {OrderDocument} from "../../../../../src/resources/models/order";
 
 describe('the order calculator', () => {
     let calculator:OrderCalculator,
@@ -141,7 +142,7 @@ describe('the order calculator', () => {
     it('adds weeks for lights-out', () => {
         const
             date = new Date(2017, 0, 9),
-            mum:Plant = { name: "4.5\" Mums", crop: Crops.Mums, size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
+            mum:Plant = { name: "4.5\" Mums", abbreviation: 'M', crop: Crops.Mums, size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
                 tight: 1000,
                 half: 800,
                 full: 500
@@ -176,7 +177,7 @@ describe('the order calculator', () => {
     it('names the event lights-out if plant has lights out', () => {
         const
             date = new Date(2017, 0, 9),
-            mum:Plant = { name: "4.5\" Mums", crop: Crops.Mums, size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
+            mum:Plant = { name: "4.5\" Mums", abbreviation: 'M', crop: Crops.Mums, size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
                 tight: 1000,
                 half: 800,
                 full: 500
@@ -214,7 +215,7 @@ describe('the order calculator', () => {
     it('names the event spacing if plant doesn\'t have lights out', () => {
         const
             date = new Date(2017, 0, 9),
-            mum:Plant = { name: "4.5\" Kalanchoe", crop: Crops.Kalanchoe, size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
+            mum:Plant = { name: "4.5\" Kalanchoe", abbreviation: 'K', crop: Crops.Kalanchoe, size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
                 tight: 1000,
                 half: 800,
                 full: 500
@@ -252,11 +253,11 @@ describe('the order calculator', () => {
     it('adds weeks for sticking', () => {
         const
             date = new Date(2017, 0, 9),
-            mum:Plant = { name: "4.5\" Mums", crop: Crops.Mums, size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
+            mum:Plant = { name: "4.5\" Mums", abbreviation: 'M', crop: Crops.Mums, size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
                 tight: 1000,
                 half: 800,
                 full: 500
-            }, hasLightsOut: true, weeksFromLightsOutToFlower: 8 };
+            }, hasLightsOut: true };
 
         seasons = [
             {
@@ -312,6 +313,46 @@ describe('the order calculator', () => {
 
         expect(calculator.weeks.length).toEqual(13);
     });
+
+    it('sets all properties when constructed with an order', () => {
+        const order:OrderDocument = {
+            _id: '123',
+            _rev: '1',
+            type: OrderDocument.OrderDocumentType,
+            arrivalDate: new Date(2017, 5, 12), // June 12, 2017: Week 24
+            flowerDate: new Date(2017,5, 8), // June 8, 2017: Week 23
+            lightsOutDate:new Date(2017, 4, 18), // May 18, 2017: 3 weeks before flower: week 20
+            stickDate: new Date(2017, 3, 13), // Apr 13, 2017: 5 weeks before lights-out
+            quantity:1000,
+            customer:{name: 'Sobeys', abbreviation: 'Sb'},
+            plant:{name: '4.5" Mums', abbreviation: 'M', size: '4.5"', crop: 'Mums', cuttingsPerPot: 5, cuttingsPerTable: {
+                full: 500,
+                tight: 1000
+            }, hasLightsOut: true},
+            zone: {
+                name: 'A',
+                tables: 500,
+                autoSpace: false,
+                weeks: [] 
+            },
+            isCancelled: false
+        },
+        thisFlowerTimes:SeasonTime[] = [
+            { plant: order.plant.name, year: 2017, times: 3 }
+        ],
+        thisPropagationTimes:SeasonTime[] = [
+            { plant: order.plant.name, year: 2017, times: 5 }
+        ];
+
+        calculator = new OrderCalculator(zones, weeks, seasons, thisPropagationTimes, thisFlowerTimes, order);
+
+        expect(calculator.order.arrivalDate).toEqual(order.arrivalDate);
+        expect(calculator.order.lightsOutDate).toEqual(order.lightsOutDate);
+        expect(calculator.order.stickDate).toEqual(order.stickDate);
+        expect(calculator.order.customer.name).toEqual('Sobeys');
+        expect(calculator.order.plant.name).toEqual('4.5" Mums');
+        expect(calculator.order.quantity).toEqual(1000);
+    });
 });
 
 describe('changing date', () => {
@@ -328,6 +369,7 @@ describe('changing date', () => {
         ],
         plant:Plant = {
             name: '6" Mums',
+            abbreviation: 'M',
             size: '6"',
             crop: 'Mums',
             cuttingsPerPot: 1,

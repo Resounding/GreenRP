@@ -25,6 +25,7 @@ export interface Order {
     customer:Customer;
     plant:Plant;
     zone:Zone;
+    isCancelled:boolean;
 }
 
 export class OrderDocument implements Order {
@@ -39,6 +40,7 @@ export class OrderDocument implements Order {
     customer:Customer;
     plant:Plant;
     zone:OrderZone;
+    isCancelled:boolean;
 
     constructor(args?:Order){
         if(args) {
