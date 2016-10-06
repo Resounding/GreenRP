@@ -54,7 +54,9 @@
                 <td class="batch">
                     <a click.delegate="detail(order.order)">${order.batch}</a>
                     <i class="truck icon" show.bind="order.isShippingThisWeek" title="This orders ships this week"></i>
-                    <i class="envira gallery icon" show.bind="order.isFloweringThisWeek" title="This orders flowers this week"></i>
+                    <i class="icon" show.bind="order.isFloweringThisWeek" title="This orders flowers this week">
+                        <img src="images/gerbera.png">
+                    </i>
                 </td>
                 <td>${order.plant}</td>
                 <td class="right aligned">${order.pots|numericFormat}</td>
