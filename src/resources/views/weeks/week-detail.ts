@@ -37,14 +37,10 @@ export class WeekDetail {
             onChange: this.refresh.bind(this)
         });
         $('.calendar.start', this.element).calendar({
-            debug: true,
-            verbose: true,
             type: 'date',
             onChange: this.onStartChange.bind(this)
         });
         $('.calendar.end', this.element).calendar({
-            debug: true,
-            verbose: true,
             type: 'date',
             onChange: this.onEndChange.bind(this)
         });

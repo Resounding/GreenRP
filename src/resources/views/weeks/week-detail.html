@@ -1,7 +1,7 @@
 <template>
     <require from="styles/week-detail.css"></require>
 
-    <button type="button" class="ui icon button red" click.delegate="close()">
+    <button type="button" class="ui icon button red close" click.delegate="close()">
         <i class="close icon"></i>
     </button>
 
@@ -24,17 +24,16 @@
                     <option repeat.for="zone of zones" value="${zone}">${zone}</option>
                 </select>
             </div>
-            <div class="inline field">
-                <a href="#" class="report-link" click.delegate="notYet()">
+            <div class="field">
+                <button class="ui basic secondary button" click.delegate="notYet()">
                     <i class="file pdf outline icon"></i>
                     Flowering
-                </a>
-            </div>
-            <div class="inline field">
-                <a href="#" class="report-link" click.delegate="notYet()">
+                </button>
+
+                <button class="ui basic secondary button" click.delegate="notYet()">
                     <i class="file pdf outline icon"></i>
                     Planting
-                </a>
+                </button>
             </div>
         </div>
     </div>

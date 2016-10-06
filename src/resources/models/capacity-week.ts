@@ -40,4 +40,16 @@ export class CapacityWeek implements Week {
     addOrder(zoneName:string, week:OrderWeek):void {
         this.zones[zoneName].available -= week.tables;
     }
+
+    removeOrder(order:OrderDocument) {
+        const zoneName = order.zone.name;
+
+        order.zone.weeks.forEach(w => {
+            const key = `week:${w.year}.${w.week}`;
+
+            if(key === this._id && zoneName in this.zones) {
+                this.zones[zoneName].available += w.tables;
+            }
+        });
+    }
 }

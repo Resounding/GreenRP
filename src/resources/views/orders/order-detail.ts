@@ -47,6 +47,11 @@ export class OrderDetail {
                 weeks = result;
             })
         ]).then(() => {
+            if(order) {
+                weeks.forEach(w => {
+                    w.removeOrder(order);
+                });
+            }
             this.calculator = new OrderCalculator(zones, weeks, seasons, propagationTimes, flowerTimes, order);
         });
     }
@@ -95,7 +100,14 @@ export class OrderDetail {
 
     save() {
         const order = this.calculator.getOrderDocument();
-        this.controller.close(true);
+        this.orderService.edit(order)
+            .then(() => {
+                this.controller.close(true);
+            })
+            .catch((err) => {
+                console.log(err);
+                alert(err);
+            });
     }
 
     @computedFrom('calculator.order.arrivalDate')
