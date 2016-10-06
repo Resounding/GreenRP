@@ -1,6 +1,7 @@
 import {autoinject, computedFrom} from 'aurelia-framework';
 import {DialogController, DialogService, DialogResult} from 'aurelia-dialog';
 import {Prompt} from "../controls/prompt";
+import {Authentication, Roles} from '../../services/authentication';
 import {CapacityService} from '../../services/domain/capacity-service';
 import {OrderCalculator} from '../../services/domain/order-calculator';
 import {CalculatorZone} from '../../services/domain/models/calculator-zone';
@@ -18,8 +19,9 @@ export class OrderDetail {
     populatePromise:Promise<any>;
     zone:CalculatorZone;
 
-    constructor(private orderService:OrdersService, private referenceService:ReferenceService, private capacityService:CapacityService,
-        private element:Element, private dialogService:DialogService, private controller:DialogController) {
+    constructor(private orderService:OrdersService, private referenceService:ReferenceService,
+        private capacityService:CapacityService, private auth:Authentication,
+        private dialogService:DialogService, private controller:DialogController, private element:Element) {
         controller.settings.lock = true;
         controller.settings.position = position;
     }
@@ -117,6 +119,10 @@ export class OrderDetail {
             display = moment(this.calculator.order.arrivalDate).format('ddd, MMM Do');
         }
         return display;
+    }
+
+    get canSaveChanges():boolean {
+        return this.auth.isInRole(Roles.Grower) || this.auth.isInRole(Roles.Administrator);
     }
 }
 

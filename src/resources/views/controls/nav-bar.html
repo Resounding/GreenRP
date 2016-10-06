@@ -9,7 +9,7 @@
                 <a repeat.for="item of router.navigation" href.bind="item.href" class="item ${item.isActive? 'active' : ''}">
                     ${item.title}
                 </a>
-                <button type="button" class="item" click.trigger="showCalculator()">
+                <button type="button" class="item" click.trigger="showCalculator()" show.bind="canCreateOrders">
                     <i class="icon plus"></i>
                     New Order
                 </button>
@@ -34,7 +34,7 @@
             <a repeat.for="item of router.navigation" href.bind="item.href" class="item ${item.isActive? 'active' : ''}">
                 ${item.title}
             </a>
-            <a type="button" class="item" click.trigger="showCalculator()">
+            <a type="button" class="item" click.trigger="showCalculator()" show.bind="canCreateOrders">
                 <i class="icon plus"></i>
                 New Order
             </a>

@@ -1,7 +1,7 @@
 import {autoinject, bindable} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 import {DialogService} from 'aurelia-dialog';
-import {Authentication} from '../../services/authentication';
+import {Authentication, Roles} from '../../services/authentication';
 import {Database} from '../../services/database';
 import {Calculator} from '../calculator/calculator';
 import {log} from '../../services/log';
@@ -46,7 +46,12 @@ export class NavBar {
         })
     }
 
-    get userName() {
-        return (this.auth.userInfo || {}).name;
+    get userName():string {
+        if(!this.auth || !this.auth.userInfo) return '';
+        return this.auth.userInfo.name;
+    }
+
+    get canCreateOrders():boolean {
+        return this.auth.isInRole(Roles.Grower) || this.auth.isInRole(Roles.Administrator);
     }
 }
