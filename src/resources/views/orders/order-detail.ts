@@ -76,10 +76,6 @@ export class OrderDetail {
         this.calculator.setArrivalDate(moment(value).toDate());
     }
 
-    print() {
-        alert('Not yet!');
-    }
-
     setZone(zone:CalculatorZone) {
         this.calculator.order.zone = zone;
     }
