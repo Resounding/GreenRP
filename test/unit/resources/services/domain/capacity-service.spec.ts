@@ -8,13 +8,13 @@ describe('the capacity service', () => {
         ordersService:OrdersService,
         weeks:Week[] = [
             { _id: '', year: 2016, week: 52, zones: {
-                A: { zone: { name: 'A', tables: 100, autoSpace: false}, available: 100 }
+                A: { zone: { name: 'A', tables: 100, autoSpace: false, isPropagationZone: false}, available: 100 }
             }},
             { _id: '', year: 2017, week: 1, zones: {
-                A: { zone: { name: 'A', tables: 100, autoSpace: false}, available: 100 }
+                A: { zone: { name: 'A', tables: 100, autoSpace: false, isPropagationZone: true}, available: 100 }
             }},
             { _id: '', year: 2017, week: 2, zones: {
-                A: { zone: { name: 'A', tables: 100, autoSpace: false}, available: 100 }
+                A: { zone: { name: 'A', tables: 100, autoSpace: false, isPropagationZone: false}, available: 100 }
             }}
         ];
 

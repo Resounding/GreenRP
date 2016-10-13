@@ -31,8 +31,8 @@
                         </select>
                     </div>
                     <div class="field">
-                        <label for="potsPerCase">Pots Per Case</label>
-                        <input type="number" name="potsPerCase" id="potsPerCase" value.bind="calculator.potsPerCase" required>
+                        <label for="pots-per-case">Pots Per Case</label>
+                        <input type="number" name="pots-per-case" id="pots-per-case" value.bind="calculator.potsPerCase" required>
                     </div>
                     <div class="field">
                         <label for="quantity">Quantity</label>
@@ -42,8 +42,13 @@
 
                 <div class="ui divider"></div>
 
-                <div class="ui checkbox">
-                    <input type="checkbox" name="partial-space" checked.bind="partialSpace">
+                <div class="ui toggle checkbox">
+                    <input type="checkbox" name="root-in-prop-zone" id="root-in-prop-zone" checked.bind="calculator.rootInPropagationZone">
+                    <label for="root-in-prop-zone">Root in B/C</label>
+                </div>
+                <div class="ui toggle checkbox right floated">
+                    <input type="checkbox" name="partial-space" id="partial-space" checked.bind="partialSpace">
+                    <label for="partial-space">Use partial spacing</label>
                 </div>
 
                 <table class="ui table">

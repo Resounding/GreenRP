@@ -26,6 +26,7 @@ export interface Order {
     plant:Plant;
     zone:Zone;
     isCancelled:boolean;
+    rootInPropArea:boolean;
 }
 
 export class OrderDocument implements Order {
@@ -41,6 +42,7 @@ export class OrderDocument implements Order {
     plant:Plant;
     zone:OrderZone;
     isCancelled:boolean;
+    rootInPropArea:boolean;
 
     constructor(args?:Order){
         if(args) {

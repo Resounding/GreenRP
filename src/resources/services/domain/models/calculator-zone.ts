@@ -7,6 +7,7 @@ export class CalculatorZone implements Zone {
     tables:number;
     autoSpace:boolean;
     weeks:CalculatorWeek[];
+    isPropagationZone:boolean;
 
     constructor(zone:Zone) {
         _.extend(this, zone);
@@ -15,7 +16,7 @@ export class CalculatorZone implements Zone {
     @computedFrom('weeks')
     get canFit():boolean {
         return _.all(this.weeks, week => {
-            return week.zones[this.name].available >= 0;
+            return week.zones[this.name] && week.zones[this.name].available >= 0;
         });
     }
 }

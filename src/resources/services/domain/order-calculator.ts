@@ -23,6 +23,7 @@ let _order:CalculatorOrder,
 
 export class OrderCalculator {
     zones:CalculatorZone[];
+    propagationZone:Zone;
     season:Season;
     seasonSelector:SeasonSelector;
     propagationTimeSelector:TimeSelector;
@@ -34,6 +35,7 @@ export class OrderCalculator {
         _weeks = [];
 
         this.zones = _.sortBy(zones, z => z.name.toLowerCase()).map(z => new CalculatorZone(z));
+        this.propagationZone = _.find(zones, z => z.isPropagationZone);
         this.seasonSelector = new SeasonSelector(seasons);
         this.propagationTimeSelector = new TimeSelector(propagationTimes);
         this.flowerTimeSelector = new TimeSelector(flowerTimes);
@@ -98,6 +100,18 @@ export class OrderCalculator {
         }
     }
 
+    @computedFrom('order.rootInPropArea')
+    get rootInPropagationZone():boolean {
+        return _order && _order.rootInPropArea;
+    }
+
+    set rootInPropagationZone(value:boolean) {
+        if(_order) {
+            _order.rootInPropArea = value;
+            this.resetWeeks();
+        }
+    }
+
     setFlowerDate(date:Date):OrderCalculator {
         _order.flowerDate = date;
         this.resetWeeks();
@@ -124,7 +138,7 @@ export class OrderCalculator {
         return _order;
     }
 
-    @computedFrom('plant', 'order.quantity', 'order.arrivalDate', 'order.flowerDate', 'order.lightsOutDate', 'order.stickDate')
+    @computedFrom('plant', 'order.quantity', 'order.arrivalDate', 'order.flowerDate', 'order.lightsOutDate', 'order.stickDate', 'order.rootInPropArea')
     get weeks():CalculatorWeek[] {
         return _weeks;
     }
@@ -233,7 +247,7 @@ export class OrderCalculator {
 
                         if(week) {
                             const tables = this.spaceCalculator.getTables(week._id),
-                                zones = this.getZones(week, tables);
+                                zones = this.getZones(week, tables, this.order.rootInPropArea);
                             const calculatorWeek = {
                                 week: week,
                                 events: [],
@@ -360,12 +374,16 @@ export class OrderCalculator {
         return season;
     }
 
-    private getZones(week:Week, tables:number):WeekZones {
+    private getZones(week:Week, tables:number, usePropZone:boolean = false):WeekZones {
         const zones = { },
             keys = Object.keys(week.zones);
         for(const key of keys) {
             const zone = _.clone(week.zones[key]);
-            zone.available -= tables;
+            
+            if(!usePropZone || (usePropZone && this.propagationZone && key === this.propagationZone.name)) {
+                zone.available -= tables;                
+            }
+
             zones[key] = zone;
         }
         return zones;

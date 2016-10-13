@@ -26,7 +26,8 @@ describe('orders', () => {
                potsPerCase: 8,
                hasLightsOut: true
            },
-           zone: null
+           zone: null,
+           rootInPropArea: false
        },
        doc = new OrderDocument(order);
 

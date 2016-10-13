@@ -5,7 +5,7 @@ declare global {
         interface Moment {
             toWeekNumberId(): string;
             toWeekNumber(): number;
-            addWeeksAndDays():MomentStatic;
+            addWeeksAndDays(val:number):Moment;
         }
     }
 }

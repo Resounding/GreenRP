@@ -11,9 +11,9 @@ import {OrderDocument} from "../../../../../src/resources/models/order";
 describe('the order calculator', () => {
     let calculator:OrderCalculator,
         zones:Zone[] = [
-            { name: 'A', tables: 100, autoSpace: false },
-            { name: 'B', tables: 100, autoSpace: false },
-            { name: 'C', tables: 100, autoSpace: false }
+            { name: 'A', tables: 100, autoSpace: false, isPropagationZone: false },
+            { name: 'B', tables: 100, autoSpace: false, isPropagationZone: true },
+            { name: 'C', tables: 100, autoSpace: false, isPropagationZone: false }
         ],
         weeks:Map<string, CapacityWeek> = new Map<string, CapacityWeek>([
             ['week:2017.1', new CapacityWeek({_id: 'week:2017.1', year: 2017, week: 1, zones: {
@@ -56,12 +56,18 @@ describe('the order calculator', () => {
 
     it('sorts the zones by name', () => {
         zones.unshift({
-            name: 'Z', tables: 100, autoSpace: false
+            name: 'Z', tables: 100, autoSpace: false, isPropagationZone: false
         });
         calculator = new OrderCalculator(zones, weeks, seasons, propagationTimes, flowerTimes);
         expect(zones[0].name).toBe('Z');
         expect(calculator.zones[0].name).toBe('A');
         expect(calculator.zones[3].name).toBe('Z');
+    });
+
+    it('sets the propagation zone', () => {
+        expect(calculator.zones[1].name).toBe('B');
+        expect(calculator.zones[1].isPropagationZone).toBe(true);
+        expect(calculator.propagationZone.name).toEqual('B')
     });
 
     it('adds the shipping week', () => {
@@ -341,9 +347,11 @@ describe('the order calculator', () => {
                 name: 'A',
                 tables: 500,
                 autoSpace: false,
+                isPropagationZone: false,
                 weeks: [] 
             },
-            isCancelled: false
+            isCancelled: false,
+            rootInPropArea: false
         },
         thisFlowerTimes:SeasonTime[] = [
             { plant: order.plant.name, year: 2017, times: 3 }
@@ -485,7 +493,7 @@ describe('changing date', () => {
     });
 
     it('saves the potsPerCase for the order plant', () => {
-        calculator.order.zone = {name: 'A', autoSpace: false, tables: 500 };
+        calculator.order.zone = {name: 'A', autoSpace: false, tables: 500, isPropagationZone: false };
         const order = calculator.getOrderDocument();
 
         expect(order.plant.potsPerCase).toEqual(8);
