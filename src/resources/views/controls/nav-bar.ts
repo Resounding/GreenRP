@@ -29,13 +29,6 @@ export class NavBar {
         this.auth.logout();
     }
 
-    destroy() {
-        this.database.destroy()
-            .then(() => {
-                this.database.init();
-            });
-    }
-
     showCalculator() {
         this.dialogService.open({
             viewModel: Calculator
