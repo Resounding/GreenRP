@@ -64,6 +64,7 @@ export class OrderCalculator {
         return this;
     }
 
+    @computedFrom('order.quantity')
     get orderQuantity():number {
         let quantity = 0;
 
@@ -74,8 +75,27 @@ export class OrderCalculator {
     }
 
     set orderQuantity(quantity:number) {
-        _order.quantity = quantity;
-        this.resetWeeks();
+        if(_order) {
+            _order.quantity = numeral(quantity).value();
+            this.resetWeeks();
+        }
+    }
+
+    @computedFrom('order.plant')
+    get potsPerCase():number {
+        let potsPerCase = 0;
+
+        if(_order && _order.plant) {
+            potsPerCase = numeral(_order.plant.potsPerCase).value();
+        }
+
+        return potsPerCase;
+    }
+
+    set potsPerCase(potsPerCase:number) {
+        if(_order && _order.plant) {
+            _order.plant.potsPerCase = numeral(potsPerCase).value();
+        }
     }
 
     setFlowerDate(date:Date):OrderCalculator {

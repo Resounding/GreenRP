@@ -67,10 +67,11 @@ export class WeekDetailOrder {
 
     get cases():number {
         let cases = 0;
-        //TODO: get this from the database
         if(this.order.plant && this.pots) {
-            let potsPerCase:number = this.order.plant.size === '6"' ? 8 : 12;
-            cases = Math.ceil(potsPerCase / this.pots);
+            let potsPerCase:number = this.order.plant.potsPerCase || 0;
+            if(potsPerCase) {
+                cases = Math.ceil(this.pots / potsPerCase);
+            }
         }
         return cases;
     }

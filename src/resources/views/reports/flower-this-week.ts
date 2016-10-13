@@ -30,10 +30,10 @@ export class FlowerThisWeek {
                     return flowerWeek === weekNumber && flowerYear === year;
                 })
                 .map((order) => {
-                    return [order.batch, order.plant, numeral(order.pots).format('0,0'),  numeral(order.cases).format('0,0'),  numeral(order.tables).format('0,0'), order.shipWeek.toString()];
+                    return [order.batch, order.plant, order.zone, numeral(order.pots).format('0,0'),  numeral(order.cases).format('0,0'), numeral(order.tables).format('0,0'), order.shipWeek.toString()];
                 });
 
-            tableBody.unshift(['Batch', 'Plant', 'Pots', 'Cases', 'Tables', 'Ship Week']);
+            tableBody.unshift(['Batch', 'Plant', 'Zone', 'Pots', 'Cases', 'Tables', 'Ship Week']);
 
         const docDefinition = {
             pageMargins: 50,
@@ -44,7 +44,7 @@ export class FlowerThisWeek {
                 {
                     table: {
                         headerRows: 1,
-                        widths: [ '*', 'auto', 'auto', 'auto', '*', '*' ],
+                        widths: [ '*', '*', 'auto', 'auto', 'auto', 'auto', 'auto' ],
                         body: tableBody
                     }
                 }
