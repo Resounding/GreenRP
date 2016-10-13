@@ -247,7 +247,7 @@ export class OrderCalculator {
 
                         if(week) {
                             const tables = this.spaceCalculator.getTables(week._id),
-                                zones = this.getZones(week, tables, this.order.rootInPropArea);
+                                zones = this.getZones(week, tables, true);
                             const calculatorWeek = {
                                 week: week,
                                 events: [],
@@ -378,13 +378,20 @@ export class OrderCalculator {
         const zones = { },
             keys = Object.keys(week.zones);
         for(const key of keys) {
-            const zone = _.clone(week.zones[key]);
+            const zone = _.clone(week.zones[key]),
+                isPropZone = (this.propagationZone && key === this.propagationZone.name),
+                noPropZone = !usePropZone || !this.order.rootInPropArea;
             
-            if(!usePropZone || (usePropZone && this.propagationZone && key === this.propagationZone.name)) {
-                zone.available -= tables;                
+            // reduce the prop zone if you're using it, reduce anything else if you're not
+            if((usePropZone && this.order.rootInPropArea && isPropZone) || (!isPropZone && noPropZone)) {
+                zone.available -= tables;                                
             }
 
-            zones[key] = zone;
+            if(usePropZone || !isPropZone) {
+                zones[key] = zone;
+            } else {
+                zones[key] = null;
+            }
         }
         return zones;
     }

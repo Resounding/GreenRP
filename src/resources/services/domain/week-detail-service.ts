@@ -40,7 +40,7 @@ export class WeekDetailOrder {
     zone:string;
 
     constructor(public order:OrderDocument, filter:WeekDetailFilter) {
-        this.batch = order._id.replace(/^order:/, '');
+        this.batch = order._id;
         this.plant = order.plant.name;
         this.pots = order.quantity;
         this.shipWeek = moment(order.arrivalDate).isoWeek();

@@ -1,6 +1,6 @@
 import {CapacityWeek} from "../../../../src/resources/models/capacity-week";
 import {Week} from "../../../../src/resources/models/week";
-import {OrderWeek} from "../../../../src/resources/models/order";
+import {OrderWeek, OrderDocument} from "../../../../src/resources/models/order";
 
 describe('capacity week', () => {
     let capacityWeek:CapacityWeek,
@@ -41,10 +41,42 @@ describe('capacity week', () => {
             tables: 50,
             available: 50
         };
+        const order:OrderDocument = new OrderDocument({
+            _id: '123',
+            _rev: '1',
+            type: 'order',
+            arrivalDate: new Date(2017, 1, 15),
+            flowerDate: new Date(2017, 1, 9),
+            lightsOutDate: new Date(2017, 0, 19),
+            stickDate: new Date(2017, 0, 1),
+            quantity: 1000,
+            customer: { abbreviation: 'Shw', name: 'Shaws' },
+            plant: {
+                name: "4.5\"Mums",
+                abbreviation: "4M",
+                crop: "Mums",
+                size: "4.5\"",
+                cuttingsPerPot: 1,
+                cuttingsPerTable: {
+                    tight: 1000,
+                    full: 500
+                },
+                potsPerCase: 8,
+                hasLightsOut: false
+            },
+            zone: {
+                name: 'A',
+                tables: 100,
+                autoSpace: false,
+                isPropagationZone: false
+            },
+            isCancelled: false,
+            rootInPropArea: false
+        });
 
         expect(capacityWeek.zones['A'].available).toEqual(100);
 
-        capacityWeek.addOrder('A', orderWeek);
+        capacityWeek.addOrder(order, orderWeek);
 
         expect(capacityWeek.zones['A'].available).toEqual(50);
     });

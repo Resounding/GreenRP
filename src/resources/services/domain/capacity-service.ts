@@ -30,7 +30,7 @@ export class CapacityService {
                         order.zone.weeks.forEach((w:OrderWeek) => {
                             const key = makeKey(w);
                             if (capacityWeeks.has(key)) {
-                                capacityWeeks.get(key).addOrder(order.zone.name, w);
+                                capacityWeeks.get(key).addOrder(order, w);
                             }
                         });
                     });

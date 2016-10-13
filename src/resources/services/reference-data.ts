@@ -10,7 +10,8 @@ export class ReferenceData {
                 zone: {
                     name: 'A',
                         tables: 352,
-                        autoSpace: false
+                        autoSpace: false,
+                        isPropagationZone: false
                 },
                 available: 50
             },
@@ -18,7 +19,8 @@ export class ReferenceData {
                 zone: {
                     name: 'B/C',
                         tables: 126,
-                        autoSpace: false
+                        autoSpace: false,
+                        isPropagationZone: true
                 },
                 available: 20
             },
@@ -26,7 +28,8 @@ export class ReferenceData {
                 zone: {
                     name: 'D',
                         tables: 154,
-                        autoSpace: false
+                        autoSpace: false,
+                        isPropagationZone: false
                 },
                 available: 50
             },
@@ -34,7 +37,8 @@ export class ReferenceData {
                 zone: {
                     name: 'E',
                         tables: 185,
-                        autoSpace: false
+                        autoSpace: false,
+                        isPropagationZone: false
                 },
                 available: 80
             },
@@ -42,7 +46,8 @@ export class ReferenceData {
                 zone: {
                     name: 'F/G',
                         tables: 681,
-                        autoSpace: true
+                        autoSpace: true,
+                        isPropagationZone: false
                 },
                 available: 80
             }

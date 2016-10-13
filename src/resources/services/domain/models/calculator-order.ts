@@ -16,8 +16,8 @@ export class CalculatorOrder implements Order {
     customer:Customer = null;
     plant:Plant = null;
     zone:Zone = null;
-    isCancelled:boolean;
-    rootInPropArea:boolean;
+    isCancelled:boolean = false;
+    rootInPropArea:boolean = false;
 
     constructor(args?:any) {
         if(args) {
@@ -30,6 +30,7 @@ export class CalculatorOrder implements Order {
             name: this.zone.name,
             tables: this.zone.tables,
             autoSpace: this.zone.autoSpace,
+            isPropagationZone: this.zone.isPropagationZone,
             weeks: weeks.map((w:CalculatorWeek) => {
                 return {
                     year: w.week.year,

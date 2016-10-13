@@ -58,7 +58,7 @@ describe('week detail service', () => {
     describe('week detail order', () => {
         it('maps the properties from the order', () => {
             const order:OrderDocument = {
-                    _id: 'order:6M:Weg:2017-12-3',
+                    _id: '6M:Weg:2017-12-3',
                     _rev: '1',
                     type: 'order',
                     isCancelled: false,
@@ -84,7 +84,7 @@ describe('week detail service', () => {
                         hasLightsOut: true
                     },
                     zone: {
-                        name: 'A', tables: 325, autoSpace: false, weeks: [
+                        name: 'A', tables: 325, autoSpace: false, isPropagationZone: false, weeks: [
                             {year: 2017, week: 3, tables: 7, available: 318},
                             {year: 2017, week: 4, tables: 7, available: 318},
                             {year: 2017, week: 5, tables: 7, available: 318},
@@ -155,7 +155,7 @@ describe('week detail service', () => {
                     hasLightsOut: true
                 },
                 zone: {
-                    name: 'A', tables: 325, autoSpace: false
+                    name: 'A', tables: 325, autoSpace: false, isPropagationZone: false
                 }
             }),
             new OrderDocument({
@@ -185,7 +185,7 @@ describe('week detail service', () => {
                     hasLightsOut: true
                 },
                 zone: {
-                    name: 'A', tables: 325, autoSpace: false
+                    name: 'A', tables: 325, autoSpace: false, isPropagationZone: false
                 }
             }),
             new OrderDocument({
@@ -214,7 +214,7 @@ describe('week detail service', () => {
                     hasLightsOut: true
                 },
                 zone: {
-                    name: 'B/C', tables: 220, autoSpace: false
+                    name: 'D', tables: 220, autoSpace: false, isPropagationZone: false
                 }
             })
         ];
@@ -261,7 +261,7 @@ describe('week detail service', () => {
             filter.zone = 'A';
             expect(service.filter(filter).length).toEqual(2);
 
-            filter.zone = 'B/C';
+            filter.zone = 'D';
             expect(service.filter(filter).length).toEqual(1);
         });
 
