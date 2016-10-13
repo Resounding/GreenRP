@@ -28,8 +28,10 @@ interface PouchDebug {
     enable(what:string);
 }
 
+import GetOptions = PouchDB.Core.GetOptions;
+
 declare global {
-    import GetOptions = PouchDB.Core.GetOptions;
+    
     interface PouchDB {
         destroy():Promise<PouchDestroyResponse>;
         plugin(plugin:any);

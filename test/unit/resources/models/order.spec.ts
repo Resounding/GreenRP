@@ -6,6 +6,7 @@ describe('orders', () => {
            _id: null,
            _rev: '1',
            type: 'order',
+           isCancelled: false,
            customer: { name: 'Shaws', abbreviation: 'Shw'},
            arrivalDate: new Date(2017, 4, 12),
            flowerDate: new Date(),
@@ -22,6 +23,7 @@ describe('orders', () => {
                    tight: 1500,
                    full: 750
                },
+               potsPerCase: 8,
                hasLightsOut: true
            },
            zone: null

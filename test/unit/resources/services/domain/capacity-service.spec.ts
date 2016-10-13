@@ -7,19 +7,19 @@ describe('the capacity service', () => {
     let service:CapacityService,
         ordersService:OrdersService,
         weeks:Week[] = [
-            { _id: '', year: 2016, week: 52, zones: [
-                { zone: { name: 'A', tables: 100, autoSpace: false}, available: 100 }
-            ]},
-            { _id: '', year: 2017, week: 1, zones: [
-                { zone: { name: 'A', tables: 100, autoSpace: false}, available: 100 }
-            ]},
-            { _id: '', year: 2017, week: 2, zones: [
-                { zone: { name: 'A', tables: 100, autoSpace: false}, available: 100 }
-            ]}
+            { _id: '', year: 2016, week: 52, zones: {
+                A: { zone: { name: 'A', tables: 100, autoSpace: false}, available: 100 }
+            }},
+            { _id: '', year: 2017, week: 1, zones: {
+                A: { zone: { name: 'A', tables: 100, autoSpace: false}, available: 100 }
+            }},
+            { _id: '', year: 2017, week: 2, zones: {
+                A: { zone: { name: 'A', tables: 100, autoSpace: false}, available: 100 }
+            }}
         ];
 
     beforeEach(() => {
-        ordersService = new OrdersService(null);
+        ordersService = new OrdersService(null, null);
         ordersService.create = (order:Order) => null;
         ordersService.getAll = () => { return Promise.resolve([]); };
 

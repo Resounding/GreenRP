@@ -22,13 +22,17 @@
                         </div>
                     </div>
                 </div>
-                <div class="two fields">
+                <div class="three fields">
                     <div class="field">
                         <label for="plant">Plant</label>
                         <select name="plant" id="plant">
                             <option value="">Choose Plant</option>
                             <option repeat.for="p of plants" value.bind="p.name | escapeQuotes">${p.name}</option>
                         </select>
+                    </div>
+                    <div class="field">
+                        <label for="potsPerCase">Pots Per Case</label>
+                        <input type="number" name="potsPerCase" id="potsPerCase" value.bind="calculator.order.plant.potsPerCase" required>
                     </div>
                     <div class="field">
                         <label for="quantity">Quantity</label>

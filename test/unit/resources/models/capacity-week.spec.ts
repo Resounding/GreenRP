@@ -9,8 +9,8 @@ describe('capacity week', () => {
             year: 2017,
             week: 1,
             zones: {
-                A: { zone: { name: 'A', tables: 100, available: 50 }, available: 50 },
-                B: { zone: { name: 'B', tables: 200, available: 25 }, available: 25 },
+                A: { zone: { name: 'A', tables: 100, autoSpace: false }, available: 50 },
+                B: { zone: { name: 'B', tables: 200, autoSpace: false }, available: 25 },
             }
         };
 

@@ -57,10 +57,11 @@ describe('week detail service', () => {
 
     describe('week detail order', () => {
         it('maps the properties from the order', () => {
-            const order = new OrderDocument({
+            const order:OrderDocument = {
                     _id: 'order:6M:Weg:2017-12-3',
                     _rev: '1',
                     type: 'order',
+                    isCancelled: false,
                     arrivalDate: new Date(2017, 2, 22),
                     flowerDate: new Date(2017, 2, 17),
                     lightsOutDate: new Date(2017, 1, 24),
@@ -68,11 +69,18 @@ describe('week detail service', () => {
                     quantity: 10000,
                     customer: {name: 'Wegmans', abbreviation: 'Weg'},
                     plant: {
-                        name: '6" Mums', crop: 'Mums', size: '6"', cuttingsPerPot: 5, cuttingsPerTable: {
+                        name: '6" Mums',
+                        abbreviation: '6M',
+                        crop: 'Mums',
+                        size: '6"',
+                        cuttingsPerPot: 5,
+                        cuttingsPerTable: {
                             "tight": 1600,
                             "half": 1100,
                             "full": 525
-                        }, hasLightsOut: true
+                        },
+                        potsPerCase: 8,
+                        hasLightsOut: true
                     },
                     zone: {
                         name: 'A', tables: 325, autoSpace: false, weeks: [
@@ -88,9 +96,9 @@ describe('week detail service', () => {
                             {year: 2017, week: 12, tables: 20, available: 305}
                         ]
                     }
-                }),
-                filter = new WeekDetailFilter(),
-                week = {_id: 'week:2017.12', year: 2017, week: 12, zones: null};
+                },                
+                week = {_id: 'week:2017.12', year: 2017, week: 12, zones: null},
+                filter = new WeekDetailFilter(week);
 
             let wdo = new WeekDetailOrder(order, filter);
 
@@ -99,8 +107,7 @@ describe('week detail service', () => {
             expect(wdo.pots).toEqual(10000);
             expect(wdo.shipWeek).toEqual(12);
 
-            // end date not set on filter
-            expect(wdo.isShippingThisWeek).toEqual(false);
+            expect(wdo.isShippingThisWeek).toEqual(true);
             expect(wdo.isFloweringThisWeek).toEqual(false);
 
             // filter ends on shipping week
@@ -125,6 +132,7 @@ describe('week detail service', () => {
                 _id: '6M:Weg:2017-12-3',
                 _rev: '1',
                 type: 'order',
+                isCancelled: false,
                 arrivalDate: new Date(2017, 2, 22),
                 flowerDate: new Date(2017, 2, 17),
                 lightsOutDate: new Date(2017, 1, 24),
@@ -132,31 +140,27 @@ describe('week detail service', () => {
                 quantity: 10000,
                 customer: {name: 'Wegmans', abbreviation: 'Weg'},
                 plant: {
-                    name: '6" Mums', crop: 'Mums', size: '6"', cuttingsPerPot: 5, cuttingsPerTable: {
+                    name: '6" Mums',
+                    abbreviation: '6M',
+                    crop: 'Mums',
+                    size: '6"',
+                    cuttingsPerPot: 5, cuttingsPerTable: {
                         "tight": 1600,
                         "half": 1100,
                         "full": 525
-                    }, hasLightsOut: true
+                    },
+                    potsPerCase: 8,
+                    hasLightsOut: true
                 },
                 zone: {
-                    name: 'A', tables: 325, autoSpace: false, weeks: [
-                        {year: 2017, week: 3, tables: 7, available: 318},
-                        {year: 2017, week: 4, tables: 7, available: 318},
-                        {year: 2017, week: 5, tables: 7, available: 318},
-                        {year: 2017, week: 6, tables: 7, available: 318},
-                        {year: 2017, week: 7, tables: 7, available: 318},
-                        {year: 2017, week: 8, tables: 10, available: 315},
-                        {year: 2017, week: 9, tables: 10, available: 315},
-                        {year: 2017, week: 10, tables: 10, available: 315},
-                        {year: 2017, week: 11, tables: 10, available: 315},
-                        {year: 2017, week: 12, tables: 10, available: 315}
-                    ]
+                    name: 'A', tables: 325, autoSpace: false
                 }
             }),
             new OrderDocument({
                 _id: '6M:Weg:2017-13-3',
                 _rev: '1',
                 type: 'order',
+                isCancelled: false,
                 arrivalDate: new Date(2017, 2, 29),
                 flowerDate: new Date(2017, 2, 24),
                 lightsOutDate: new Date(2017, 2, 3),
@@ -164,31 +168,28 @@ describe('week detail service', () => {
                 quantity: 10000,
                 customer: {name: 'Wegmans', abbreviation: 'Weg'},
                 plant: {
-                    name: '6" Mums', crop: 'Mums', size: '6"', cuttingsPerPot: 5, cuttingsPerTable: {
+                    name: '6" Mums',
+                    abbreviation: '6M',
+                    crop: 'Mums',
+                    size: '6"',
+                    cuttingsPerPot: 5,
+                    cuttingsPerTable: {
                         "tight": 1600,
                         "half": 1100,
                         "full": 525
-                    }, hasLightsOut: true
+                    },
+                    potsPerCase: 8,
+                    hasLightsOut: true
                 },
                 zone: {
-                    name: 'A', tables: 325, autoSpace: false, weeks: [
-                        {year: 2017, week: 4, tables: 7, available: 318},
-                        {year: 2017, week: 5, tables: 7, available: 318},
-                        {year: 2017, week: 6, tables: 7, available: 318},
-                        {year: 2017, week: 7, tables: 7, available: 318},
-                        {year: 2017, week: 8, tables: 7, available: 318},
-                        {year: 2017, week: 9, tables: 20, available: 305},
-                        {year: 2017, week: 10, tables: 20, available: 305},
-                        {year: 2017, week: 11, tables: 20, available: 305},
-                        {year: 2017, week: 12, tables: 20, available: 305},
-                        {year: 2017, week: 13, tables: 20, available: 305}
-                    ]
+                    name: 'A', tables: 325, autoSpace: false
                 }
             }),
             new OrderDocument({
                 _id: '6M:shw:2017-40-5',
                 _rev: '1',
                 type: 'order',
+                isCancelled: false,
                 arrivalDate: new Date(2017, 9, 6),
                 flowerDate: new Date(2017, 9, 2),
                 lightsOutDate: new Date(2017, 7, 28),
@@ -196,26 +197,20 @@ describe('week detail service', () => {
                 quantity: 12500,
                 customer: {name: 'Shaws', abbreviation: 'Shw'},
                 plant: {
-                    name: '4.5" Kolanchoe', crop: 'Kolanchoe', size: '4.5"', cuttingsPerPot: 1, cuttingsPerTable: {
+                    name: '4.5" Kolanchoe',
+                    abbreviation: '4K',
+                    crop: 'Kolanchoe',
+                    size: '4.5"',
+                    cuttingsPerPot: 1,
+                    cuttingsPerTable: {
                         "tight": 800,
                         "full": 454
-                    }, hasLightsOut: true
+                    },
+                    potsPerCase: 8,
+                    hasLightsOut: true
                 },
                 zone: {
-                    name: 'B/C', tables: 220, autoSpace: false, weeks: [
-                        {year: 2017, week: 29, tables: 16, available: 204},
-                        {year: 2017, week: 30, tables: 16, available: 204},
-                        {year: 2017, week: 31, tables: 16, available: 204},
-                        {year: 2017, week: 32, tables: 16, available: 204},
-                        {year: 2017, week: 33, tables: 16, available: 204},
-                        {year: 2017, week: 34, tables: 16, available: 204},
-                        {year: 2017, week: 35, tables: 28, available: 192},
-                        {year: 2017, week: 36, tables: 28, available: 192},
-                        {year: 2017, week: 37, tables: 28, available: 192},
-                        {year: 2017, week: 38, tables: 28, available: 192},
-                        {year: 2017, week: 39, tables: 28, available: 192},
-                        {year: 2017, week: 40, tables: 28, available: 192}
-                    ]
+                    name: 'B/C', tables: 220, autoSpace: false
                 }
             })
         ];

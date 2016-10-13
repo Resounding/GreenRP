@@ -6,6 +6,7 @@ import {Plant, Crops} from "../../../../../src/resources/models/plant";
 describe('the space calculator', () => {
     let mum:Plant = {
             name: '4.5" Mums',
+            abbreviation: '4M',
             crop: Crops.Mums,
             size: '4.5"',
             cuttingsPerPot: 1,
@@ -13,10 +14,12 @@ describe('the space calculator', () => {
                 tight: 1000,
                 full: 250
             },
+            potsPerCase: 8,
             hasLightsOut: true
         },
         cyclamen:Plant = {
             name: '6" Cyclamen',
+            abbreviation: '6C',
             crop: Crops.Cyclamen,
             size: '6"',
             cuttingsPerPot: 5,
@@ -25,6 +28,7 @@ describe('the space calculator', () => {
                 half: 800,
                 full: 450
             },
+            potsPerCase: 8,
             hasLightsOut: true
         },
         calculator:SpaceCalculator,

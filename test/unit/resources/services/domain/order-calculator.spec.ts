@@ -146,7 +146,9 @@ describe('the order calculator', () => {
                 tight: 1000,
                 half: 800,
                 full: 500
-            }, hasLightsOut: true };
+            },
+            potsPerCase: 8,
+            hasLightsOut: true };
 
         seasons = [
             {
@@ -181,7 +183,9 @@ describe('the order calculator', () => {
                 tight: 1000,
                 half: 800,
                 full: 500
-            }, hasLightsOut: true };
+            },
+            potsPerCase: 8,
+            hasLightsOut: true };
 
         seasons = [
             {
@@ -219,7 +223,9 @@ describe('the order calculator', () => {
                 tight: 1000,
                 half: 800,
                 full: 500
-            }, hasLightsOut: false };
+            },
+            potsPerCase: 8,
+            hasLightsOut: false };
 
         seasons = [
             {
@@ -257,7 +263,9 @@ describe('the order calculator', () => {
                 tight: 1000,
                 half: 800,
                 full: 500
-            }, hasLightsOut: true };
+            },
+            potsPerCase: 8,
+            hasLightsOut: true };
 
         seasons = [
             {
@@ -328,7 +336,7 @@ describe('the order calculator', () => {
             plant:{name: '4.5" Mums', abbreviation: 'M', size: '4.5"', crop: 'Mums', cuttingsPerPot: 5, cuttingsPerTable: {
                 full: 500,
                 tight: 1000
-            }, hasLightsOut: true},
+            }, potsPerCase: 8, hasLightsOut: true},
             zone: {
                 name: 'A',
                 tables: 500,
@@ -378,6 +386,7 @@ describe('changing date', () => {
                 half: 500,
                 full: 250
             },
+            potsPerCase: 8,
             hasLightsOut: false
         },
         propagationTimes:SeasonTime[] = [
@@ -473,5 +482,12 @@ describe('changing date', () => {
         expect(weeks[12].events[0].date).toEqual(new Date(2017, 6, 3)); // flower date - 4 days prior
         expect(weeks[4].events[0].date).toEqual(new Date(2017, 4, 8)); // space week - no change to date
         expect(weeks[0].events[0].date).toEqual(stick); // stick week - as set
+    });
+
+    it('saves the potsPerCase for the order plant', () => {
+        calculator.order.zone = {name: 'A', autoSpace: false, tables: 500 };
+        const order = calculator.getOrderDocument();
+
+        expect(order.plant.potsPerCase).toEqual(8);
     });
 });

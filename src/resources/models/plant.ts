@@ -11,6 +11,7 @@ export interface Plant {
     size:string;
     cuttingsPerPot:number;
     cuttingsPerTable:CuttingsPerTable;
+    potsPerCase:number;
     hasLightsOut:boolean;
 }
 
@@ -21,6 +22,7 @@ export class PlantDocument implements Plant {
     size:string;
     cuttingsPerPot:number;
     cuttingsPerTable:CuttingsPerTable;
+    potsPerCase:number;
     hasLightsOut:boolean;
 
     constructor(args?:Plant) {
@@ -35,6 +37,7 @@ export class Crops {
     static Kalanchoe:string = 'Kalanchoe';
     static Cyclamen:string = 'Cyclamen';
     static Gerbera:string = 'Gerbera';
+    static Geraniums:string = 'Geraniums';
 }
 
 export class Spacings {
