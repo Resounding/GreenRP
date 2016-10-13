@@ -105,7 +105,10 @@ export class WeekDetailService {
         }
 
         function sortOrder(a:OrderDocument, b:OrderDocument):number {
-            return a.arrivalDate - b.arrivalDate;
+            const dateFactor = (moment(a.arrivalDate).isoWeek() - moment(b.arrivalDate).isoWeek()) * 100,
+                zoneFactor = (a.zone.name.charCodeAt(0) - b.zone.name.charCodeAt(0));
+
+            return dateFactor + zoneFactor;
         }
     }
 }
