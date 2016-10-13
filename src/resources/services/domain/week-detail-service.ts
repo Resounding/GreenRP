@@ -37,12 +37,14 @@ export class WeekDetailOrder {
     shipWeek:number;
     isShippingThisWeek:boolean;
     isFloweringThisWeek:boolean;
+    zone:string;
 
     constructor(public order:OrderDocument, filter:WeekDetailFilter) {
         this.batch = order._id.replace(/^order:/, '');
         this.plant = order.plant.name;
         this.pots = order.quantity;
         this.shipWeek = moment(order.arrivalDate).isoWeek();
+        this.zone = order.zone.name;
 
         const filterWeek = filter.weekNumber,
             filterYear = filter.yearNumber,
