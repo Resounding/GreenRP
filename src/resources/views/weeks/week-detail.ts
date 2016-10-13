@@ -7,6 +7,8 @@ import {WeekDetailService, WeekDetailFilter, WeekDetailOrder} from "../../servic
 import {Week} from "../../models/week";
 import {OrderDocument} from "../../models/order";
 import {OrderDetail} from "../orders/order-detail";
+import {PlantThisWeek, PlantThisWeekDataModel} from '../reports/plant-this-week';
+import {FlowerThisWeek, FlowerThisWeekDataModel} from '../reports/flower-this-week';
 
 @autoinject()
 export class WeekDetail {
@@ -15,12 +17,16 @@ export class WeekDetail {
     weekDetailService:WeekDetailService;
     orders: WeekDetailOrder[] = [];
     zones: string[];
+    allWeeks: Week[];
 
     constructor(private events:EventAggregator, private ordersService:OrdersService, referenceService:ReferenceService, private dialogService:DialogService, private element:Element) {
         this.loadOrders();
 
         referenceService.zones()
             .then(result => this.zones = _.pluck(result, 'name').sort());
+
+        referenceService.weeks()
+            .then(result => this.allWeeks = result);
     }
 
     attached() {
@@ -108,8 +114,41 @@ export class WeekDetail {
         });
     }
 
-    notYet() {
-        alert('The reports are not ready yet');
+    openPlantThisWeekReport() {
+        const filter = new WeekDetailFilter(this.week);
+
+        const allOrders = this.weekDetailService.filter(filter), 
+            model:PlantThisWeekDataModel = new PlantThisWeekDataModel(allOrders, this.week);
+        this.dialogService.open({
+            viewModel: PlantThisWeek,
+            model: model
+        });
+    }
+
+    openFlowerThisWeekReport() {
+        const filter = new WeekDetailFilter(this.week);
+
+        const allOrders = this.weekDetailService.filter(filter), 
+            model:FlowerThisWeekDataModel = new FlowerThisWeekDataModel(allOrders, this.week);
+        this.dialogService.open({
+            viewModel: FlowerThisWeek,
+            model: model
+        });
+    }
+
+    get week():Week {
+        if(!this.filter.startDate) return null;
+        const start = moment(this.filter.startDate),
+            weekNumber = start.isoWeek(),
+            year = start.isoWeekYear(),
+            startWeek = this.allWeeks.find(w => w.year === year && w.week === weekNumber);
+
+        return startWeek;
+    }
+
+    get weekId():string {
+        const week = this.week;
+        return week ? week._id : '';
     }
 
     @computedFrom('filter.startDate')
