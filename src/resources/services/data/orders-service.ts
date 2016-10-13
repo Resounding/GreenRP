@@ -6,9 +6,7 @@ import {Database} from '../database';
 @autoinject()
 export class OrdersService {
 
-    static OrderCreatedEvent:string = 'Order Created';
-    static OrderUpdatedEvent:string = 'Order Updated';
-    static OrderDeletedEvent:string = 'Order Deleted';
+    static OrdersChangedEvent:string = 'Order Changed';
 
     constructor(private database:Database, private events:EventAggregator) { }
 
@@ -20,7 +18,7 @@ export class OrdersService {
             .then((result:PouchDB.Core.Response) => {
                 if(result.ok) {
                     orderDoc._rev = result.rev;
-                    this.events.publish(OrdersService.OrderCreatedEvent);
+                    this.events.publish(OrdersService.OrdersChangedEvent);
                     resolve(orderDoc);
                 } else {
                     reject(new Error('Order was not saved.'));
@@ -54,7 +52,7 @@ export class OrdersService {
                     }
                     
                     doc._rev = value.rev;
-                    this.events.publish(OrdersService.OrderUpdatedEvent, doc);
+                    this.events.publish(OrdersService.OrdersChangedEvent, doc);
                     return resolve(doc);
                 })
                 .catch(reject);
@@ -68,7 +66,7 @@ export class OrdersService {
                     doc.isCancelled = true;
                     this.database.db.put(doc)
                         .then((delDoc) => {
-                            this.events.publish(OrdersService.OrderDeletedEvent);
+                            this.events.publish(OrdersService.OrdersChangedEvent);
                             resolve(delDoc);
                         })
                         .catch(reject);

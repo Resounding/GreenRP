@@ -15,9 +15,7 @@ export class Index {
     weeks:Map<string, CapacityWeek>;
     zones:Zone[];
     year:number = new Date().getFullYear();
-    orderCreatedSubscription:Subscription;
-    orderUpdatedSubscription:Subscription;
-    orderDeletedSubscription:Subscription;
+    orderChangedSubscription:Subscription;
     ordersSyncChangeSubscription:Subscription;
     zonesSyncChangedSubscription:Subscription;
 
@@ -26,9 +24,7 @@ export class Index {
 
     activate(params) {
 
-        this.orderCreatedSubscription = this.events.subscribe(OrdersService.OrderCreatedEvent, this.load.bind(this));
-        this.orderUpdatedSubscription = this.events.subscribe(OrdersService.OrderUpdatedEvent, this.load.bind(this));
-        this.orderDeletedSubscription = this.events.subscribe(OrdersService.OrderDeletedEvent, this.load.bind(this));
+        this.orderChangedSubscription = this.events.subscribe(OrdersService.OrdersChangedEvent, this.load.bind(this));
         this.ordersSyncChangeSubscription = this.events.subscribe(Database.OrdersSyncChangeEvent, this.load.bind(this));
 
         if('year' in params) {
@@ -43,9 +39,7 @@ export class Index {
     }
 
     deactivate() {
-        this.orderCreatedSubscription.dispose();
-        this.orderUpdatedSubscription.dispose();
-        this.orderDeletedSubscription.dispose();
+        this.orderChangedSubscription.dispose();
         this.ordersSyncChangeSubscription.dispose();
     }
 

@@ -12,6 +12,7 @@ import {FlowerThisWeek, FlowerThisWeekDataModel} from '../reports/flower-this-we
 
 @autoinject()
 export class WeekDetail {
+    orderChangedSubscription:Subscription;
     showWeekDetailSubscription:Subscription;
     filter:WeekDetailFilter = new WeekDetailFilter();
     weekDetailService:WeekDetailService;
@@ -30,6 +31,7 @@ export class WeekDetail {
     }
 
     attached() {
+        this.orderChangedSubscription = this.events.subscribe(OrdersService.OrdersChangedEvent, () => this.loadOrders().then(this.refresh.bind(this)));
         this.showWeekDetailSubscription = this.events.subscribe(WeekDetail.ShowWeekDetailEvent, this.show.bind(this));
 
         $('#week-detail-sidebar').sidebar({
@@ -53,6 +55,7 @@ export class WeekDetail {
     }
 
     detached() {
+        this.orderChangedSubscription.dispose();
         this.showWeekDetailSubscription.dispose();
         $('#week-detail-sidebar').sidebar('destroy');
         $('[name=zones]', this.element).dropdown('destroy');
