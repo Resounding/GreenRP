@@ -1,5 +1,4 @@
 import {Season} from '../../../../../src/resources/models/season';
-import {Crops} from '../../../../../src/resources/models/plant';
 import {SeasonSelector} from '../../../../../src/resources/services/domain/season-selector';
 
 describe('season selector', () => {
@@ -39,14 +38,14 @@ describe('season selector', () => {
         expect(year).toBe(2017);
         expect(week).toBe(10);
 
-        const season = selector.get(date, Crops.Mums);
+        const season = selector.get(date, 'Mums');
 
         expect(season.name).toBe('spring');
     });
 
     it('returns undefined if the selection is before the first season', () => {
         const date = new Date(2016, 0, 1),
-            season = selector.get(date, Crops.Mums);
+            season = selector.get(date, 'Mums');
 
         expect(season).toBeUndefined();
     });
@@ -72,17 +71,17 @@ describe('season selector', () => {
             summer2017 = new Date(2017, 6, 17),
             winter2018 = new Date(2018, 11, 30);
 
-        let season = selector.get(spring2016, Crops.Mums);
+        let season = selector.get(spring2016, 'Mums');
         expect(season.name).toBe('spring');
         expect(season.year).toBe(2016);
         expect(season.week).toBe(6);
 
-        season = selector.get(summer2017, Crops.Mums);
+        season = selector.get(summer2017, 'Mums');
         expect(season.name).toBe('summer');
         expect(season.year).toBe(2017);
         expect(season.week).toBe(20);
 
-        season = selector.get(winter2018, Crops.Mums);
+        season = selector.get(winter2018, 'Mums');
         expect(season.name).toBe('winter');
         expect(season.year).toBe(2018);
         expect(season.week).toBe(47);
@@ -95,8 +94,8 @@ describe('season selector', () => {
 
         expect(moment(date).isoWeek()).toEqual(31);
 
-        const mumSeason = selector.get(date, Crops.Mums),
-            kalanchoeSeason = selector.get(date, Crops.Kalanchoe);
+        const mumSeason = selector.get(date, 'Mums'),
+            kalanchoeSeason = selector.get(date, 'Kalanchoe');
 
         expect(mumSeason.name).toEqual('fall');
         expect(kalanchoeSeason.name).toEqual('summer');
@@ -112,7 +111,7 @@ describe('season selector', () => {
             m = moment(date),
             week = m.isoWeek(),
             year = m.isoWeekYear(),
-            season = selector.get(date, Crops.Mums);
+            season = selector.get(date, 'Mums');
 
         expect(year).toEqual(2016);
         expect(week).toEqual(52);

@@ -1,13 +1,78 @@
-import {ReferenceData} from '../../../../../src/resources/services/reference-data';
 import {OrderCalculator} from '../../../../../src/resources/services/domain/order-calculator';
 import {Events, CalculatorWeek} from "../../../../../src/resources/services/domain/models/calculator-week";
 import {Zone} from '../../../../../src/resources/models/zone';
 import {Season} from "../../../../../src/resources/models/season";
-import {Plant, Crops} from "../../../../../src/resources/models/plant";
+import {Plant} from "../../../../../src/resources/models/plant";
 import {SeasonTime} from "../../../../../src/resources/models/season-time";
 import {CapacityWeek, CapacityWeekZones} from "../../../../../src/resources/models/capacity-week";
 import {OrderDocument} from "../../../../../src/resources/models/order";
-import {Week} from "../../../../../src/resources/models/week";
+import {Week, WeekZones} from "../../../../../src/resources/models/week";
+
+class ReferenceData {
+    get weeks():Week[] {
+        const start = moment().startOf('isoWeek'),
+            zones:WeekZones =  {
+            A: {
+                zone: {
+                    name: 'A',
+                        tables: 352,
+                        autoSpace: false,
+                        isPropagationZone: false
+                },
+                available: 50
+            },
+            'B/C': {
+                zone: {
+                    name: 'B/C',
+                        tables: 126,
+                        autoSpace: false,
+                        isPropagationZone: true
+                },
+                available: 20
+            },
+            D: {
+                zone: {
+                    name: 'D',
+                        tables: 154,
+                        autoSpace: false,
+                        isPropagationZone: false
+                },
+                available: 50
+            },
+            E: {
+                zone: {
+                    name: 'E',
+                        tables: 185,
+                        autoSpace: false,
+                        isPropagationZone: false
+                },
+                available: 80
+            },
+            'F/G': {
+                zone: {
+                    name: 'F/G',
+                        tables: 681,
+                        autoSpace: true,
+                        isPropagationZone: false
+                },
+                available: 80
+            }
+        };
+
+        return _.chain(_.range(0, 100))
+            .map(idx => {
+                const date = start.clone().add(idx, 'weeks');
+
+                return {
+                    _id: date.toWeekNumberId(),
+                    year: date.isoWeekYear(),
+                    week: date.isoWeek(),
+                    zones: zones
+                };
+            })
+            .value();
+    }
+}
 
 describe('the order calculator', () => {
     let calculator:OrderCalculator,
@@ -158,7 +223,7 @@ describe('the order calculator', () => {
     it('adds weeks for lights-out', () => {
         const
             date = new Date(2017, 0, 9),
-            mum:Plant = { name: "4.5\" Mums", abbreviation: 'M', crop: Crops.Mums, size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
+            mum:Plant = { name: "4.5\" Mums", abbreviation: 'M', crop: 'Mums', size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
                 tight: 1000,
                 half: 800,
                 full: 500
@@ -188,7 +253,7 @@ describe('the order calculator', () => {
     it('names the event lights-out if plant has lights out', () => {
         const
             date = new Date(2017, 0, 9),
-            mum:Plant = { name: "4.5\" Mums", abbreviation: 'M', crop: Crops.Mums, size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
+            mum:Plant = { name: "4.5\" Mums", abbreviation: 'M', crop: 'Mums', size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
                 tight: 1000,
                 half: 800,
                 full: 500
@@ -228,7 +293,7 @@ describe('the order calculator', () => {
     it('names the event spacing if plant doesn\'t have lights out', () => {
         const
             date = new Date(2017, 0, 9),
-            mum:Plant = { name: "4.5\" Kalanchoe", abbreviation: 'K', crop: Crops.Kalanchoe, size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
+            mum:Plant = { name: "4.5\" Kalanchoe", abbreviation: 'K', crop: 'Kalanchoe', size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
                 tight: 1000,
                 half: 800,
                 full: 500
@@ -268,7 +333,7 @@ describe('the order calculator', () => {
     it('adds weeks for sticking', () => {
         const
             date = new Date(2017, 0, 9),
-            mum:Plant = { name: "4.5\" Mums", abbreviation: 'M', crop: Crops.Mums, size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
+            mum:Plant = { name: "4.5\" Mums", abbreviation: 'M', crop: 'Mums', size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
                 tight: 1000,
                 half: 800,
                 full: 500
@@ -332,7 +397,7 @@ describe('the order calculator', () => {
     });
 
     it('sets all properties when constructed with an order', () => {
-        const order:OrderDocument = {
+        const order:OrderDocument = new OrderDocument({
             _id: '123',
             _rev: '1',
             type: OrderDocument.OrderDocumentType,
@@ -350,12 +415,11 @@ describe('the order calculator', () => {
                 name: 'A',
                 tables: 500,
                 autoSpace: false,
-                isPropagationZone: false,
-                weeks: [] 
+                isPropagationZone: false
             },
             isCancelled: false,
             rootInPropArea: false
-        },
+        }),
         thisFlowerTimes:SeasonTime[] = [
             { plant: order.plant.name, year: 2017, times: 3 }
         ],

@@ -22,7 +22,6 @@ export class Database {
             if(Configuration.isDebug()) {
                 PouchDB.debug.enable('*');
             }
-            populate(localDB);
         }
 
         if (this.auth.isAuthenticated()) {
@@ -80,19 +79,4 @@ export class Database {
 
     static OrdersSyncChangeEvent:string = 'OrdersSyncChangeEvent';
     static ZonesSyncChangeEvent:string = 'ZonesSyncChangeEvent';
-}
-
-function populate(db: PouchDB) {
-    // const data = new ReferenceData(),
-    //     keys = Object.keys(data);
-    //
-    // for(let key of keys) {
-    //     const val = data[key];
-    //     db.get(val._id)
-    //         .catch(err => {
-    //             if(err.status === 404) {
-    //                 db.put(val);
-    //             }
-    //         })
-    // }
 }

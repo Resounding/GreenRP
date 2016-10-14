@@ -5,8 +5,8 @@ import {Plant} from '../../models/plant';
 import {Zone} from '../../models/zone';
 import {Season} from '../../models/season';
 import {Week} from "../../models/week";
-import {ReferenceData} from '../reference-data';
 import {SeasonTime} from "../../models/season-time";
+import {CapacityWeekZones} from "../../models/capacity-week";
 
 @autoinject()
 export class ReferenceService {
@@ -59,8 +59,35 @@ export class ReferenceService {
     }
 
     weeks():Promise<Week[]> {
-        const weeks = new ReferenceData().weeks;
-        return Promise.resolve(weeks);
+        return new Promise((resolve, reject) => {
+            this.database.db.get('zones')
+                .then(result => {
+                    const zones:CapacityWeekZones = _.reduce(result.zones, (memo, zone:Zone) => {
+                            memo[zone.name] = {
+                                zone:zone,
+                                tables:zone.tables,
+                                available:zone.tables  
+                            };
+                            return memo;
+                        }, {}),
+                        start = moment().startOf('isoWeek'),
+                        returnValue = _.chain(_.range(0, 100))
+                            .map(idx => {
+                                const date = start.clone().add(idx, 'weeks');
+
+                                return {
+                                    _id: date.toWeekNumberId(),
+                                    year: date.isoWeekYear(),
+                                    week: date.isoWeek(),
+                                    zones: zones
+                                };
+                            })
+                            .value();
+
+                    resolve(returnValue);
+                })
+                .catch(reject);
+        });        
     }
 
     propagationTimes():Promise<SeasonTime[]> {

@@ -1,13 +1,13 @@
 import {SpaceCalculator} from "../../../../../src/resources/services/domain/space-calculator";
 import {CalculatorOrder} from "../../../../../src/resources/services/domain/models/calculator-order";
 import {Order} from "../../../../../src/resources/models/order";
-import {Plant, Crops} from "../../../../../src/resources/models/plant";
+import {Plant} from "../../../../../src/resources/models/plant";
 
 describe('the space calculator', () => {
     let mum:Plant = {
             name: '4.5" Mums',
             abbreviation: '4M',
-            crop: Crops.Mums,
+            crop: 'Mums',
             size: '4.5"',
             cuttingsPerPot: 1,
             cuttingsPerTable: {
@@ -20,7 +20,7 @@ describe('the space calculator', () => {
         cyclamen:Plant = {
             name: '6" Cyclamen',
             abbreviation: '6C',
-            crop: Crops.Cyclamen,
+            crop: 'Cyclamen',
             size: '6"',
             cuttingsPerPot: 5,
             cuttingsPerTable: {

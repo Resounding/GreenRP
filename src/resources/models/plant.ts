@@ -32,14 +32,6 @@ export class PlantDocument implements Plant {
     }
 }
 
-export class Crops {
-    static Mums:string = 'Mums';
-    static Kalanchoe:string = 'Kalanchoe';
-    static Cyclamen:string = 'Cyclamen';
-    static Gerbera:string = 'Gerbera';
-    static Geraniums:string = 'Geraniums';
-}
-
 export class Spacings {
     static Tight:string = 'tight';
     static Half:string = 'half';

@@ -11,7 +11,7 @@ export class OrdersService {
     constructor(private database:Database, private events:EventAggregator) { }
 
     create(order:Order):Promise<Order> {
-        const orderDoc = new OrderDocument(order);
+        const orderDoc = new OrderDocument(order).toJSON();
 
         return new Promise((resolve, reject) => {
         return this.database.db.put(orderDoc)

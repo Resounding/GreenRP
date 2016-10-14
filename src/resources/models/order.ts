@@ -90,5 +90,23 @@ export class OrderDocument implements Order {
         }
     }
 
+    toJSON() {
+        return {
+            _id: this._id,
+            _rev: this._rev,
+            type: this.type,
+            arrivalDate: moment(this.arrivalDate).format('YYYY-MM-DD'),
+            flowerDate: moment(this.flowerDate).format('YYYY-MM-DD'),
+            lightsOutDate: moment(this.lightsOutDate).format('YYYY-MM-DD'),
+            stickDate: moment(this.stickDate).format('YYYY-MM-DD'),
+            quantity: numeral(this.quantity).value(),
+            customer: this.customer,
+            plant: this.plant,
+            zone: this.zone,
+            isCancelled: !!this.isCancelled,
+            rootInPropArea: !!this.rootInPropArea
+        };
+    }
+
     static OrderDocumentType:string = 'order';
 }

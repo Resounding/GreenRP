@@ -3,8 +3,8 @@ import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {Zone} from "../../models/zone";
 import {OrdersService} from "../../services/data/orders-service";
 import {ReferenceService} from "../../services/data/reference-service";
-import {ZoneDetailService} from "../../services/domain/zone-detail-service";
-import {Order} from "../../models/order";
+import {ZoneDetailService, ZoneDetailModel} from "../../services/domain/zone-detail-service";
+import {OrderDocument} from "../../models/order";
 import {Plant} from "../../models/plant";
 
 @autoinject()
@@ -32,13 +32,13 @@ export class ZoneDetail {
         $('#zone-detail-sidebar').sidebar('destroy');
     }
 
-    show(model:ZoneDetailModel) {
+    show(model:ZoneDetailInputModel) {
         $('#zone-detail-sidebar').sidebar('show');
         console.log(model);
         this.zone = model.zone;
         this.year = model.year;
 
-        let orders:Order[],
+        let orders:OrderDocument[],
             plants:Plant[];
 
         Promise.all([
@@ -48,8 +48,11 @@ export class ZoneDetail {
                 .then(result => plants = result)
         ])
         .then(() => {
-           this.model = this.zoneDetailService.createModel(plants, orders, model.year, model.zone);
-            console.log(this.model);
+           this.zoneDetailService.createModel(plants, orders, model.year, model.zone)
+                .then(result => {
+                    this.model = result;
+                    console.log(this.model);
+                });
         });
     }
 
@@ -60,7 +63,7 @@ export class ZoneDetail {
     static ShowZoneDetailEvent:string = 'show-zone-detail';
 }
 
-export interface ZoneDetailModel {
+export interface ZoneDetailInputModel {
     zone:Zone;
     year:number;
 }

@@ -1,12 +1,18 @@
 import {CapacityService} from "../../../../../src/resources/services/domain/capacity-service";
 import {OrdersService} from "../../../../../src/resources/services/data/orders-service";
+import {ReferenceService} from "../../../../../src/resources/services/data/reference-service";
 import {Week} from "../../../../../src/resources/models/week";
 import {Order} from "../../../../../src/resources/models/order";
 
 describe('the capacity service', () => {
     let service:CapacityService,
         ordersService:OrdersService,
-        weeks:Week[] = [
+        weeks:Week[],
+        referenceService:ReferenceService;
+
+    beforeEach(() => {
+
+         weeks = [
             { _id: '', year: 2016, week: 52, zones: {
                 A: { zone: { name: 'A', tables: 100, autoSpace: false, isPropagationZone: false}, available: 100 }
             }},
@@ -17,33 +23,33 @@ describe('the capacity service', () => {
                 A: { zone: { name: 'A', tables: 100, autoSpace: false, isPropagationZone: false}, available: 100 }
             }}
         ];
-
-    beforeEach(() => {
+        
         ordersService = new OrdersService(null, null);
         ordersService.create = (order:Order) => null;
         ordersService.getAll = () => { return Promise.resolve([]); };
 
-        const referenceData = {
-            weeks: weeks
-        };
-        service = new CapacityService(referenceData, ordersService);
+        referenceService = new ReferenceService(null);
+        referenceService.weeks = function():Promise<Week[]> {
+            return Promise.resolve(weeks);
+        }
+        service = new CapacityService(referenceService, ordersService);
     });
 
     it('returns a map of all the weeks', (done) => {
 
-        service.getCapacityWeeks()
+        return service.getCapacityWeeks()
             .then(weeks => {
                 expect(weeks.size).toEqual(3);
-                done();
+                return done();
             });
     });
 
     it('filters for the year', (done) => {
 
-        service.getCapacityWeeks(2017)
+        return service.getCapacityWeeks(2017)
             .then(weeks => {
                 expect(weeks.size).toEqual(2);
-                done();
+                return done();
             });
     });
 });

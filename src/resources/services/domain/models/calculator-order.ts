@@ -41,7 +41,7 @@ export class CalculatorOrder implements Order {
             })
         };
 
-        return {
+        return new OrderDocument({
             _id: this._id,
             _rev: this._rev,
             type: OrderDocument.OrderDocumentType,
@@ -55,6 +55,6 @@ export class CalculatorOrder implements Order {
             zone: zone,
             isCancelled: this.isCancelled,
             rootInPropArea: this.rootInPropArea
-        }
+        });
     }
 }
