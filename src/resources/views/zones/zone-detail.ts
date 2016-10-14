@@ -11,6 +11,7 @@ import {Plant} from "../../models/plant";
 export class ZoneDetail {
     year:number;
     zone:Zone;
+    orderChangedSubscription:Subscription;
     showZoneDetailSubscription: Subscription;
     model:ZoneDetailModel;
 
@@ -19,6 +20,7 @@ export class ZoneDetail {
                 private zoneDetailService:ZoneDetailService) { }
 
     attached() {
+        this.orderChangedSubscription = this.events.subscribe(OrdersService.OrdersChangedEvent, this.loadOrders.bind(this));
         this.showZoneDetailSubscription = this.events.subscribe(ZoneDetail.ShowZoneDetailEvent, this.show.bind(this));
 
         $('#zone-detail-sidebar').sidebar({
@@ -28,6 +30,7 @@ export class ZoneDetail {
     }
 
     detached() {
+        this.orderChangedSubscription.dispose();
         this.showZoneDetailSubscription.dispose();
         $('#zone-detail-sidebar').sidebar('destroy');
     }
@@ -37,7 +40,15 @@ export class ZoneDetail {
         console.log(model);
         this.zone = model.zone;
         this.year = model.year;
+        
+        this.loadOrders();
+    }
 
+    close() {
+        $('#zone-detail-sidebar').sidebar('hide');
+    }
+
+    loadOrders() {
         let orders:OrderDocument[],
             plants:Plant[];
 
@@ -48,16 +59,12 @@ export class ZoneDetail {
                 .then(result => plants = result)
         ])
         .then(() => {
-           this.zoneDetailService.createModel(plants, orders, model.year, model.zone)
+           this.zoneDetailService.createModel(plants, orders, this.year, this.zone)
                 .then(result => {
                     this.model = result;
                     console.log(this.model);
                 });
         });
-    }
-
-    close() {
-        $('#zone-detail-sidebar').sidebar('hide');
     }
 
     static ShowZoneDetailEvent:string = 'show-zone-detail';

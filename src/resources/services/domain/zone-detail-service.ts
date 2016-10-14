@@ -19,8 +19,6 @@ export interface ZoneDetailModel {
 @autoinject()
 export class ZoneDetailService {
 
-
-
     constructor(private referenceService:ReferenceService) { }
 
     createModel(plants:Plant[], orders:OrderDocument[], year:number, zone:Zone):Promise<ZoneDetailModel> {
@@ -80,7 +78,7 @@ export class ZoneDetailService {
                     zone: zone
                 };
 
-                return model;
+                resolve(model);
             })
             .catch(reject);
         });
