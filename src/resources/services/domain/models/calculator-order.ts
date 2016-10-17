@@ -18,6 +18,7 @@ export class CalculatorOrder implements Order {
     zone:Zone = null;
     isCancelled:boolean = false;
     rootInPropArea:boolean = false;
+    partialSpace: boolean = false;
 
     constructor(args?:any) {
         if(args) {
@@ -54,7 +55,8 @@ export class CalculatorOrder implements Order {
             plant: this.plant,
             zone: zone,
             isCancelled: this.isCancelled,
-            rootInPropArea: this.rootInPropArea
+            rootInPropArea: this.rootInPropArea,
+            partialSpace: this.partialSpace
         });
     }
 }

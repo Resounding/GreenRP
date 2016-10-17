@@ -418,7 +418,8 @@ describe('the order calculator', () => {
                 isPropagationZone: false
             },
             isCancelled: false,
-            rootInPropArea: false
+            rootInPropArea: false,
+            partialSpace: false
         }),
         thisFlowerTimes:SeasonTime[] = [
             { plant: order.plant.name, year: 2017, times: 3 }
@@ -435,6 +436,75 @@ describe('the order calculator', () => {
         expect(calculator.order.customer.name).toEqual('Sobeys');
         expect(calculator.order.plant.name).toEqual('4.5" Mums');
         expect(calculator.order.quantity).toEqual(1000);
+    });
+
+    it('adds the partial space event if partially spaced', () => {
+        const
+            date = new Date(2017, 0, 9),
+            gerbera:Plant = { name: "4.5\" Gerbera", abbreviation: 'G', crop: 'Kalanchoe', size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
+                    tight: 1000,
+                    half: 800,
+                    full: 500
+                },
+                potsPerCase: 8,
+                hasLightsOut: true
+            },
+            zoneF:Zone = {
+                name: 'F',
+                isPropagationZone: false,
+                tables: 100,
+                autoSpace: true
+            };
+
+        zones.push(zoneF);
+
+        seasons = [
+            {
+                name: 'spring',
+                year: 2017,
+                week: 1
+            }
+        ];
+        propagationTimes = [
+            {
+                plant: gerbera.name,
+                times: 3,
+                year: 2017
+            }
+        ];
+        flowerTimes = [
+            {
+                plant: gerbera.name,
+                year: 2017,
+                times: 8
+            }
+        ];
+
+        let rawWeeks = new ReferenceData().weeks;
+        weeks = new Map<string, CapacityWeek>();
+        rawWeeks.forEach(w => weeks.set(w._id, new CapacityWeek(w)));
+
+        calculator = new OrderCalculator(zones, weeks, seasons, propagationTimes, flowerTimes);
+        calculator.setArrivalDate(date);
+        calculator.setPlant(gerbera);
+
+        let partialSpaceWeek = calculator.weeks[2],
+            lightsOutWeek = calculator.weeks[3],
+            fullSpaceWeek = calculator.weeks[4];
+
+        expect(partialSpaceWeek.events.length).toEqual(0);
+        expect(lightsOutWeek.events[0].name).toEqual('Lights Out');
+        expect(fullSpaceWeek.events.length).toEqual(0);
+
+        calculator.partialSpace = true;
+
+        partialSpaceWeek = calculator.weeks[2];
+        lightsOutWeek = calculator.weeks[3];
+        fullSpaceWeek = calculator.weeks[4];
+
+        expect(partialSpaceWeek.events[0].name).toEqual('Partial Space');
+        expect(lightsOutWeek.events[0].name).toEqual('Lights Out');
+        expect(fullSpaceWeek.events[0].name).toEqual('Full Space');
     });
 });
 

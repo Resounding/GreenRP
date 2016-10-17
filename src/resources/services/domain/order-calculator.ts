@@ -112,6 +112,18 @@ export class OrderCalculator {
         }
     }
 
+    @computedFrom('order.partialSpace')
+    get partialSpace():boolean {
+        return _order && _order.partialSpace;
+    }
+
+    set partialSpace(value:boolean) {
+        if(_order) {
+            _order.partialSpace = value;
+            this.resetWeeks();
+        }
+    }
+
     setFlowerDate(date:Date):OrderCalculator {
         _order.flowerDate = date;
         this.resetWeeks();
@@ -138,7 +150,7 @@ export class OrderCalculator {
         return _order;
     }
 
-    @computedFrom('plant', 'order.quantity', 'order.arrivalDate', 'order.flowerDate', 'order.lightsOutDate', 'order.stickDate', 'order.rootInPropArea')
+    @computedFrom('plant', 'order.quantity', 'order.arrivalDate', 'order.flowerDate', 'order.lightsOutDate', 'order.stickDate', 'order.rootInPropArea', 'order.partialSpace')
     get weeks():CalculatorWeek[] {
         return _weeks;
     }
@@ -152,7 +164,9 @@ export class OrderCalculator {
         const weeks:CalculatorWeek[] = [],
             shipWeek = this.getShipWeek(),
             flowerWeek = this.getFlowerWeek(),
+            fullSpaceWeek = this.getFullSpaceWeek(),
             lightsOutWeek = this.getLightsOutWeek(),
+            partialSpaceWeek = this.getPartialSpaceWeek(),
             stickWeek = this.getStickWeek();
 
         if(shipWeek) {
@@ -192,7 +206,87 @@ export class OrderCalculator {
             log.debug('No ship week!');
         }
 
-        if(lightsOutWeek) {
+        if(fullSpaceWeek) {
+            const fullSpaceDate = moment(_order.lightsOutDate).add(1, 'week'),
+                fullSpaceId = fullSpaceDate.toWeekNumberId(),
+                flowerDate = moment(_order.flowerDate),
+                loopDate = flowerDate.add(-1, 'week');
+            while(loopDate.isSameOrAfter(fullSpaceDate)) {
+                let id = loopDate.toWeekNumberId(),
+                    week = this.allWeeks.get(id);
+
+                if(week) {
+                    const isFullSpaceWeek = week._id === fullSpaceId, 
+                        tables = this.spaceCalculator.getTables(week._id),
+                        zones = this.getZones(week, tables);
+                    
+                    let calculatorWeek:CalculatorWeek = {
+                        week: week,
+                        events: [],
+                        tables: tables,
+                        zones: zones
+                    };
+
+                    if(isFullSpaceWeek) {
+                        calculatorWeek.events.push({
+                            name: Events.FullSpaceEventName,
+                            date: fullSpaceDate.toDate()
+                        });
+                    }
+
+                    weeks.unshift(calculatorWeek);
+                    
+                    if(isFullSpaceWeek) {
+                        // now add lights-out...
+                        loopDate.subtract(1, 'week');
+                        id = loopDate.toWeekNumberId(),
+                        week = this.allWeeks.get(id);
+
+                        if(week) {
+                            calculatorWeek = {
+                                week: week,
+                                events: [
+                                    {
+                                        name: Events.LightsOutEventName,
+                                        date: _order.lightsOutDate
+                                    }
+                                ],
+                                tables: tables,
+                                zones: zones
+                            }
+
+                            weeks.unshift(calculatorWeek);
+                        }
+
+                        // ... & partial space
+                        loopDate.subtract(1, 'week');
+                        id = loopDate.toWeekNumberId(),
+                        week = this.allWeeks.get(id);
+
+                        if(week) {
+                            calculatorWeek = {
+                                week: week,
+                                events: [
+                                    {
+                                        name: Events.PartialSpaceEventName,
+                                        date:fullSpaceDate.clone().subtract(2, 'weeks').toDate()
+                                    }
+                                ],
+                                tables: tables,
+                                zones: zones
+                            }
+
+                            weeks.unshift(calculatorWeek);
+                        }
+
+                        // break out so it doesn't subtract another week
+                        break;
+                    }
+                }
+
+                loopDate.subtract(1, 'week');
+            }
+        } else if(lightsOutWeek) {
             const lightsOutDate = moment(_order.lightsOutDate),
                 lightsOutId = lightsOutDate.toWeekNumberId(),
                 flowerDate = moment(_order.flowerDate),
@@ -238,8 +332,9 @@ export class OrderCalculator {
                 if(propagationTime) {
                     const
                         stickDate = moment(_order.stickDate),
-                        lightsOutDate = moment(_order.lightsOutDate),
-                        loopDate = lightsOutDate.add(-1, 'week');
+                        // if it's partial-spaced, the week after lights-out has already been added
+                        lastDate = moment(_order.lightsOutDate).subtract(fullSpaceWeek ? 1 : 0, 'weeks'),
+                        loopDate = lastDate.add(-1, 'week');
 
                     while(loopDate.isSameOrAfter(stickDate)){
                         let id = loopDate.toWeekNumberId(),
@@ -335,6 +430,24 @@ export class OrderCalculator {
 
         const id = moment(_order.lightsOutDate).toWeekNumberId(),
             week = this.allWeeks.get(id);
+
+        return week;
+    }
+
+    private getPartialSpaceWeek():Week {
+        if(!_order.partialSpace || !_order.lightsOutDate) return null;
+
+        const id = moment(_order.lightsOutDate).subtract(1, 'week').toWeekNumberId(),
+        week = this.allWeeks.get(id);
+
+        return week;
+    }
+
+    private getFullSpaceWeek():Week {
+        if(!_order.partialSpace || !_order.lightsOutDate) return null;
+
+        const id = moment(_order.lightsOutDate).add(1, 'week').toWeekNumberId(),
+        week = this.allWeeks.get(id);
 
         return week;
     }

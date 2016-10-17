@@ -27,6 +27,7 @@ export interface Order {
     zone:Zone;
     isCancelled:boolean;
     rootInPropArea:boolean;
+    partialSpace:boolean;
 }
 
 export class OrderDocument implements Order {
@@ -43,6 +44,7 @@ export class OrderDocument implements Order {
     zone:OrderZone;
     isCancelled:boolean;
     rootInPropArea:boolean;
+    partialSpace:boolean;
 
     constructor(args?:Order){
         if(args) {
@@ -104,7 +106,8 @@ export class OrderDocument implements Order {
             plant: this.plant,
             zone: this.zone,
             isCancelled: !!this.isCancelled,
-            rootInPropArea: !!this.rootInPropArea
+            rootInPropArea: !!this.rootInPropArea,
+            partialSpace: !!this.partialSpace
         };
     }
 

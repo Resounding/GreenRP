@@ -18,4 +18,6 @@ export class Events {
     static SpacingEventName:string = 'Space';
     static FlowerEventName:string = 'Flower';
     static ShipEventName:string = 'Ship Date';
+    static PartialSpaceEventName:string = 'Partial Space';
+    static FullSpaceEventName:string = 'Full Space';
 }

@@ -58,11 +58,13 @@ describe('week detail service', () => {
     describe('week detail order', () => {
         it('maps the properties from the order', () => {
             const order:OrderDocument = {
+                    toJSON: () => null,
                     _id: '6M:Weg:2017-12-3',
                     _rev: '1',
                     type: 'order',
                     isCancelled: false,
                     rootInPropArea: false,
+                    partialSpace: false,
                     arrivalDate: new Date(2017, 2, 22),
                     flowerDate: new Date(2017, 2, 17),
                     lightsOutDate: new Date(2017, 1, 24),
@@ -135,6 +137,7 @@ describe('week detail service', () => {
                 type: 'order',
                 isCancelled: false,
                 rootInPropArea: false,
+                partialSpace: false,
                 arrivalDate: new Date(2017, 2, 22),
                 flowerDate: new Date(2017, 2, 17),
                 lightsOutDate: new Date(2017, 1, 24),
@@ -164,6 +167,7 @@ describe('week detail service', () => {
                 type: 'order',
                 isCancelled: false,
                 rootInPropArea: false,
+                partialSpace: false,
                 arrivalDate: new Date(2017, 2, 29),
                 flowerDate: new Date(2017, 2, 24),
                 lightsOutDate: new Date(2017, 2, 3),
@@ -194,6 +198,7 @@ describe('week detail service', () => {
                 type: 'order',
                 isCancelled: false,
                 rootInPropArea: false,
+                partialSpace: false,
                 arrivalDate: new Date(2017, 9, 6),
                 flowerDate: new Date(2017, 9, 2),
                 lightsOutDate: new Date(2017, 7, 28),
