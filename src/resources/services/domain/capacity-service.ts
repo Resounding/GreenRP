@@ -12,9 +12,9 @@ export class CapacityService {
     getCapacityWeeks(year?:number):Promise<Map<string, CapacityWeek>> {
 
         return new Promise((resolve, reject) => {
-            this.ordersService.getAll()
+            return this.ordersService.getAll()
                 .then((orders:OrderDocument[]) => {
-                    this.referenceService.weeks()
+                    return this.referenceService.weeks()
                         .then((weeks) => {
                             const capacityWeeks = new Map<string,CapacityWeek>();
 
