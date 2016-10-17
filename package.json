@@ -17,7 +17,7 @@
     "jquery": "^3.1.0",
     "moment": "^2.14.1",
     "numeral": "^1.5.3",
-    "pouchdb": "^6.0.5",
+    "pouchdb": "^6.0.7",
     "pouchdb-find": "^0.10.3",
     "semantic-ui": "github:mdehoog/Semantic-UI#2c10c1f",
     "semantic-ui-calendar": "mdehoog/Semantic-UI#2c10c1f",
@@ -28,7 +28,7 @@
   },
   "peerDependencies": {},
   "devDependencies": {
-    "aurelia-cli": "^0.20.0",
+    "aurelia-cli": "^0.21.0",
     "aurelia-testing": "^1.0.0-beta.2.0.0",
     "aurelia-tools": "^0.2.4",
     "browser-sync": "^2.13.0",
