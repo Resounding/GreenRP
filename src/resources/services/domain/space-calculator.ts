@@ -1,24 +1,57 @@
 import {Order} from "../../../../src/resources/models/order";
 import {Spacings, SpacingOptions} from "../../models/plant";
 
+export class TableSpaceResult {
+    autoSpacing: number;
+    manualSpacing: number;
+}
+
 export class SpaceCalculator {
 
     constructor(private order:Order) { }
 
-    getTables(weekId:string):number {
+    getTables(weekId:string):number|TableSpaceResult {
         if(!this.order.stickDate || !this.order.plant) return 0;
 
         let loop = moment(this.order.stickDate).startOf('isoWeek'),
             spacingOption:SpacingOptions = <SpacingOptions>Spacings.Tight;
 
         if(this.order.lightsOutDate) {
-            const lightsOutDate = moment(this.order.lightsOutDate).startOf('isoWeek');
+            const lightsOutDate = moment(this.order.lightsOutDate).startOf('isoWeek'),
+                isPartialSpacing = this.order.partialSpace;
 
-            while(loop.isBefore(lightsOutDate)) {
-                if(loop.toWeekNumberId() === weekId) {
-                    return this.calculateTables(spacingOption);
+            if(isPartialSpacing) {
+                const partialSpaceDate = lightsOutDate.clone().subtract(1, 'week'),
+                    fullSpaceDate = lightsOutDate.clone().add(1, 'week');
+
+                while(loop.isBefore(partialSpaceDate)) {
+                    if(loop.toWeekNumberId() === weekId) {
+                        return this.calculateTables(spacingOption);
+                    }
+                    loop.add(1, 'week');
                 }
-                loop.add(1, 'week');
+                // now we're partially spaced. zones that are manually spaced are still tight
+                spacingOption = <SpacingOptions>Spacings.Half;
+                while(loop.isBefore(lightsOutDate)) {
+                    if(loop.toWeekNumberId() === weekId) {
+                        return this.calculateTables(spacingOption, <SpacingOptions>Spacings.Tight);
+                    }
+                    loop.add(1, 'week');
+                }
+                // after lights-out, zones that are manually spaced are full
+                while(loop.isBefore(fullSpaceDate)) {
+                    if(loop.toWeekNumberId() === weekId) {
+                        return this.calculateTables(spacingOption, <SpacingOptions>Spacings.Full);
+                    }
+                    loop.add(1, 'week');
+                }
+            } else {
+                while(loop.isBefore(lightsOutDate)) {
+                    if(loop.toWeekNumberId() === weekId) {
+                        return this.calculateTables(spacingOption);
+                    }
+                    loop.add(1, 'week');
+                }
             }
             spacingOption = <SpacingOptions>Spacings.Full;
 
@@ -37,13 +70,23 @@ export class SpaceCalculator {
         return 0;
     }
 
-    private calculateTables(spaceType:SpacingOptions):number {
+    private calculateTables(spaceType:SpacingOptions, manualSpaceType?:SpacingOptions):number|TableSpaceResult {
         if(this.order.plant.cuttingsPerPot == 0) return 0;
 
         const potsPerTable:number = this.order.plant.cuttingsPerTable[spaceType] / this.order.plant.cuttingsPerPot;
 
         if(potsPerTable == 0) return 0;
 
-        return Math.ceil(this.order.quantity / potsPerTable);
+        const spaceTypeTables = Math.ceil(this.order.quantity / potsPerTable);
+        if(manualSpaceType) {
+            const manualTables = this.calculateTables(manualSpaceType),
+                manualTableCount = typeof manualTables === 'number' ? manualTables : manualTables.manualSpacing;
+            return {
+                autoSpacing: spaceTypeTables,
+                manualSpacing: manualTableCount
+            };
+        }
+
+        return spaceTypeTables;
     }
 }

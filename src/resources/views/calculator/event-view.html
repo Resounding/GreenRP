@@ -1,5 +1,6 @@
 <template>
-    <div class="calendar">
+    <div class.bind="event.readonly ? 'readonly-date' : 'calendar'"  title.bind="event.readonly ? 'The Partial &amp; Full Space events cannot be changed. Change the Lights Out date instead.' : ''">
         ${event.name} <span>(${event.date | dateFormat: 'ddd, MMM D'})</span>
+        <i show.bind="event.readonly" class="icon info circle"></i>
     </div>
 </template>

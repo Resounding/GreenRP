@@ -2,7 +2,7 @@ import {computedFrom} from 'aurelia-binding';
 import {log} from '../log';
 import {SeasonSelector} from "./season-selector";
 import {TimeSelector} from "./time-selector";
-import {SpaceCalculator} from './space-calculator';
+import {SpaceCalculator, TableSpaceResult} from './space-calculator';
 import {CalculatorWeek, Events, Event} from './models/calculator-week';
 import {CalculatorOrder} from './models/calculator-order';
 import {CalculatorZone} from "./models/calculator-zone";
@@ -171,14 +171,15 @@ export class OrderCalculator {
 
         if(shipWeek) {
             const tables = this.spaceCalculator.getTables(shipWeek._id),
-                zones = this.getZones(shipWeek, tables);
+                zones = this.getZones(shipWeek, tables),
+                tableCount = typeof tables === 'number' ? tables : tables.manualSpacing;
             weeks.push({
                 week: shipWeek,
                 events: [{
                     name: Events.ShipEventName,
                     date: _order.arrivalDate
                 }],
-                tables: tables,
+                tables: tableCount,
                 zones: zones
             });
 
@@ -191,11 +192,12 @@ export class OrderCalculator {
                     weeks[0].events.unshift(flowerEvent);
                 } else {
                     const tables = this.spaceCalculator.getTables(flowerWeek._id),
+                        tableCount = typeof tables === 'number' ? tables : tables.manualSpacing,
                         zones = this.getZones(flowerWeek, tables);
                     weeks.unshift({
                         week: flowerWeek,
                         events: [flowerEvent],
-                        tables: tables,
+                        tables: tableCount,
                         zones: zones
                     });
                 }
@@ -216,21 +218,23 @@ export class OrderCalculator {
                     week = this.allWeeks.get(id);
 
                 if(week) {
-                    const isFullSpaceWeek = week._id === fullSpaceId, 
-                        tables = this.spaceCalculator.getTables(week._id),
-                        zones = this.getZones(week, tables);
-                    
-                    let calculatorWeek:CalculatorWeek = {
+                    const isFullSpaceWeek = week._id === fullSpaceId; 
+                        
+                    let tables = this.spaceCalculator.getTables(week._id),
+                        tableCount = typeof tables === 'number' ? tables : tables.manualSpacing,
+                        zones = this.getZones(week, tables),
+                        calculatorWeek:CalculatorWeek = {
                         week: week,
                         events: [],
-                        tables: tables,
+                        tables: tableCount,
                         zones: zones
                     };
 
                     if(isFullSpaceWeek) {
                         calculatorWeek.events.push({
                             name: Events.FullSpaceEventName,
-                            date: fullSpaceDate.toDate()
+                            date: fullSpaceDate.toDate(),
+                            readonly: true
                         });
                     }
 
@@ -243,6 +247,9 @@ export class OrderCalculator {
                         week = this.allWeeks.get(id);
 
                         if(week) {
+                            tables = this.spaceCalculator.getTables(week._id);
+                            tableCount = typeof tables === 'number' ? tables : tables.manualSpacing;
+                            zones = this.getZones(week, tables);
                             calculatorWeek = {
                                 week: week,
                                 events: [
@@ -251,7 +258,7 @@ export class OrderCalculator {
                                         date: _order.lightsOutDate
                                     }
                                 ],
-                                tables: tables,
+                                tables: tableCount,
                                 zones: zones
                             }
 
@@ -264,15 +271,19 @@ export class OrderCalculator {
                         week = this.allWeeks.get(id);
 
                         if(week) {
+                            tables = this.spaceCalculator.getTables(week._id);
+                            tableCount = typeof tables === 'number' ? tables : tables.manualSpacing;
+                            zones = this.getZones(week, tables);
                             calculatorWeek = {
                                 week: week,
                                 events: [
                                     {
                                         name: Events.PartialSpaceEventName,
-                                        date:fullSpaceDate.clone().subtract(2, 'weeks').toDate()
+                                        date:fullSpaceDate.clone().subtract(2, 'weeks').toDate(),
+                                        readonly: true
                                     }
                                 ],
-                                tables: tables,
+                                tables: tableCount,
                                 zones: zones
                             }
 
@@ -297,11 +308,12 @@ export class OrderCalculator {
 
                 if(week) {
                     const tables = this.spaceCalculator.getTables(week._id),
+                        tableCount = typeof tables === 'number' ? tables : tables.manualSpacing,
                         zones = this.getZones(week, tables);
                     const calculatorWeek:CalculatorWeek = {
                         week: week,
                         events: [],
-                        tables: tables,
+                        tables: tableCount,
                         zones: zones
                     };
 
@@ -342,11 +354,12 @@ export class OrderCalculator {
 
                         if(week) {
                             const tables = this.spaceCalculator.getTables(week._id),
+                                tableCount = typeof tables === 'number' ? tables : tables.manualSpacing,
                                 zones = this.getZones(week, tables, true);
                             const calculatorWeek = {
                                 week: week,
                                 events: [],
-                                tables: tables,
+                                tables: tableCount,
                                 zones: zones
                             };
 
@@ -487,17 +500,18 @@ export class OrderCalculator {
         return season;
     }
 
-    private getZones(week:Week, tables:number, usePropZone:boolean = false):WeekZones {
+    private getZones(week:Week, tables:number|TableSpaceResult, usePropZone:boolean = false):WeekZones {
         const zones = { },
             keys = Object.keys(week.zones);
         for(const key of keys) {
             const zone = _.clone(week.zones[key]),
+                tableCount = typeof tables === 'number' ? tables : (zone.zone.autoSpace ? tables.autoSpacing : tables.manualSpacing),
                 isPropZone = (this.propagationZone && key === this.propagationZone.name),
                 noPropZone = !usePropZone || !this.order.rootInPropArea;
             
             // reduce the prop zone if you're using it, reduce anything else if you're not
             if((usePropZone && this.order.rootInPropArea && isPropZone) || (!isPropZone && noPropZone)) {
-                zone.available -= tables;                                
+                zone.available -= tableCount;                                
             }
 
             if(usePropZone || !isPropZone) {

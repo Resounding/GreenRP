@@ -448,15 +448,7 @@ describe('the order calculator', () => {
                 },
                 potsPerCase: 8,
                 hasLightsOut: true
-            },
-            zoneF:Zone = {
-                name: 'F',
-                isPropagationZone: false,
-                tables: 100,
-                autoSpace: true
             };
-
-        zones.push(zoneF);
 
         seasons = [
             {
@@ -505,6 +497,58 @@ describe('the order calculator', () => {
         expect(partialSpaceWeek.events[0].name).toEqual('Partial Space');
         expect(lightsOutWeek.events[0].name).toEqual('Lights Out');
         expect(fullSpaceWeek.events[0].name).toEqual('Full Space');
+    });
+
+    it('sets the partial spacing events as readonly', () => {
+        const
+            date = new Date(2017, 0, 9),
+            gerbera:Plant = { name: "4.5\" Gerbera", abbreviation: 'G', crop: 'Kalanchoe', size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
+                    tight: 1000,
+                    half: 800,
+                    full: 500
+                },
+                potsPerCase: 8,
+                hasLightsOut: true
+            };
+
+        seasons = [
+            {
+                name: 'spring',
+                year: 2017,
+                week: 1
+            }
+        ];
+        propagationTimes = [
+            {
+                plant: gerbera.name,
+                times: 3,
+                year: 2017
+            }
+        ];
+        flowerTimes = [
+            {
+                plant: gerbera.name,
+                year: 2017,
+                times: 8
+            }
+        ];
+
+        let rawWeeks = new ReferenceData().weeks;
+        weeks = new Map<string, CapacityWeek>();
+        rawWeeks.forEach(w => weeks.set(w._id, new CapacityWeek(w)));
+
+        calculator = new OrderCalculator(zones, weeks, seasons, propagationTimes, flowerTimes);
+        calculator.setArrivalDate(date);
+        calculator.setPlant(gerbera);
+        calculator.partialSpace = true;
+
+        let partialSpaceEvent = calculator.weeks[2].events[0],
+            fullSpaceEvent = calculator.weeks[4].events[0];
+
+        expect(partialSpaceEvent.name).toEqual('Partial Space');
+        expect(partialSpaceEvent.readonly).toEqual(true);
+        expect(fullSpaceEvent.name).toEqual('Full Space');
+        expect(fullSpaceEvent.readonly).toEqual(true);
     });
 });
 

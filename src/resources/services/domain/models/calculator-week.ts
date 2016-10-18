@@ -3,6 +3,7 @@ import {Week, WeekZones} from '../../../models/week';
 export interface Event {
     name:string;
     date:Date;
+    readonly?:boolean;
 }
 
 export interface CalculatorWeek {

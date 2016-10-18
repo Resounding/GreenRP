@@ -1,4 +1,4 @@
-import {SpaceCalculator} from "../../../../../src/resources/services/domain/space-calculator";
+import {SpaceCalculator,TableSpaceResult} from "../../../../../src/resources/services/domain/space-calculator";
 import {CalculatorOrder} from "../../../../../src/resources/services/domain/models/calculator-order";
 import {Order} from "../../../../../src/resources/models/order";
 import {Plant} from "../../../../../src/resources/models/plant";
@@ -62,7 +62,7 @@ describe('the space calculator', () => {
         expect(calculator.getTables(weekId)).toEqual(0);
     });
 
-    it('has a tight space before spacaing', () => {
+    it('has a tight space before spacing', () => {
         const startWeekId = moment(order.stickDate).toWeekNumberId(),
             weekId = moment(order.lightsOutDate).subtract(1, 'week').toWeekNumberId();
 
@@ -71,7 +71,7 @@ describe('the space calculator', () => {
         expect(calculator.getTables(weekId)).toEqual(3);
     });
 
-    it('has a full space after spacaing', () => {
+    it('has a full space after spacing', () => {
         const startWeekId = moment(order.stickDate).toWeekNumberId(),
             weekId = moment(order.lightsOutDate).add(3, 'weeks').toWeekNumberId();
 
@@ -86,5 +86,74 @@ describe('the space calculator', () => {
         order.quantity = 2121;
         // 1 cutting per pot, 1000 pots per table, round up to 3.
         expect(calculator.getTables(stickWeekId)).toEqual(3);
+    });
+
+    it('has a partial space after partial space week', () => {
+        order = new CalculatorOrder({
+            stickDate: new Date(2017, 3, 17),
+            lightsOutDate: new Date(2017, 4, 8),
+            flowerDate: new Date(2017, 6, 3),
+            arrivalDate: new Date(2017, 6,7),
+            quantity: 800,
+            customer: null,
+            plant: cyclamen,
+            partialSpace: true
+        });
+        calculator = new SpaceCalculator(order);
+
+        const partialSpaceWeekId = moment(order.lightsOutDate).subtract(1, 'week').toWeekNumberId(),
+            lightsOutWeekId = moment(order.lightsOutDate).toWeekNumberId(),
+            partialTables = <TableSpaceResult>calculator.getTables(partialSpaceWeekId),
+            lightsOutTables = <TableSpaceResult>calculator.getTables(lightsOutWeekId);
+            
+        // half-spaced is 5 cuttings per pot x 800 pots / 800 cuttings per table = 5 tables
+        expect(partialTables.autoSpacing).toEqual(5);
+        expect(partialTables.manualSpacing).toEqual(4);
+        
+        expect(lightsOutTables.autoSpacing).toEqual(5);
+        expect(lightsOutTables.manualSpacing).toEqual(9);
+    });
+
+    it('has a full space after full space week', () => {
+        order = new CalculatorOrder({
+            stickDate: new Date(2017, 3, 17),
+            lightsOutDate: new Date(2017, 4, 8),
+            flowerDate: new Date(2017, 6, 3),
+            arrivalDate: new Date(2017, 6,7),
+            quantity: 800,
+            customer: null,
+            plant: cyclamen,
+            partialSpace: true
+        });
+        calculator = new SpaceCalculator(order);
+
+        const fullSpaceWeekId = moment(order.lightsOutDate).add(1, 'week').toWeekNumberId(),
+            tables = <number>calculator.getTables(fullSpaceWeekId);
+            
+        // half-spaced is 5 cuttings per pot x 800 pots / 450 cuttings per table = 8.888 ~9 tables
+        expect(tables).toEqual(9);
+    });
+
+    it('only uses partial spacing for zones that support it', () => {
+        order = new CalculatorOrder({
+            stickDate: new Date(2017, 3, 17),
+            lightsOutDate: new Date(2017, 4, 8),
+            flowerDate: new Date(2017, 6, 3),
+            arrivalDate: new Date(2017, 6,7),
+            quantity: 800,
+            customer: null,
+            plant: cyclamen,
+            partialSpace: true
+        });
+        calculator = new SpaceCalculator(order);
+
+        const fullSpaceWeekId = moment(order.lightsOutDate).add(1, 'week').toWeekNumberId();
+            
+        const partialSpaceWeekId = moment(order.lightsOutDate).subtract(1, 'week').toWeekNumberId(),
+            tables = <TableSpaceResult>calculator.getTables(partialSpaceWeekId);
+            
+        // half-spaced is 5 cuttings per pot x 800 pots / 800 cuttings per table = 5 tables
+        expect(tables.autoSpacing).toEqual(5);
+        expect(tables.manualSpacing).toEqual(4);
     });
 });

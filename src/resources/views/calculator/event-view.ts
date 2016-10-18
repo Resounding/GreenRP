@@ -15,10 +15,18 @@ export class EventViewCustomElement {
             initialDate: this.event.date,
             onChange: this.onDateChange.bind(this)
         }).calendar('set date', this.event.date);
+
+        if(this.event.readonly) {
+            $('div', this.element).popup();
+        }
     }
 
     detached() {
         $('.calendar', this.element).calendar('destroy');
+
+        if(this.event.readonly) {
+            $('div', this.element).popup('destroy');
+        }
     }
 
     onDateChange(value:string) {
