@@ -210,10 +210,10 @@ export class OrderCalculator {
 
         if(fullSpaceWeek) {
             const fullSpaceDate = moment(_order.lightsOutDate).add(1, 'week'),
+                fullSpaceStartOfWeek = fullSpaceDate.startOf('isoweek'),
                 fullSpaceId = fullSpaceDate.toWeekNumberId(),
-                flowerDate = moment(_order.flowerDate),
-                loopDate = flowerDate.add(-1, 'week');
-            while(loopDate.isSameOrAfter(fullSpaceDate)) {
+                loopDate = moment(_order.flowerDate).startOf('isoweek');
+            while(loopDate.isSameOrAfter(fullSpaceStartOfWeek)) {
                 let id = loopDate.toWeekNumberId(),
                     week = this.allWeeks.get(id);
 
@@ -299,10 +299,10 @@ export class OrderCalculator {
             }
         } else if(lightsOutWeek) {
             const lightsOutDate = moment(_order.lightsOutDate),
+                lightsOutStartOfWeek = lightsOutDate.startOf('isoweek'),
                 lightsOutId = lightsOutDate.toWeekNumberId(),
-                flowerDate = moment(_order.flowerDate),
-                loopDate = flowerDate.add(-1, 'week');
-            while(loopDate.isSameOrAfter(lightsOutDate)) {
+                loopDate = moment(_order.flowerDate).add(-1, 'week');
+            while(loopDate.isSameOrAfter(lightsOutStartOfWeek)) {
                 let id = loopDate.toWeekNumberId(),
                     week = this.allWeeks.get(id);
 
@@ -344,11 +344,12 @@ export class OrderCalculator {
                 if(propagationTime) {
                     const
                         stickDate = moment(_order.stickDate),
+                        stickDateStartOfWeek = stickDate.startOf('isoweek'),
                         // if it's partial-spaced, the week after lights-out has already been added
                         lastDate = moment(_order.lightsOutDate).subtract(fullSpaceWeek ? 1 : 0, 'weeks'),
                         loopDate = lastDate.add(-1, 'week');
 
-                    while(loopDate.isSameOrAfter(stickDate)){
+                    while(loopDate.isSameOrAfter(stickDateStartOfWeek)){
                         let id = loopDate.toWeekNumberId(),
                             week = this.allWeeks.get(id);
 
