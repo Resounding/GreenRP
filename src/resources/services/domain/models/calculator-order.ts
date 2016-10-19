@@ -36,8 +36,10 @@ export class CalculatorOrder implements Order {
                 return {
                     year: w.week.year,
                     week: w.week.week,
-                    available: this.zone.tables - w.tables,
-                    tables: w.tables
+                    //available: this.zone.tables - w.tables,
+                    available: w.zones[this.zone.name].available,
+                    //tables: w.tables
+                    tables: w.zones[this.zone.name].tables
                 };
             })
         };

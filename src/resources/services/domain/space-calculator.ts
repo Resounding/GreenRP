@@ -73,7 +73,11 @@ export class SpaceCalculator {
     private calculateTables(spaceType:SpacingOptions, manualSpaceType?:SpacingOptions):number|TableSpaceResult {
         if(this.order.plant.cuttingsPerPot == 0) return 0;
 
-        const potsPerTable:number = this.order.plant.cuttingsPerTable[spaceType] / this.order.plant.cuttingsPerPot;
+        let potsPerTable:number = this.order.plant.cuttingsPerTable[spaceType] / this.order.plant.cuttingsPerPot;
+
+        if(isNaN(potsPerTable) && manualSpaceType) {
+            potsPerTable = this.order.plant.cuttingsPerTable[manualSpaceType] / this.order.plant.cuttingsPerPot;
+        }
 
         if(potsPerTable == 0) return 0;
 

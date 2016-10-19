@@ -156,4 +156,46 @@ describe('the space calculator', () => {
         expect(tables.autoSpacing).toEqual(5);
         expect(tables.manualSpacing).toEqual(4);
     });
+
+    it('only uses partial spacing for plants that support it', () => {
+        cyclamen = {
+            name: '6" Cyclamen',
+            abbreviation: '6C',
+            crop: 'Cyclamen',
+            size: '6"',
+            cuttingsPerPot: 5,
+            cuttingsPerTable: {
+                tight: 1100,
+                // no half-space
+                full: 450
+            },
+            potsPerCase: 8,
+            hasLightsOut: true
+        };
+
+        order = new CalculatorOrder({
+            stickDate: new Date(2017, 3, 17),
+            lightsOutDate: new Date(2017, 4, 8),
+            flowerDate: new Date(2017, 6, 3),
+            arrivalDate: new Date(2017, 6,7),
+            quantity: 800,
+            customer: null,
+            plant: cyclamen,
+            partialSpace: true
+        });
+        calculator = new SpaceCalculator(order);
+
+        const partialSpaceWeekId = moment(order.lightsOutDate).subtract(1, 'week').toWeekNumberId(),
+            lightsOutWeekId = moment(order.lightsOutDate).toWeekNumberId();
+        
+        // still tight at this point: 5 cuttings per pot x 800 pots / 1100 cuttings per table ~= 4 tables
+        let tables = <TableSpaceResult>calculator.getTables(partialSpaceWeekId);            
+        expect(tables.autoSpacing).toEqual(4);
+        expect(tables.manualSpacing).toEqual(4);
+            
+        // should be fully-spaced b/c plant doesn't have half-spacing: 5 cuttings per pot x 800 pots / 450 cuttings per table ~= 9 tables
+        tables = <TableSpaceResult>calculator.getTables(lightsOutWeekId);
+        expect(tables.autoSpacing).toEqual(9);
+        expect(tables.manualSpacing).toEqual(9);
+    });
 });

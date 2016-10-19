@@ -3,6 +3,7 @@ import {Zone} from './zone';
 export interface WeekZone {
     zone:Zone;
     available:number;
+    tables:number;
 }
 
 export interface WeekZones {

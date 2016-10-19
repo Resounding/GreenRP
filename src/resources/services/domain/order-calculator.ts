@@ -511,7 +511,8 @@ export class OrderCalculator {
             
             // reduce the prop zone if you're using it, reduce anything else if you're not
             if((usePropZone && this.order.rootInPropArea && isPropZone) || (!isPropZone && noPropZone)) {
-                zone.available -= tableCount;                                
+                zone.available -= tableCount;
+                zone.tables = tableCount;
             }
 
             if(usePropZone || !isPropZone) {
