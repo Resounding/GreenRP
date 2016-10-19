@@ -1,6 +1,7 @@
 import {autoinject, computedFrom} from 'aurelia-framework';
 import {DialogService, DialogResult} from 'aurelia-dialog';
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
+import {Database} from "../../services/database";
 import {OrdersService} from "../../services/data/orders-service";
 import {ReferenceService} from "../../services/data/reference-service";
 import {WeekDetailService, WeekDetailFilter, WeekDetailOrder} from "../../services/domain/week-detail-service";
@@ -13,6 +14,7 @@ import {FlowerThisWeek, FlowerThisWeekDataModel} from '../reports/flower-this-we
 @autoinject()
 export class WeekDetail {
     orderChangedSubscription:Subscription;
+    databaseSyncSubscription:Subscription;
     showWeekDetailSubscription:Subscription;
     filter:WeekDetailFilter = new WeekDetailFilter();
     weekDetailService:WeekDetailService;
@@ -32,6 +34,7 @@ export class WeekDetail {
 
     attached() {
         this.orderChangedSubscription = this.events.subscribe(OrdersService.OrdersChangedEvent, () => this.loadOrders().then(this.refresh.bind(this)));
+        this.databaseSyncSubscription = this.events.subscribe(Database.OrdersSyncChangeEvent, () => this.loadOrders().then(this.refresh.bind(this)));
         this.showWeekDetailSubscription = this.events.subscribe(WeekDetail.ShowWeekDetailEvent, this.show.bind(this));
 
         $('#week-detail-sidebar').sidebar({

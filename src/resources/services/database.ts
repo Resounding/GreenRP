@@ -46,7 +46,7 @@ export class Database {
                     log.debug(change);
                     if(change.direction === 'pull' && _.isArray(change.change.docs)) {
 
-                        let ordersSynced:boolean = _.any(change.change.docs, doc => doc.type === OrderDocument.OrderDocumentType),
+                        let ordersSynced:boolean = _.any(change.change.docs, doc => doc.type === OrderDocument.OrderDocumentType || doc._deleted),
                             zonesSynced:boolean = _.any(change.change.docs, doc => doc._id === 'zones');
 
                         if(ordersSynced) {
@@ -63,14 +63,6 @@ export class Database {
                     log.debug(info);
                 })
         }
-    }
-
-    destroy(): Promise {
-        return localDB.destroy()
-            .then(() => {
-                localDB = null;
-                this.init();
-            });
     }
 
     get db() {
