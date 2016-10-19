@@ -7,6 +7,7 @@ import {OrderCalculator} from '../../services/domain/order-calculator';
 import {OrdersService} from "../../services/data/orders-service";
 import {CalculatorZone} from "../../services/domain/models/calculator-zone";
 import {Prompt} from '../controls/prompt';
+import {ErrorNotification} from '../controls/error-notification';
 import {Plant} from '../../models/plant';
 import {Customer} from '../../models/customer';
 import {Season} from '../../models/season';
@@ -103,6 +104,7 @@ export class Calculator {
     }
 
     createOrder(zone:CalculatorZone) {
+        let revision = 0;
 
         const saver = () => {
             this.calculator.order.zone = zone;
@@ -112,9 +114,34 @@ export class Calculator {
                     this.controller.close(true, result);                    
                 })
                 .catch(error => {
-                    console.log(error);
-                    alert(error);
+                    log.error(error);
+                    if(error.status === 409) {
+                        // if this is the first conflict, prompt
+                        if(revision === 0) {
+                            const customer = this.calculator.order.customer.name,
+                                date = moment(this.calculator.order.arrivalDate).format('MMM D, YYYY');
+                            this.dialogService.open({ viewModel: Prompt, model: `There is already an order for ${customer} on ${date}. Would you like to continue creating this order?` })
+                                .then((result:DialogResult) => {
+                                    if(result.wasCancelled) return;
+
+                                    recreate();
+                                });
+                        // if there are multiple conflicts, don't ask every time
+                        } else {
+                            recreate();
+                        }
+                    } else {
+                        this.dialogService.open({ viewModel: ErrorNotification, model: error.message })
+                    }
                 });
+        },
+        recreate = () => {
+            delete this.calculator.order._id;
+            const id = this.calculator.getOrderDocument().toJSON()._id;
+
+            revision++;
+            this.calculator.order._id = `${id} (${revision})`;
+            saver();
         };
 
         if(zone.canFit) {

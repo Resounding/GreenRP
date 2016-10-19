@@ -13,18 +13,30 @@ export class OrdersService {
     create(order:Order):Promise<Order> {
         const orderDoc = new OrderDocument(order).toJSON();
 
+        if(!orderDoc.customer) {
+            return Promise.reject(Error('Please choose a customer.'));
+        } else if(!orderDoc.quantity) {
+            return Promise.reject(Error('Please enter the quantity for the order.'));
+        } else if(!orderDoc.plant) {
+            return Promise.reject(Error('Please choose a plant for the order.'));
+        } else if(!orderDoc.zone) {
+            return Promise.reject(Error('Please select the zone for the order.'));
+        } else if(!orderDoc._id) {
+            return Promise.reject(Error('There was a problem creating the order. Please verify all fields have been entered.'));
+        }
+
         return new Promise((resolve, reject) => {
-        return this.database.db.put(orderDoc)
-            .then((result:PouchDB.Core.Response) => {
-                if(result.ok) {
-                    orderDoc._rev = result.rev;
-                    this.events.publish(OrdersService.OrdersChangedEvent);
-                    resolve(orderDoc);
-                } else {
-                    reject(new Error('Order was not saved.'));
-                }
-            })
-            .catch(reject);
+            return this.database.db.put(orderDoc)
+                .then((result:PouchDB.Core.Response) => {
+                    if(result.ok) {
+                        orderDoc._rev = result.rev;
+                        this.events.publish(OrdersService.OrdersChangedEvent);
+                        resolve(orderDoc);
+                    } else {
+                        reject(new Error('Order was not saved.'));
+                    }
+                })
+                .catch(reject);
         });
     }
 
