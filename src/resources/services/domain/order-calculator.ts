@@ -175,6 +175,8 @@ export class OrderCalculator {
             stickWeek = this.getStickWeek();
 
         if(shipWeek) {
+            log.debug(`Ship week: ${shipWeek._id}`);
+
             const tables = this.spaceCalculator.getTables(shipWeek._id),
                 zones = this.getZones(shipWeek, tables),
                 tableCount = typeof tables === 'number' ? tables : tables.manualSpacing;
@@ -188,7 +190,7 @@ export class OrderCalculator {
                 zones: zones
             });
 
-            if(flowerWeek){
+            if(flowerWeek) {
                 const flowerEvent:Event = {
                     name: Events.FlowerEventName,
                     date: _order.flowerDate
@@ -216,6 +218,8 @@ export class OrderCalculator {
         }
 
         if(fullSpaceWeek) {
+            log.debug(`Full space  week: ${fullSpaceWeek._id}`);
+            
             const fullSpaceDate = moment(_order.lightsOutDate).add(1, 'week'),
                 fullSpaceStartOfWeek = fullSpaceDate.clone().startOf('isoweek'),
                 fullSpaceId = fullSpaceDate.toWeekNumberId(),
@@ -308,6 +312,8 @@ export class OrderCalculator {
                 loopDate.subtract(1, 'week');
             }
         } else if(lightsOutWeek) {
+            log.debug(`Lights out week: ${lightsOutWeek._id}`);
+
             const lightsOutDate = moment(_order.lightsOutDate),
                 lightsOutStartOfWeek = lightsOutDate.clone().startOf('isoweek'),
                 lightsOutId = lightsOutDate.toWeekNumberId(),
@@ -388,7 +394,11 @@ export class OrderCalculator {
 
                         loopDate.add(-1, 'week');
                     }
+                } else {
+                    log.debug(`Propagation time not found for ${_order.plant.crop} in ${season.name}`);
                 }
+            } else {
+                log.debug(`Season not found for ${_order.plant.crop} on ${_order.arrivalDate}`);
             }
         } else {
             log.debug('No stick week');
