@@ -70,7 +70,7 @@ export class ReferenceService {
                             };
                             return memo;
                         }, {}),
-                        start = moment().startOf('isoWeek'),
+                        start = moment().startOf('year'),
                         returnValue = _.chain(_.range(0, 100))
                             .map(idx => {
                                 const date = start.clone().add(idx, 'weeks');
