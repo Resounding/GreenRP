@@ -20,7 +20,8 @@ export class Database {
         if (localDB === null) {
             localDB = new PouchDB(this.config.app_database_name);
             if(Configuration.isDebug()) {
-                PouchDB.debug.enable('*');
+                //PouchDB.debug.enable('*');
+                //PouchDB.debug.disable();
             }
         }
 
