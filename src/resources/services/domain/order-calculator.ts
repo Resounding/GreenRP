@@ -133,7 +133,6 @@ export class OrderCalculator {
 
     setLightsOutDate(date:Date):OrderCalculator {
         _order.lightsOutDate = date;
-        this.resetStickDate();
         this.resetWeeks();
 
         return this;
@@ -210,7 +209,7 @@ export class OrderCalculator {
 
         if(fullSpaceWeek) {
             const fullSpaceDate = moment(_order.lightsOutDate).add(1, 'week'),
-                fullSpaceStartOfWeek = fullSpaceDate.startOf('isoweek'),
+                fullSpaceStartOfWeek = fullSpaceDate.clone().startOf('isoweek'),
                 fullSpaceId = fullSpaceDate.toWeekNumberId(),
                 loopDate = moment(_order.flowerDate).startOf('isoweek');
             while(loopDate.isSameOrAfter(fullSpaceStartOfWeek)) {
@@ -299,7 +298,7 @@ export class OrderCalculator {
             }
         } else if(lightsOutWeek) {
             const lightsOutDate = moment(_order.lightsOutDate),
-                lightsOutStartOfWeek = lightsOutDate.startOf('isoweek'),
+                lightsOutStartOfWeek = lightsOutDate.clone().startOf('isoweek'),
                 lightsOutId = lightsOutDate.toWeekNumberId(),
                 loopDate = moment(_order.flowerDate).add(-1, 'week');
             while(loopDate.isSameOrAfter(lightsOutStartOfWeek)) {
@@ -344,7 +343,7 @@ export class OrderCalculator {
                 if(propagationTime) {
                     const
                         stickDate = moment(_order.stickDate),
-                        stickDateStartOfWeek = stickDate.startOf('isoweek'),
+                        stickDateStartOfWeek = stickDate.clone().startOf('isoweek'),
                         // if it's partial-spaced, the week after lights-out has already been added
                         lastDate = moment(_order.lightsOutDate).subtract(fullSpaceWeek ? 1 : 0, 'weeks'),
                         loopDate = lastDate.add(-1, 'week');
