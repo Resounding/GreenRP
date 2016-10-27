@@ -160,6 +160,12 @@ export class OrderCalculator {
 
     private resetWeeks() {
 
+        let stickEventCreated = false,
+            partialSpaceEventCreated = false,
+            lightsOutEventCreated = false, 
+            fullSpaceEventCreated = false,
+            flowerEventCreated = false;
+
         const weeks:CalculatorWeek[] = [],
             shipWeek = this.getShipWeek(),
             flowerWeek = this.getFlowerWeek(),
@@ -189,6 +195,7 @@ export class OrderCalculator {
                 };
                 if(flowerWeek._id === shipWeek._id) {
                     weeks[0].events.unshift(flowerEvent);
+                    flowerEventCreated = true;
                 } else {
                     const tables = this.spaceCalculator.getTables(flowerWeek._id),
                         tableCount = typeof tables === 'number' ? tables : tables.manualSpacing,
@@ -199,6 +206,7 @@ export class OrderCalculator {
                         tables: tableCount,
                         zones: zones
                     });
+                    flowerEventCreated = true;
                 }
             } else {
                 log.debug('No flower week');
@@ -235,6 +243,7 @@ export class OrderCalculator {
                             date: fullSpaceDate.toDate(),
                             readonly: true
                         });
+                        fullSpaceEventCreated = true;
                     }
 
                     weeks.unshift(calculatorWeek);
@@ -262,6 +271,7 @@ export class OrderCalculator {
                             }
 
                             weeks.unshift(calculatorWeek);
+                            lightsOutEventCreated = true;
                         }
 
                         // ... & partial space
@@ -287,6 +297,7 @@ export class OrderCalculator {
                             }
 
                             weeks.unshift(calculatorWeek);
+                            partialSpaceEventCreated = true;
                         }
 
                         // break out so it doesn't subtract another week
@@ -324,6 +335,7 @@ export class OrderCalculator {
                     }
 
                     weeks.unshift(calculatorWeek);
+                    lightsOutEventCreated = true;
                 }
 
                 loopDate.add(-1, 'week');
@@ -368,6 +380,7 @@ export class OrderCalculator {
                                     name: Events.StickEvent,
                                     date: stickDate.toDate()
                                 });
+                                stickEventCreated = true;
                             }
 
                             weeks.unshift(calculatorWeek);
@@ -379,6 +392,65 @@ export class OrderCalculator {
             }
         } else {
             log.debug('No stick week');
+        }
+
+        // if events overlaps another event's week, we'll put
+        //  the event where it belongs
+        if(stickWeek && !stickEventCreated) {
+            const week = _.find(weeks, w => {
+                return w.week._id === stickWeek._id;
+            });
+            if(week) {
+                week.events.unshift({
+                    name: Events.StickEvent,
+                    date: _order.stickDate
+                });
+            }
+        }
+        if(partialSpaceWeek && !partialSpaceEventCreated) {
+            const week = _.find(weeks, w => {
+                return w.week._id === partialSpaceWeek._id;
+            });
+            if(week) {
+                week.events.unshift({
+                    name: Events.PartialSpaceEventName,
+                    date: moment(_order.lightsOutDate).subtract(1, 'week').toDate()
+                });
+            }
+        }
+        if(lightsOutWeek && !lightsOutEventCreated) {
+            const week = _.find(weeks, w => {
+                return w.week._id === lightsOutWeek._id;
+            });
+            if(week) {
+                const eventName = (_order.plant.hasLightsOut || _order.partialSpace) ? Events.LightsOutEventName : Events.SpacingEventName;
+                week.events.unshift({
+                    name: eventName,
+                    date: _order.lightsOutDate
+                });
+            }
+        }
+        if(fullSpaceWeek && !fullSpaceEventCreated) {
+            const week = _.find(weeks, w => {
+                return w.week._id === fullSpaceWeek._id;
+            });
+            if(week) {
+                week.events.unshift({
+                    name: Events.FullSpaceEventName,
+                    date: moment(_order.lightsOutDate).add(1, 'week').toDate()
+                });
+            }
+        }
+        if(flowerWeek && !flowerEventCreated) {
+            const week = _.find(weeks, w => {
+                return w.week._id === flowerWeek._id;
+            });
+            if(week) {
+                week.events.unshift({
+                    name: Events.FlowerEventName,
+                    date: _order.flowerDate
+                });
+            }
         }
 
         this.zones.forEach(z => z.weeks = weeks);
