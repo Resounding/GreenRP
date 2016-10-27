@@ -46,7 +46,14 @@ export class Index {
     load() {
         this.capacityService.getCapacityWeeks(this.year)
             .then(result => {
-                this.weeks = result;
+                const thisWeek = moment().isoWeek(),
+                    thisYear = moment().isoWeekYear();
+                this.weeks = new Map<string, CapacityWeek>();
+                result.forEach((value, key) => {
+                    if(value.year === thisYear && value.week >= thisWeek || value.year > thisYear) {
+                        this.weeks.set(key, value);
+                    }
+                });
             })
             .catch(error => {
                 console.error(error);
