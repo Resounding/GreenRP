@@ -71,7 +71,7 @@ export class ReferenceService {
                             return memo;
                         }, {}),
                         start = moment().startOf('year'),
-                        returnValue = _.chain(_.range(0, 100))
+                        returnValue = _.chain(_.range(0, 200))
                             .map(idx => {
                                 const date = start.clone().add(idx, 'weeks');
 
