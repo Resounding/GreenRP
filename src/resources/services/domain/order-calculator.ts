@@ -595,6 +595,8 @@ export class OrderCalculator {
             if((usePropZone && this.order.rootInPropArea && isPropZone) || (!isPropZone && noPropZone)) {
                 zone.available -= tableCount;
                 zone.tables = tableCount;
+            } else if(usePropZone && this.order.rootInPropArea && !isPropZone) {
+                zone.tables = 0;
             }
 
             if(usePropZone || !isPropZone) {

@@ -38,8 +38,8 @@ export class CalculatorOrder implements Order {
                     week: w.week.week,
                     //available: this.zone.tables - w.tables,
                     available: w.zones[this.zone.name].available,
-                    //tables: w.tables
-                    tables: w.zones[this.zone.name].tables
+                    tables: w.tables
+                    //tables: w.zones[this.zone.name].tables
                 };
             })
         };
