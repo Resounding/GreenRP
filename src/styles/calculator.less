@@ -3,11 +3,25 @@ ai-dialog-container,
 ai-dialog-container > div,
 ai-dialog-container > div > div,
 ai-dialog-container > div > div > ai-dialog#calculator {
-    height: 100%;
     width: 100%;
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
+    padding: 0;
+}
+ai-dialog-container,
+ai-dialog-container > div {
+    height: 100vh;
+}
+ai-dialog-container > div {
+    padding: 30px;
+}
+ai-dialog-container > div > div,
+ai-dialog-container > div > div > ai-dialog#calculator {
+    height: 100%;
+}
+ai-dialog#calculator {
+    display: inline-block;
 }
 #calculator form {
     height: 100%;
