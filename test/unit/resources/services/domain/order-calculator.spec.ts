@@ -10,7 +10,7 @@ import {Week, WeekZones} from "../../../../../src/resources/models/week";
 
 class ReferenceData {
     get weeks():Week[] {
-        const start = moment().startOf('isoWeek'),
+        const start = moment().startOf('year'),
             zones:WeekZones =  {
             A: {
                 zone: {
@@ -369,12 +369,7 @@ describe('the order calculator', () => {
             {
                 year: 2017,
                 plant: mum.name,
-                times: {
-                    spring: 3,
-                    winter: 3,
-                    fall: 3,
-                    summer: 3
-                }
+                times: 3
             }
         ];
 
@@ -443,7 +438,7 @@ describe('the order calculator', () => {
     it('adds the partial space event if partially spaced', () => {
         const
             date = new Date(2017, 0, 9),
-            gerbera:Plant = { name: "4.5\" Gerbera", abbreviation: 'G', crop: 'Kalanchoe', size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
+            gerbera:Plant = { name: "4.5\" Gerbera", abbreviation: 'G', crop: 'Gerbera', size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
                     tight: 1000,
                     half: 800,
                     full: 500
@@ -654,19 +649,19 @@ describe('changing date', () => {
         expect(weeks[0].events[0].date).toEqual(new Date(2017, 3, 17)); // stick week - no change
     });
 
-    it('resets the stick date when setting the lights-out date', () => {
+    it('doesn\'t affect the stick date when setting the lights-out date', () => {
 
         const lightsOut = new Date(2017, 4, 1); // moved this back a week
         calculator.setLightsOutDate(lightsOut);
 
         const weeks:CalculatorWeek[] = calculator.weeks;
 
-        expect(weeks.length).toEqual(13); // increased by a week
+        expect(weeks.length).toEqual(12); // no change
 
-        expect(weeks[12].events[1].date).toEqual(arrival); // arrival date
-        expect(weeks[12].events[0].date).toEqual(new Date(2017, 6, 3)); // flower date - 4 days prior
-        expect(weeks[3].events[0].date).toEqual(lightsOut); // space week - as set
-        expect(weeks[0].events[0].date).toEqual(new Date(2017, 3, 10)); // stick week - also moved a week back
+        expect(weeks[11].events[1].date).toEqual(arrival); // arrival date
+        expect(weeks[11].events[0].date).toEqual(new Date(2017, 6, 3)); // flower date - 4 days prior
+        expect(weeks[2].events[0].date).toEqual(lightsOut); // space week - as set, now 1 week earlier
+        expect(weeks[0].events[0].date).toEqual(new Date(2017, 3, 17)); // stick week - left alone
     });
 
     it('sets the stick date', () => {
