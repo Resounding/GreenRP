@@ -19,7 +19,8 @@ class ReferenceData {
                         autoSpace: false,
                         isPropagationZone: false
                 },
-                available: 50
+                available: 50,
+                tables: 50
             },
             'B/C': {
                 zone: {
@@ -28,7 +29,8 @@ class ReferenceData {
                         autoSpace: false,
                         isPropagationZone: true
                 },
-                available: 20
+                available: 20,
+                tables: 80
             },
             D: {
                 zone: {
@@ -37,7 +39,8 @@ class ReferenceData {
                         autoSpace: false,
                         isPropagationZone: false
                 },
-                available: 50
+                available: 50,
+                tables: 50
             },
             E: {
                 zone: {
@@ -46,7 +49,8 @@ class ReferenceData {
                         autoSpace: false,
                         isPropagationZone: false
                 },
-                available: 80
+                available: 80,
+                tables: 20
             },
             'F/G': {
                 zone: {
@@ -55,7 +59,8 @@ class ReferenceData {
                         autoSpace: true,
                         isPropagationZone: false
                 },
-                available: 80
+                available: 80,
+                tables: 20
             }
         };
 
@@ -91,22 +96,19 @@ describe('the order calculator', () => {
         ];
         weeks = new Map<string, CapacityWeek>([
             ['week:2017.1', new CapacityWeek({_id: 'week:2017.1', year: 2017, week: 1, zones: {
-                A: { zone: zones[0], available: 10 },
-                B: { zone: zones[1], available: 5 },
-                C: { zone: zones[2], available: 50
-                }
+                A: { zone: zones[0], available: 10, tables: 0 },
+                B: { zone: zones[1], available: 5, tables: 0 },
+                C: { zone: zones[2], available: 50, tables: 0 }
             }})],
             ['week:2017.2', new CapacityWeek({_id: 'week:2017.2', year: 2017, week: 2, zones: {
-                A: { zone: zones[0], available: 20 },
-                B: { zone: zones[1], available: 0 },
-                C: { zone: zones[2], available: 10
-                }
+                A: { zone: zones[0], available: 20, tables: 0 },
+                B: { zone: zones[1], available: 0, tables: 0 },
+                C: { zone: zones[2], available: 10, tables: 0 }
             }})],
             ['week:2017.3', new CapacityWeek({_id: 'week:2017.1', year: 2017, week: 3, zones: {
-                A: { zone: zones[0], available: 5 },
-                B: { zone: zones[1], available: 5 },
-                C: { zone: zones[2], available: 5
-                }
+                A: { zone: zones[0], available: 5, tables: 0 },
+                B: { zone: zones[1], available: 5, tables: 0 },
+                C: { zone: zones[2], available: 5, tables: 0 }
             }})]
         ]);
         seasons = [
