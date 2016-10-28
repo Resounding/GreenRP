@@ -63,8 +63,8 @@ export class OrderDetail {
             $('.calendar', this.element).calendar({
                 type: 'date',
                 initialDate: this.calculator.order.arrivalDate,
-                onChange: this.onDateChange.bind(this)
-            }).calendar('set date', this.calculator.order.arrivalDate);
+            }).calendar('set date', this.calculator.order.arrivalDate)
+            .calendar({ onChange: this.onDateChange.bind(this) });
         });        
     }
 

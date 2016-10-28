@@ -42,7 +42,7 @@ export class OrderCalculator {
         this.spaceCalculator = new SpaceCalculator(_order);
 
         if(order && _.isDate(order.arrivalDate)){
-            this.setArrivalDate(order.arrivalDate);
+            this.resetWeeks();
         }
     }
 
