@@ -1,7 +1,9 @@
-FROM node:6.3.1
+FROM node:6.9.1
 
-RUN npm install -g \
-    typescript@rc \
+RUN npm install -g yarn
+
+RUN yarn global add \
+    typescript \
     gulp \
     typings \
     aurelia-cli
@@ -14,7 +16,7 @@ RUN git clone https://$GITHUB_KEY@github.com/Resounding/GreenRP /usr/src/GreenRP
 WORKDIR /usr/src/GreenRP
 RUN git checkout $APP_RELEASE
 
-RUN npm install --ignore-scripts
+RUN yarn install --ignore-scripts
 RUN typings install
 
 RUN mkdir -p /usr/src/GreenRP/export
