@@ -9,8 +9,8 @@ describe('capacity week', () => {
             year: 2017,
             week: 1,
             zones: {
-                A: { zone: { name: 'A', tables: 100, autoSpace: false, isPropagationZone: false }, available: 50 },
-                B: { zone: { name: 'B', tables: 200, autoSpace: false, isPropagationZone: true }, available: 25 },
+                A: { zone: { name: 'A', tables: 100, autoSpace: false, isPropagationZone: false }, available: 50, tables: 50 },
+                B: { zone: { name: 'B', tables: 200, autoSpace: false, isPropagationZone: true }, available: 25, tables: 75 },
             }
         };
 
@@ -50,6 +50,7 @@ describe('capacity week', () => {
             lightsOutDate: new Date(2017, 0, 19),
             stickDate: new Date(2017, 0, 1),
             quantity: 1000,
+            partialSpace: false,
             customer: { abbreviation: 'Shw', name: 'Shaws' },
             plant: {
                 name: "4.5\"Mums",
@@ -70,7 +71,6 @@ describe('capacity week', () => {
                 autoSpace: false,
                 isPropagationZone: false
             },
-            isCancelled: false,
             rootInPropArea: false
         });
 

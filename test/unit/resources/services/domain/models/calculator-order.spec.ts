@@ -42,7 +42,6 @@ describe('calculator order', () => {
                     autoSpace: false,
                     tables: 100
                 },
-                isCancelled: false,
                 rootInPropArea: false,
                 partialSpace: false
             };
@@ -62,7 +61,6 @@ describe('calculator order', () => {
             expect(order.lightsOutDate).toEqual(orderDoc.lightsOutDate);
             expect(order.stickDate).toEqual(orderDoc.stickDate);
             expect(order.quantity).toEqual(orderDoc.quantity);
-            expect(order.isCancelled).toEqual(orderDoc.isCancelled);
             expect(order.rootInPropArea).toEqual(orderDoc.rootInPropArea);
             expect(order.partialSpace).toEqual(orderDoc.partialSpace);
             expect(order.customer.name).toEqual(orderDoc.customer.name);

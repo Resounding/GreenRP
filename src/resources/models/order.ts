@@ -25,7 +25,6 @@ export interface Order {
     customer:Customer;
     plant:Plant;
     zone:Zone;
-    isCancelled:boolean;
     rootInPropArea:boolean;
     partialSpace:boolean;
 }
@@ -42,7 +41,6 @@ export class OrderDocument implements Order {
     customer:Customer;
     plant:Plant;
     zone:OrderZone;
-    isCancelled:boolean;
     rootInPropArea:boolean;
     partialSpace:boolean;
 
@@ -105,7 +103,6 @@ export class OrderDocument implements Order {
             customer: this.customer,
             plant: this.plant,
             zone: this.zone,
-            isCancelled: !!this.isCancelled,
             rootInPropArea: !!this.rootInPropArea,
             partialSpace: !!this.partialSpace
         };

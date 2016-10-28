@@ -414,7 +414,6 @@ describe('the order calculator', () => {
                 autoSpace: false,
                 isPropagationZone: false
             },
-            isCancelled: false,
             rootInPropArea: false,
             partialSpace: false
         }),

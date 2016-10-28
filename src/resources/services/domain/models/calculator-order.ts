@@ -16,7 +16,6 @@ export class CalculatorOrder implements Order {
     customer:Customer = null;
     plant:Plant = null;
     zone:Zone = null;
-    isCancelled:boolean = false;
     rootInPropArea:boolean = false;
     partialSpace: boolean = false;
 
@@ -56,7 +55,6 @@ export class CalculatorOrder implements Order {
             customer: this.customer,
             plant: this.plant,
             zone: zone,
-            isCancelled: this.isCancelled,
             rootInPropArea: this.rootInPropArea,
             partialSpace: this.partialSpace
         });

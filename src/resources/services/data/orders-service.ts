@@ -44,8 +44,7 @@ export class OrdersService {
 
         return new Promise((resolve, reject) => {
             this.database.db.find({ selector: {
-                type: { '$eq': OrderDocument.OrderDocumentType },
-                isCancelled: { '$ne': true }
+                type: { '$eq': OrderDocument.OrderDocumentType }
             }})
             .then((result) => {
                 const docs = result.docs.map(doc => new OrderDocument(doc));
@@ -75,8 +74,7 @@ export class OrdersService {
         return new Promise((resolve, reject) => {
             this.database.db.get(id)
                 .then((doc:OrderDocument) => {
-                    doc.isCancelled = true;
-                    this.database.db.put(doc)
+                    this.database.db.remove(doc)
                         .then((delDoc) => {
                             this.events.publish(OrdersService.OrdersChangedEvent);
                             resolve(delDoc);
