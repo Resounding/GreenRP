@@ -17,6 +17,7 @@ import {OrderDocument} from "../../models/order";
 export class OrderCalculator {
     private _order:CalculatorOrder;
     private _weeks:CalculatorWeek[];
+
     zones:CalculatorZone[];
     propagationZone:Zone;
     season:Season;
@@ -513,7 +514,6 @@ export class OrderCalculator {
 
     private getLightsOutWeek():Week {
         if(!this._order.lightsOutDate) return null;
-
         const id = moment(this._order.lightsOutDate).toWeekNumberId();
         return this.allWeeks.get(id);
     }

@@ -1,4 +1,5 @@
 import {autoinject, computedFrom} from 'aurelia-framework';
+import {EventAggregator} from 'aurelia-event-aggregator';
 import {DialogController, DialogService, DialogResult} from 'aurelia-dialog';
 import {log} from '../../services/log';
 import {ReferenceService} from '../../services/data/reference-service';
@@ -17,14 +18,25 @@ import {CapacityWeek} from '../../models/capacity-week';
 
 @autoinject()
 export class Calculator {
+    private _repeatCount:number = 0;
+    private _repeatDays:number = 1;
+    private _isRepeatingOrder:boolean = false;
+    private _zones:Zone[];
+    private _seasons:Season[];
+    private _weeks:Map<string, CapacityWeek> = new Map<string,CapacityWeek>();
+    private _propagationTimes:SeasonTime[];
+    private _flowerTimes:SeasonTime[];
+
     customers:Customer[];
     plants:Plant[];
     season:Season;
     calculator:OrderCalculator;
+    repeatCalculators:OrderCalculator[] = [];
     partialSpace:boolean = false;
 
-    constructor(private ordersService:OrdersService, referenceService:ReferenceService, capacityService:CapacityService,
-                private dialogService:DialogService, private controller:DialogController, private element:Element) {
+    constructor(private ordersService:OrdersService, private referenceService:ReferenceService, private capacityService:CapacityService,
+                private dialogService:DialogService, private controller:DialogController, private element:Element,
+                private events:EventAggregator) {
         controller.settings.lock = true;
         controller.settings.position = position;
 
@@ -35,32 +47,25 @@ export class Calculator {
             this.plants = result;
         });
 
-        let zones:Zone[],
-            seasons:Season[],
-            weeks:Map<string, CapacityWeek> = new Map<string,CapacityWeek>(),
-            propagationTimes:SeasonTime[],
-            flowerTimes:SeasonTime[];
         Promise.all([
-            referenceService.seasons().then(result => {
-                seasons = result;
+            this.referenceService.seasons().then(result => {
+                this._seasons = result;
             }),
-            referenceService.zones().then(result => {
-                zones = result;
+            this.referenceService.zones().then(result => {
+                this._zones = result;
             }),
-            referenceService.propagationTimes().then(result => {
-                propagationTimes = result;
+            this.referenceService.propagationTimes().then(result => {
+                this._propagationTimes = result;
             }),
-            referenceService.flowerTimes().then(result => {
-                flowerTimes = result;
+            this.referenceService.flowerTimes().then(result => {
+                this._flowerTimes = result;
             }),
-            capacityService.getCapacityWeeks().then(result => {
-                weeks = result;
+            this.capacityService.getCapacityWeeks().then(result => {
+                this._weeks = result;
             })
         ]).then(() => {
-            this.calculator = new OrderCalculator(zones, weeks, seasons, propagationTimes, flowerTimes);
+            this.calculator = this.createCalculator();
         });
-
-
     }
 
     attached() {
@@ -83,6 +88,11 @@ export class Calculator {
         $('.calendar', this.element).calendar('destroy');
     }
 
+    @computedFrom('repeatCount', 'repeatDays')
+    get numberRepeats():number {
+        return this.repeatCalculators.length;
+    }
+
     @computedFrom('calculator.order.arrivalDate')
     get dateDisplay():string {
         let display = 'Choose Date';
@@ -99,6 +109,10 @@ export class Calculator {
     onDateChange(value:string) {
         this.calculator.setArrivalDate(moment(value).toDate());
         log.debug(this.season);
+    }
+
+    createCalculator():OrderCalculator {
+        return new OrderCalculator(this._zones, this._weeks, this._seasons, this._propagationTimes, this._flowerTimes);
     }
 
     createOrder(zone:CalculatorZone) {
@@ -155,6 +169,61 @@ export class Calculator {
 
                     saver();
                 });
+        }
+    }
+
+    get isRepeatingOrder():boolean {
+        return this._isRepeatingOrder;
+    }
+
+    set isRepeatingOrder(value:boolean) {
+        this._isRepeatingOrder = value;
+
+        if(!value) {
+            this.repeatCount = 0;
+        }
+    }
+
+    get repeatCount():number {
+        return this._repeatCount;
+    }
+    set repeatCount(value:number) {
+        value = numeral(value).value();
+
+        if(value < 0) {
+            value = 0;
+        }
+
+        this._repeatCount = value;
+
+        this.repeatCalculators.length = value;
+
+        for(let i=0; i < this.repeatCalculators.length; i++) {
+            if(typeof this.repeatCalculators[i] === 'undefined') {
+                const calculator = this.createCalculator();
+                calculator.setArrivalDate(this.calculator.order.arrivalDate);
+                calculator.setPlant(this.calculator.order.plant);
+                this.repeatCalculators[i] = calculator;
+            }
+        }
+    }
+
+    get repeatDays():number {
+        return this._repeatDays;
+    }
+    set repeatDays(value:number) {
+        value = numeral(value).value();
+
+        this._repeatDays = value;
+
+        if(this.calculator.order.arrivalDate) {
+            const firstArrival = moment(this.calculator.order.arrivalDate);
+            this.repeatCalculators.forEach((calculator, index) => {
+                const days = (index + 1) * value;
+                calculator.setArrivalDate(firstArrival.clone().add(days, 'days').toDate());
+            });
+
+            this.repeatDays = this.repeatDays;
         }
     }
 }
