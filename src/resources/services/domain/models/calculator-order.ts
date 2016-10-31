@@ -1,5 +1,5 @@
 import {Zone} from "../../../models/zone";
-import {Order, OrderDocument, OrderZone} from "../../../models/order";
+import {Order, OrderDocument, OrderWeeksInHouse} from "../../../models/order";
 import {CalculatorWeek} from "./calculator-week";
 import {Customer} from "../../../models/customer";
 import {Plant} from "../../../models/plant";
@@ -16,6 +16,7 @@ export class CalculatorOrder implements Order {
     customer:Customer = null;
     plant:Plant = null;
     zone:Zone = null;
+    weeksInHouse:OrderWeeksInHouse;
     rootInPropArea:boolean = false;
     partialSpace: boolean = false;
 
@@ -25,23 +26,38 @@ export class CalculatorOrder implements Order {
         }
     }
 
-    toOrderDocument(weeks:CalculatorWeek[]):OrderDocument {
-        const zone:OrderZone = {
-            name: this.zone.name,
-            tables: this.zone.tables,
-            autoSpace: this.zone.autoSpace,
-            isPropagationZone: this.zone.isPropagationZone,
-            weeks: weeks.map((w:CalculatorWeek) => {
-                return {
-                    year: w.week.year,
-                    week: w.week.week,
-                    //available: this.zone.tables - w.tables,
-                    available: w.zones[this.zone.name].available,
-                    tables: w.tables
-                    //tables: w.zones[this.zone.name].tables
-                };
-            })
-        };
+    toOrderDocument(weeks:CalculatorWeek[], zones:Zone[]):OrderDocument {
+        let lightsOutDate, lightsOutWeek, lightsOutYear;
+
+        if(this.lightsOutDate && this.rootInPropArea) {
+            lightsOutDate = moment(this.lightsOutDate);
+            lightsOutWeek = lightsOutDate.isoWeek();
+            lightsOutYear = lightsOutDate.isoWeekYear();
+        }
+
+        const propZone = _.find(zones, z => z.isPropagationZone),
+            zone = _.clone(_.find(zones, z => z.name === this.zone.name));
+
+
+        //noinspection TypeScriptUnresolvedVariable
+        delete zone.__metadata__;
+        delete zone.weeks;
+
+        const weeksInHouse = weeks.reduce((memo: OrderWeeksInHouse, w:CalculatorWeek):OrderWeeksInHouse => {
+            let zoneName:string;
+            // TODO: this isn't right. need to find the actual zone
+            if(lightsOutDate) {
+                if (lightsOutYear < w.week.year || lightsOutYear === w.week.year && w.week.week < lightsOutWeek) {
+                    if(propZone) {
+                        zoneName = propZone.name;
+                    }
+                }
+            }
+            if(!zoneName) zoneName = this.zone.name;
+
+            memo[w.week._id] = { zone: zoneName, tables: w.tables, week: w.week.week, year: w.week.year };
+            return memo;
+        }, <OrderWeeksInHouse>{});
 
         return new OrderDocument({
             _id: this._id,
@@ -55,6 +71,7 @@ export class CalculatorOrder implements Order {
             customer: this.customer,
             plant: this.plant,
             zone: zone,
+            weeksInHouse: weeksInHouse,
             rootInPropArea: this.rootInPropArea,
             partialSpace: this.partialSpace
         });

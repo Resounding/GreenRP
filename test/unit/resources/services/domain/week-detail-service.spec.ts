@@ -84,19 +84,20 @@ describe('week detail service', () => {
                         potsPerCase: 8,
                         hasLightsOut: true
                     },
+                    weeksInHouse: {
+                        'week:2017.3': {year: 2017, week: 3, tables: 7},
+                        'week:2017.4': {year: 2017, week: 4, tables: 7},
+                        'week:2017.5': {year: 2017, week: 5, tables: 7},
+                        'week:2017.6': {year: 2017, week: 6, tables: 7},
+                        'week:2017.7': {year: 2017, week: 7, tables: 7},
+                        'week:2017.8': {year: 2017, week: 8, tables: 20},
+                        'week:2017.9': {year: 2017, week: 9, tables: 20},
+                        'week:2017.10': {year: 2017, week: 10, tables: 20},
+                        'week:2017.11': {year: 2017, week: 11, tables: 20},
+                        'week:2017.12': {year: 2017, week: 12, tables: 20}
+                    },
                     zone: {
-                        name: 'A', tables: 325, autoSpace: false, isPropagationZone: false, weeks: [
-                            {year: 2017, week: 3, tables: 7, available: 318},
-                            {year: 2017, week: 4, tables: 7, available: 318},
-                            {year: 2017, week: 5, tables: 7, available: 318},
-                            {year: 2017, week: 6, tables: 7, available: 318},
-                            {year: 2017, week: 7, tables: 7, available: 318},
-                            {year: 2017, week: 8, tables: 20, available: 305},
-                            {year: 2017, week: 9, tables: 20, available: 305},
-                            {year: 2017, week: 10, tables: 20, available: 305},
-                            {year: 2017, week: 11, tables: 20, available: 305},
-                            {year: 2017, week: 12, tables: 20, available: 305}
-                        ]
+                        name: 'A', tables: 325, autoSpace: false, isPropagationZone: false
                     }
                 },                
                 week = {_id: 'week:2017.12', year: 2017, week: 12, zones: null},
@@ -120,7 +121,7 @@ describe('week detail service', () => {
             expect(wdo.tables).toEqual(20);
 
             // filter ends on stick week
-            filter.endDate = new Date(2017, 1, 1);
+            filter.endDate = new Date(2017, 0, 21);
             wdo = new WeekDetailOrder(order, filter);
             expect(wdo.isShippingThisWeek).toEqual(false);
             expect(wdo.isFloweringThisWeek).toEqual(false);
@@ -155,6 +156,9 @@ describe('week detail service', () => {
                     potsPerCase: 8,
                     hasLightsOut: true
                 },
+                weeksInHouse: {
+
+                },
                 zone: {
                     name: 'A', tables: 325, autoSpace: false, isPropagationZone: false
                 }
@@ -185,6 +189,9 @@ describe('week detail service', () => {
                     potsPerCase: 8,
                     hasLightsOut: true
                 },
+                weeksInHouse: {
+
+                },
                 zone: {
                     name: 'A', tables: 325, autoSpace: false, isPropagationZone: false
                 }
@@ -213,6 +220,9 @@ describe('week detail service', () => {
                     },
                     potsPerCase: 8,
                     hasLightsOut: true
+                },
+                weeksInHouse: {
+
                 },
                 zone: {
                     name: 'D', tables: 220, autoSpace: false, isPropagationZone: false

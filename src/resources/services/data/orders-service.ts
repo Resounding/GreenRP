@@ -19,8 +19,6 @@ export class OrdersService {
             return Promise.reject(Error('Please enter the quantity for the order.'));
         } else if(!orderDoc.plant) {
             return Promise.reject(Error('Please choose a plant for the order.'));
-        } else if(!orderDoc.zone) {
-            return Promise.reject(Error('Please select the zone for the order.'));
         } else if(!orderDoc._id) {
             return Promise.reject(Error('There was a problem creating the order. Please verify all fields have been entered.'));
         }

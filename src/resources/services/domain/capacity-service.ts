@@ -2,7 +2,7 @@ import {autoinject} from 'aurelia-framework';
 import {CapacityWeek} from '../../models/capacity-week';
 import {Week} from '../../models/week';
 import {ReferenceService} from '../data/reference-service';
-import {OrderDocument, OrderWeek} from '../../models/order';
+import {OrderDocument, OrderWeek, WeekInHouse} from '../../models/order';
 import {OrdersService} from '../data/orders-service';
 
 @autoinject()
@@ -28,10 +28,9 @@ export class CapacityService {
                             });
 
                             orders.forEach((order:OrderDocument) => {
-                                order.zone.weeks.forEach((w:OrderWeek) => {
-                                    const key = makeKey(w);
-                                    if (capacityWeeks.has(key)) {
-                                        capacityWeeks.get(key).addOrder(order, w);
+                                _.forEach(order.weeksInHouse, (w:WeekInHouse, weekId:string) => {
+                                    if(capacityWeeks.has(weekId)) {
+                                        capacityWeeks.get(weekId).addOrder(w);
                                     }
                                 });
                             });
@@ -45,6 +44,6 @@ export class CapacityService {
     }
 }
 
-function makeKey(week:Week|OrderWeek) {
+function makeKey(week:Week) {
     return `week:${week.year}.${week.week}`
 }

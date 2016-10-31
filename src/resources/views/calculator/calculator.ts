@@ -14,7 +14,6 @@ import {Season} from '../../models/season';
 import {Zone} from '../../models/zone';
 import {SeasonTime} from '../../models/season-time';
 import {CapacityWeek} from '../../models/capacity-week';
-import {EventAggregator} from "aurelia-event-aggregator";
 
 @autoinject()
 export class Calculator {
@@ -25,8 +24,7 @@ export class Calculator {
     partialSpace:boolean = false;
 
     constructor(private ordersService:OrdersService, referenceService:ReferenceService, capacityService:CapacityService,
-                private dialogService:DialogService, private controller:DialogController, private element:Element,
-                private events:EventAggregator) {
+                private dialogService:DialogService, private controller:DialogController, private element:Element) {
         controller.settings.lock = true;
         controller.settings.position = position;
 
@@ -106,6 +104,7 @@ export class Calculator {
     createOrder(zone:CalculatorZone) {
         let revision = 0;
 
+        //noinspection JSUnusedLocalSymbols
         const saver = () => {
             this.calculator.order.zone = zone;
 
@@ -124,10 +123,12 @@ export class Calculator {
                                 .then((result:DialogResult) => {
                                     if(result.wasCancelled) return;
 
+                                    //noinspection TypeScriptUnresolvedFunction
                                     recreate();
                                 });
                         // if there are multiple conflicts, don't ask every time
                         } else {
+                            //noinspection TypeScriptUnresolvedFunction
                             recreate();
                         }
                     } else {
@@ -136,7 +137,8 @@ export class Calculator {
                 });
         },
         recreate = () => {
-            delete this.calculator.order._id;
+            const order = this.calculator.order;
+            order._id = void 0;
             const id = this.calculator.getOrderDocument().toJSON()._id;
 
             revision++;
@@ -157,7 +159,7 @@ export class Calculator {
     }
 }
 
-function position(modalContainer:Element, modalOverlay:Element) {
+function position(modalContainer:Element) {
     const $container = $(modalContainer),
         $aiFooter = $container.find('ai-dialog-footer'),
         $aiBody = $container.find('ai-dialog-body'),

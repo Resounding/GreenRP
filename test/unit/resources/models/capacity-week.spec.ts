@@ -1,6 +1,6 @@
 import {CapacityWeek} from "../../../../src/resources/models/capacity-week";
 import {Week} from "../../../../src/resources/models/week";
-import {OrderWeek, OrderDocument} from "../../../../src/resources/models/order";
+import {OrderDocument, WeekInHouse} from "../../../../src/resources/models/order";
 
 describe('capacity week', () => {
     let capacityWeek:CapacityWeek,
@@ -16,7 +16,7 @@ describe('capacity week', () => {
 
     beforeEach(() => {
         capacityWeek = new CapacityWeek(week);
-    })
+    });
 
     it('sets the properties from the constructor', () => {
 
@@ -35,11 +35,11 @@ describe('capacity week', () => {
     });
 
     it('deducts from the available when an order is added', () => {
-        const orderWeek:OrderWeek = {
+        const weekInHouse:WeekInHouse = {
             year: 2017,
             week: 1,
             tables: 50,
-            available: 50
+            zone: 'A'
         };
         const order:OrderDocument = new OrderDocument({
             _id: '123',
@@ -65,6 +65,14 @@ describe('capacity week', () => {
                 potsPerCase: 8,
                 hasLightsOut: false
             },
+            weeksInHouse: {
+                "week:2017-1": { zone: 'A', tables: 1, year: 2017, week: 1 },
+                "week:2017-2": { zone: 'A', tables: 1, year: 2017, week: 2 },
+                "week:2017-3": { zone: 'A', tables: 1, year: 2017, week: 3 },
+                "week:2017-4": { zone: 'A', tables: 2, year: 2017, week: 4 },
+                "week:2017-5": { zone: 'A', tables: 2, year: 2017, week: 5 },
+                "week:2017-6": { zone: 'A', tables: 2, year: 2017, week: 6 }
+            },
             zone: {
                 name: 'A',
                 tables: 100,
@@ -76,7 +84,7 @@ describe('capacity week', () => {
 
         expect(capacityWeek.zones['A'].available).toEqual(100);
 
-        capacityWeek.addOrder(order, orderWeek);
+        capacityWeek.addOrder(weekInHouse);
 
         expect(capacityWeek.zones['A'].available).toEqual(50);
     });

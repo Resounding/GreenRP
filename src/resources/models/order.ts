@@ -2,15 +2,15 @@ import {Zone} from "./zone";
 import {Customer} from "./customer";
 import {Plant} from "./plant";
 
-export interface OrderWeek {
+export interface WeekInHouse {
+    zone:string;
+    tables:number;
     year:number;
     week:number;
-    tables:number;
-    available:number;
 }
 
-export interface OrderZone extends Zone {
-    weeks:OrderWeek[];
+export interface OrderWeeksInHouse {
+    [index:string]: WeekInHouse;
 }
 
 export interface Order {
@@ -25,6 +25,7 @@ export interface Order {
     customer:Customer;
     plant:Plant;
     zone:Zone;
+    weeksInHouse:OrderWeeksInHouse;
     rootInPropArea:boolean;
     partialSpace:boolean;
 }
@@ -40,7 +41,8 @@ export class OrderDocument implements Order {
     quantity:number;
     customer:Customer;
     plant:Plant;
-    zone:OrderZone;
+    zone:Zone;
+    weeksInHouse:OrderWeeksInHouse;
     rootInPropArea:boolean;
     partialSpace:boolean;
 
@@ -103,6 +105,7 @@ export class OrderDocument implements Order {
             customer: this.customer,
             plant: this.plant,
             zone: this.zone,
+            weeksInHouse: this.weeksInHouse,
             rootInPropArea: !!this.rootInPropArea,
             partialSpace: !!this.partialSpace
         };

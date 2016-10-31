@@ -4,7 +4,6 @@ import {Configuration} from './configuration';
 import {Authentication} from './authentication';
 import {log} from './log';
 import {OrderDocument} from "../models/order";
-import {ZoneDocument} from "../models/zone";
 
 let localDB: PouchDB = null;
 let remoteDB: PouchDB = null;
@@ -26,8 +25,7 @@ export class Database {
         }
 
         if (this.auth.isAuthenticated()) {
-            const userInfo = this.auth.userInfo,
-                headers = {Authorization: userInfo.basicAuth};
+            const userInfo = this.auth.userInfo;
 
             remoteDB = new PouchDB(this.config.remote_database_name, {
                 skip_setup: true,
@@ -47,7 +45,7 @@ export class Database {
                     log.debug(change);
                     if(change.direction === 'pull' && _.isArray(change.change.docs)) {
 
-                        let ordersSynced:boolean = _.any(change.change.docs, doc => doc.type === OrderDocument.OrderDocumentType || doc._deleted),
+                        let ordersSynced:boolean = _.any(change.change.docs, doc => doc.type === OrderDocument.OrderDocumentType),
                             zonesSynced:boolean = _.any(change.change.docs, doc => doc._id === 'zones');
 
                         if(ordersSynced) {
@@ -66,6 +64,7 @@ export class Database {
         }
     }
 
+    //noinspection JSMethodCanBeStatic
     get db() {
         return localDB;
     }

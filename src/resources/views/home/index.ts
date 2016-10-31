@@ -6,8 +6,7 @@ import {Database} from '../../services/database';
 import {ReferenceService} from "../../services/data/reference-service";
 import {OrdersService} from '../../services/data/orders-service';
 import {Zone} from "../../models/zone";
-import {Calculator} from "../calculator/calculator";
-import {ZoneDetail, ZoneDetailModel} from "../zones/zone-detail";
+import {ZoneDetail, ZoneDetailInputModel} from "../zones/zone-detail";
 import {WeekDetail} from "../weeks/week-detail";
 
 @autoinject()
@@ -78,7 +77,7 @@ export class Index {
     }
 
     showZoneDetails(zone:Zone) {
-        const model:ZoneDetailModel = { year: this.year, zone: zone };
+        const model:ZoneDetailInputModel = { year: this.year, zone: zone };
         this.events.publish(ZoneDetail.ShowZoneDetailEvent, model);
     }
 

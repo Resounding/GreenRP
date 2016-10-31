@@ -1,12 +1,14 @@
 import {CalculatorOrder} from '../../../../../../src/resources/services/domain/models/calculator-order';
 import {CalculatorWeek} from '../../../../../../src/resources/services/domain/models/calculator-week';
 import {OrderDocument} from '../../../../../../src/resources/models/order';
+import {Zone} from "../../../../../../src/resources/models/zone";
 
 describe('calculator order', () => {
     let calculatorOrder:CalculatorOrder,
         order:OrderDocument,
         weeks:CalculatorWeek[],
-        orderDoc: any;
+        orderDoc: any,
+        allZones:Zone[];
 
     describe('toOrderDocument()', () => {
         beforeEach(() => {
@@ -46,10 +48,17 @@ describe('calculator order', () => {
                 partialSpace: false
             };
             calculatorOrder = new CalculatorOrder(orderDoc);
+
+            allZones = [
+                { name: 'A', isPropagationZone: false, autoSpace: false, tables: 100},
+                { name: 'B', isPropagationZone: true, autoSpace: false, tables: 100},
+                { name: 'C', isPropagationZone: false, autoSpace: false, tables: 100},
+                { name: 'F', isPropagationZone: false, autoSpace: true, tables: 100}
+            ];
             
             weeks = [];
 
-            order = calculatorOrder.toOrderDocument(weeks);
+            order = calculatorOrder.toOrderDocument(weeks, allZones);
         });
 
         it('contains all the properties', () => {
@@ -120,18 +129,18 @@ describe('calculator order', () => {
                  }
             ];
 
-            order = calculatorOrder.toOrderDocument(weeks);
-            let week = order.zone.weeks[0]; 
+            order = calculatorOrder.toOrderDocument(weeks, allZones);
+            let week = order.weeksInHouse['week:2017.1'];
             expect(week.week).toEqual(1);
-            expect(week.available).toEqual(75);
+            expect(week.tables).toEqual(25);
 
-            week = order.zone.weeks[1];
+            week = order.weeksInHouse['week:2017.2'];
             expect(week.week).toEqual(2);
-            expect(week.available).toEqual(50);
+            expect(week.tables).toEqual(50);
 
-            week = order.zone.weeks[2];
+            week = order.weeksInHouse['week:2017.3'];
             expect(week.week).toEqual(3);
-            expect(week.available).toEqual(50);
+            expect(week.tables).toEqual(50);
         });
 
         it('contains the right values for the weeks when partially spaced', () => {
@@ -195,10 +204,10 @@ describe('calculator order', () => {
             };
             calculatorOrder = new CalculatorOrder(orderDoc);
             
-            order = calculatorOrder.toOrderDocument(weeks);
-            let week = order.zone.weeks[0]; 
+            order = calculatorOrder.toOrderDocument(weeks, allZones);
+            let week = order.weeksInHouse['week:2017.1'];
             expect(week.week).toEqual(1);
-            expect(week.available).toEqual(75);
+            expect(week.tables).toEqual(50);
         });
 
     });

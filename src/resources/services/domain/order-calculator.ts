@@ -8,20 +8,15 @@ import {CalculatorOrder} from './models/calculator-order';
 import {CalculatorZone} from "./models/calculator-zone";
 import {Zone} from '../../models/zone';
 import {Season} from '../../models/season';
-import {Week, WeekDocument, WeekZones} from '../../models/week';
+import {Week, WeekZones} from '../../models/week';
 import {Plant} from "../../models/plant";
 import {SeasonTime} from "../../models/season-time";
 import {CapacityWeek} from "../../models/capacity-week";
 import {OrderDocument} from "../../models/order";
 
-interface WeekMap {
-    [id:string]: WeekDocument
-}
-
-let _order:CalculatorOrder,
-    _weeks:CalculatorWeek[];
-
 export class OrderCalculator {
+    private _order:CalculatorOrder;
+    private _weeks:CalculatorWeek[];
     zones:CalculatorZone[];
     propagationZone:Zone;
     season:Season;
@@ -31,15 +26,15 @@ export class OrderCalculator {
     spaceCalculator:SpaceCalculator;
 
     constructor(zones:Zone[], private allWeeks:Map<string, CapacityWeek>, seasons:Season[], private propagationTimes:SeasonTime[], private flowerTimes:SeasonTime[], order?:OrderDocument) {
-        _order = new CalculatorOrder(order);
-        _weeks = [];
+        this._order = new CalculatorOrder(order);
+        this._weeks = [];
 
         this.zones = _.sortBy(zones, z => z.name.toLowerCase()).map(z => new CalculatorZone(z));
         this.propagationZone = _.find(zones, z => z.isPropagationZone);
         this.seasonSelector = new SeasonSelector(seasons);
         this.propagationTimeSelector = new TimeSelector(propagationTimes);
         this.flowerTimeSelector = new TimeSelector(flowerTimes);
-        this.spaceCalculator = new SpaceCalculator(_order);
+        this.spaceCalculator = new SpaceCalculator(this._order);
 
         if(order && _.isDate(order.arrivalDate)){
             this.resetWeeks();
@@ -47,7 +42,7 @@ export class OrderCalculator {
     }
 
     setArrivalDate(date:Date):OrderCalculator {
-        _order.arrivalDate = date;
+        this._order.arrivalDate = date;
         this.resetFlowerDate();
         this.resetLightsOutDate();
         this.resetStickDate();
@@ -57,7 +52,7 @@ export class OrderCalculator {
     }
 
     setPlant(plant:Plant):OrderCalculator {
-        _order.plant = plant;
+        this._order.plant = plant;
         this.resetFlowerDate();
         this.resetLightsOutDate();
         this.resetStickDate();
@@ -70,15 +65,15 @@ export class OrderCalculator {
     get orderQuantity():number {
         let quantity = 0;
 
-        if(_order) {
-            quantity = numeral(_order.quantity).value();
+        if(this._order) {
+            quantity = numeral(this._order.quantity).value();
         }
         return quantity;
     }
 
     set orderQuantity(quantity:number) {
-        if(_order) {
-            _order.quantity = numeral(quantity).value();
+        if(this._order) {
+            this._order.quantity = numeral(quantity).value();
             this.resetWeeks();
         }
     }
@@ -87,75 +82,75 @@ export class OrderCalculator {
     get potsPerCase():number {
         let potsPerCase = 0;
 
-        if(_order && _order.plant) {
-            potsPerCase = numeral(_order.plant.potsPerCase).value();
+        if(this._order && this._order.plant) {
+            potsPerCase = numeral(this._order.plant.potsPerCase).value();
         }
 
         return potsPerCase;
     }
 
     set potsPerCase(potsPerCase:number) {
-        if(_order && _order.plant) {
-            _order.plant.potsPerCase = numeral(potsPerCase).value();
+        if(this._order && this._order.plant) {
+            this._order.plant.potsPerCase = numeral(potsPerCase).value();
         }
     }
 
     @computedFrom('order.rootInPropArea')
     get rootInPropagationZone():boolean {
-        return _order && _order.rootInPropArea;
+        return this._order && this._order.rootInPropArea;
     }
 
     set rootInPropagationZone(value:boolean) {
-        if(_order) {
-            _order.rootInPropArea = value;
+        if(this._order) {
+            this._order.rootInPropArea = value;
             this.resetWeeks();
         }
     }
 
     @computedFrom('order.partialSpace')
     get partialSpace():boolean {
-        return _order && _order.partialSpace;
+        return this._order && this._order.partialSpace;
     }
 
     set partialSpace(value:boolean) {
-        if(_order) {
-            _order.partialSpace = value;
+        if(this._order) {
+            this._order.partialSpace = value;
             this.resetWeeks();
         }
     }
 
     setFlowerDate(date:Date):OrderCalculator {
-        _order.flowerDate = date;
+        this._order.flowerDate = date;
         this.resetWeeks();
 
         return this;
     }
 
     setLightsOutDate(date:Date):OrderCalculator {
-        _order.lightsOutDate = date;
+        this._order.lightsOutDate = date;
         this.resetWeeks();
 
         return this;
     }
 
     setStickDate(date:Date):OrderCalculator {
-        _order.stickDate = date;
+        this._order.stickDate = date;
         this.resetWeeks();
 
         return this;
     }
 
     get order():CalculatorOrder {
-        return _order;
+        return this._order;
     }
 
     @computedFrom('plant', 'order.quantity', 'order.arrivalDate', 'order.flowerDate', 'order.lightsOutDate', 'order.stickDate', 'order.rootInPropArea', 'order.partialSpace')
     get weeks():CalculatorWeek[] {
-        return _weeks;
+        return this._weeks;
     }
 
     public getOrderDocument() {
-        return this.order.toOrderDocument(this.weeks);
+        return this.order.toOrderDocument(this.weeks, this.zones);
     }
 
     private resetWeeks() {
@@ -184,7 +179,7 @@ export class OrderCalculator {
                 week: shipWeek,
                 events: [{
                     name: Events.ShipEventName,
-                    date: _order.arrivalDate
+                    date: this._order.arrivalDate
                 }],
                 tables: tableCount,
                 zones: zones
@@ -193,7 +188,7 @@ export class OrderCalculator {
             if(flowerWeek) {
                 const flowerEvent:Event = {
                     name: Events.FlowerEventName,
-                    date: _order.flowerDate
+                    date: this._order.flowerDate
                 };
                 if(flowerWeek._id === shipWeek._id) {
                     weeks[0].events.unshift(flowerEvent);
@@ -220,10 +215,10 @@ export class OrderCalculator {
         if(fullSpaceWeek) {
             log.debug(`Full space  week: ${fullSpaceWeek._id}`);
             
-            const fullSpaceDate = moment(_order.lightsOutDate).add(1, 'week'),
+            const fullSpaceDate = moment(this._order.lightsOutDate).add(1, 'week'),
                 fullSpaceStartOfWeek = fullSpaceDate.clone().startOf('isoweek'),
                 fullSpaceId = fullSpaceDate.toWeekNumberId(),
-                loopDate = moment(_order.flowerDate).startOf('isoweek');
+                loopDate = moment(this._order.flowerDate).startOf('isoweek');
             while(loopDate.isSameOrAfter(fullSpaceStartOfWeek)) {
                 let id = loopDate.toWeekNumberId(),
                     week = this.allWeeks.get(id);
@@ -255,7 +250,7 @@ export class OrderCalculator {
                     if(isFullSpaceWeek) {
                         // now add lights-out...
                         loopDate.subtract(1, 'week');
-                        id = loopDate.toWeekNumberId(),
+                        id = loopDate.toWeekNumberId();
                         week = this.allWeeks.get(id);
 
                         if(week) {
@@ -267,12 +262,12 @@ export class OrderCalculator {
                                 events: [
                                     {
                                         name: Events.LightsOutEventName,
-                                        date: _order.lightsOutDate
+                                        date: this._order.lightsOutDate
                                     }
                                 ],
                                 tables: tableCount,
                                 zones: zones
-                            }
+                            };
 
                             weeks.unshift(calculatorWeek);
                             lightsOutEventCreated = true;
@@ -280,7 +275,7 @@ export class OrderCalculator {
 
                         // ... & partial space
                         loopDate.subtract(1, 'week');
-                        id = loopDate.toWeekNumberId(),
+                        id = loopDate.toWeekNumberId();
                         week = this.allWeeks.get(id);
 
                         if(week) {
@@ -298,7 +293,7 @@ export class OrderCalculator {
                                 ],
                                 tables: tableCount,
                                 zones: zones
-                            }
+                            };
 
                             weeks.unshift(calculatorWeek);
                             partialSpaceEventCreated = true;
@@ -314,10 +309,10 @@ export class OrderCalculator {
         } else if(lightsOutWeek) {
             log.debug(`Lights out week: ${lightsOutWeek._id}`);
 
-            const lightsOutDate = moment(_order.lightsOutDate),
+            const lightsOutDate = moment(this._order.lightsOutDate),
                 lightsOutStartOfWeek = lightsOutDate.clone().startOf('isoweek'),
                 lightsOutId = lightsOutDate.toWeekNumberId(),
-                loopDate = moment(_order.flowerDate).add(-1, 'week');
+                loopDate = moment(this._order.flowerDate).add(-1, 'week');
             while(loopDate.isSameOrAfter(lightsOutStartOfWeek)) {
                 let id = loopDate.toWeekNumberId(),
                     week = this.allWeeks.get(id);
@@ -335,7 +330,7 @@ export class OrderCalculator {
 
                     if(week._id === lightsOutId) {
                         calculatorWeek.events.push({
-                            name: _order.plant.hasLightsOut ? Events.LightsOutEventName : Events.SpacingEventName,
+                            name: this._order.plant.hasLightsOut ? Events.LightsOutEventName : Events.SpacingEventName,
                             date: lightsOutDate.toDate()
                         });
                     }
@@ -353,17 +348,17 @@ export class OrderCalculator {
         if(stickWeek) {
             log.debug(`Stick Week: ${stickWeek._id}`);
 
-            const season:Season = this.seasonSelector.get(_order.arrivalDate, _order.plant.crop);
+            const season:Season = this.seasonSelector.get(this._order.arrivalDate, this._order.plant.crop);
 
             if(season) {
-                const propagationTime = this.propagationTimeSelector.get(season, _order.plant.name);
+                const propagationTime = this.propagationTimeSelector.get(season, this._order.plant.name);
 
                 if(propagationTime) {
                     const
-                        stickDate = moment(_order.stickDate),
+                        stickDate = moment(this._order.stickDate),
                         stickDateStartOfWeek = stickDate.clone().startOf('isoweek'),
                         // if it's partial-spaced, the week after lights-out has already been added
-                        lastDate = moment(_order.lightsOutDate).subtract(fullSpaceWeek ? 1 : 0, 'weeks'),
+                        lastDate = moment(this._order.lightsOutDate).subtract(fullSpaceWeek ? 1 : 0, 'weeks'),
                         loopDate = lastDate.add(-1, 'week');
 
                     while(loopDate.isSameOrAfter(stickDateStartOfWeek)){
@@ -395,10 +390,10 @@ export class OrderCalculator {
                         loopDate.add(-1, 'week');
                     }
                 } else {
-                    log.debug(`Propagation time not found for ${_order.plant.crop} in ${season.name}`);
+                    log.debug(`Propagation time not found for ${this._order.plant.crop} in ${season.name}`);
                 }
             } else {
-                log.debug(`Season not found for ${_order.plant.crop} on ${_order.arrivalDate}`);
+                log.debug(`Season not found for ${this._order.plant.crop} on ${this._order.arrivalDate}`);
             }
         } else {
             log.debug('No stick week');
@@ -413,7 +408,7 @@ export class OrderCalculator {
             if(week) {
                 week.events.unshift({
                     name: Events.StickEvent,
-                    date: _order.stickDate
+                    date: this._order.stickDate
                 });
             }
         }
@@ -424,7 +419,7 @@ export class OrderCalculator {
             if(week) {
                 week.events.unshift({
                     name: Events.PartialSpaceEventName,
-                    date: moment(_order.lightsOutDate).subtract(1, 'week').toDate()
+                    date: moment(this._order.lightsOutDate).subtract(1, 'week').toDate()
                 });
             }
         }
@@ -433,10 +428,10 @@ export class OrderCalculator {
                 return w.week._id === lightsOutWeek._id;
             });
             if(week) {
-                const eventName = (_order.plant.hasLightsOut || _order.partialSpace) ? Events.LightsOutEventName : Events.SpacingEventName;
+                const eventName = (this._order.plant.hasLightsOut || this._order.partialSpace) ? Events.LightsOutEventName : Events.SpacingEventName;
                 week.events.unshift({
                     name: eventName,
-                    date: _order.lightsOutDate
+                    date: this._order.lightsOutDate
                 });
             }
         }
@@ -447,7 +442,7 @@ export class OrderCalculator {
             if(week) {
                 week.events.unshift({
                     name: Events.FullSpaceEventName,
-                    date: moment(_order.lightsOutDate).add(1, 'week').toDate()
+                    date: moment(this._order.lightsOutDate).add(1, 'week').toDate()
                 });
             }
         }
@@ -458,128 +453,115 @@ export class OrderCalculator {
             if(week) {
                 week.events.unshift({
                     name: Events.FlowerEventName,
-                    date: _order.flowerDate
+                    date: this._order.flowerDate
                 });
             }
         }
 
         this.zones.forEach(z => z.weeks = weeks);
-        _weeks = weeks;
+        this._weeks = weeks;
     }
 
     private getShipWeek():Week {
-        if(!_order.arrivalDate) {
+        if(!this._order.arrivalDate) {
             log.debug('No arrival date - ship week null');
             return null;
         }
 
-        const id = moment(_order.arrivalDate).toWeekNumberId(),
-            week = this.allWeeks.get(id);
-
-        return week;
+        const id = moment(this._order.arrivalDate).toWeekNumberId();
+        return this.allWeeks.get(id);
     }
 
     private resetFlowerDate():Date {
         let date:Date = null;
 
-        if(_order.arrivalDate) {
-            date = moment(_order.arrivalDate).add(-OrderCalculator.FLOWER_LEAD_TIME, 'days').toDate();
+        if(this._order.arrivalDate) {
+            date = moment(this._order.arrivalDate).add(-OrderCalculator.FLOWER_LEAD_TIME, 'days').toDate();
         }
 
-        _order.flowerDate = date;
+        this._order.flowerDate = date;
         return date;
     }
 
     private getFlowerWeek():Week {
-        if(!_order.flowerDate) return null;
+        if(!this._order.flowerDate) return null;
 
-        const id = moment(_order.flowerDate).toWeekNumberId(),
-            week = this.allWeeks.get(id);
-
-        return week;
+        const id = moment(this._order.flowerDate).toWeekNumberId();
+        return this.allWeeks.get(id);
     }
 
     private resetLightsOutDate():Date {
         let date:Date = null;
 
-        if(_order.flowerDate && _order.plant) {
+        if(this._order.flowerDate && this._order.plant) {
 
             const season: Season = this.getSeason();
 
             if (!season) return null;
 
-            const time: number = this.flowerTimeSelector.get(season, _order.plant.name);
+            const time: number = this.flowerTimeSelector.get(season, this._order.plant.name);
             if (!time) return null;
 
-            const lightsOutDate = moment(_order.flowerDate).addWeeksAndDays(-time);
+            const lightsOutDate = moment(this._order.flowerDate).addWeeksAndDays(-time);
 
             date = lightsOutDate.toDate();
         }
 
-        _order.lightsOutDate = date;
+        this._order.lightsOutDate = date;
         return date;
     }
 
     private getLightsOutWeek():Week {
-        if(!_order.lightsOutDate) return null;
+        if(!this._order.lightsOutDate) return null;
 
-        const id = moment(_order.lightsOutDate).toWeekNumberId(),
-            week = this.allWeeks.get(id);
-
-        return week;
+        const id = moment(this._order.lightsOutDate).toWeekNumberId();
+        return this.allWeeks.get(id);
     }
 
     private getPartialSpaceWeek():Week {
-        if(!_order.partialSpace || !_order.lightsOutDate) return null;
+        if(!this._order.partialSpace || !this._order.lightsOutDate) return null;
 
-        const id = moment(_order.lightsOutDate).subtract(1, 'week').toWeekNumberId(),
-        week = this.allWeeks.get(id);
-
-        return week;
+        const id = moment(this._order.lightsOutDate).subtract(1, 'week').toWeekNumberId();
+        return this.allWeeks.get(id);
     }
 
     private getFullSpaceWeek():Week {
-        if(!_order.partialSpace || !_order.lightsOutDate) return null;
+        if(!this._order.partialSpace || !this._order.lightsOutDate) return null;
 
-        const id = moment(_order.lightsOutDate).add(1, 'week').toWeekNumberId(),
-        week = this.allWeeks.get(id);
-
-        return week;
+        const id = moment(this._order.lightsOutDate).add(1, 'week').toWeekNumberId();
+        return this.allWeeks.get(id);
     }
 
     private resetStickDate():Date {
         let date:Date = null;
 
-        if(_order.arrivalDate && _order.plant) {
+        if(this._order.arrivalDate && this._order.plant) {
 
             const season = this.getSeason();
 
             if (season) {
 
-                const time = this.propagationTimeSelector.get(season, _order.plant.name);
+                const time = this.propagationTimeSelector.get(season, this._order.plant.name);
                 if (time) {
 
-                    const lightsOut = moment(_order.lightsOutDate);
+                    const lightsOut = moment(this._order.lightsOutDate);
 
                     date = lightsOut.addWeeksAndDays(-time).toDate();
                 }
             }
         }
 
-        _order.stickDate = date;
+        this._order.stickDate = date;
         return date;
     }
 
     private getStickWeek():Week {
-        const id = moment(_order.stickDate).toWeekNumberId(),
-            week = this.allWeeks.get(id);
-
-        return week;
+        const id = moment(this._order.stickDate).toWeekNumberId();
+        return this.allWeeks.get(id);
     }
 
     private getSeason():Season {
-        const season = this.seasonSelector.get(_order.arrivalDate, _order.plant.crop);
-        return season;
+        return this.seasonSelector.get(this._order.arrivalDate, this._order.plant.crop);
     }
 
     private getZones(week:Week, tables:number|TableSpaceResult, usePropZone:boolean = false):WeekZones {
