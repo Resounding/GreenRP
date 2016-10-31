@@ -514,6 +514,7 @@ export class OrderCalculator {
 
     private getLightsOutWeek():Week {
         if(!this._order.lightsOutDate) return null;
+
         const id = moment(this._order.lightsOutDate).toWeekNumberId();
         return this.allWeeks.get(id);
     }
