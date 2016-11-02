@@ -60,7 +60,7 @@
                 
                 <order-table calculator.bind="calculator"></order-table>
 
-                <order-table repeat.for="i of numberRepeats" calculator.bind="repeatCalculators[i]"></order-table>
+                <order-table repeat.for="c of repeatCalculators" calculator.bind="c"></order-table>
 
             </form>
         </ai-dialog-body>

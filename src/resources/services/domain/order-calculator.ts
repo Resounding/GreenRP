@@ -186,6 +186,8 @@ export class OrderCalculator {
         return this._order;
     }
 
+    
+    @computedFrom('plant', 'order.quantity', 'order.arrivalDate', 'order.flowerDate', 'order.lightsOutDate', 'order.stickDate', 'order.rootInPropArea', 'order.partialSpace')
     get weeks():CalculatorWeek[] {
         return this._weeks;
     }

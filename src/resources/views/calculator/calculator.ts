@@ -1,5 +1,5 @@
 import {autoinject, computedFrom} from 'aurelia-framework';
-import {ObserverLocator} from 'aurelia-binding';
+import {ObserverLocator, observable} from 'aurelia-binding';
 import {EventAggregator} from 'aurelia-event-aggregator';
 import {DialogController, DialogService, DialogResult} from 'aurelia-dialog';
 import {log} from '../../services/log';
@@ -35,7 +35,7 @@ export class Calculator {
     plants:Plant[];
     season:Season;
     calculator:OrderCalculator;
-    repeatCalculators:OrderCalculator[] = [];
+    @observable repeatCalculators:OrderCalculator[] = [];
     partialSpace:boolean = false;
 
     constructor(private ordersService:OrdersService, private referenceService:ReferenceService, private capacityService:CapacityService,
@@ -75,6 +75,9 @@ export class Calculator {
             this.observerLocator
                 .getObserver(this.calculator, 'orderQuantity')
                 .subscribe(this.onQuantityChange.bind(this));
+            this.observerLocator
+                .getObserver(this.calculator, 'rootInPropagationZone')
+                .subscribe(this.onRootInPropagationZoneChange.bind(this));
         });
     }
 
@@ -100,11 +103,6 @@ export class Calculator {
         this.observerLocator
                 .getObserver(this.calculator, 'orderQuantity')
                 .unsubscribe(this.onQuantityChange.bind(this));
-    }
-
-    @computedFrom('repeatCount', 'repeatDays')
-    get numberRepeats():number {
-        return this.repeatCalculators.length;
     }
 
     @computedFrom('calculator.order.arrivalDate')
@@ -138,6 +136,20 @@ export class Calculator {
     }
     onQuantityChange(value:string) {
         this.repeatCalculators.forEach((calculator, index) => {
+            this.resetRepeatingCalculator(calculator, index);
+        });
+    }
+    onRootInPropagationZoneChange(value:boolean) {
+        const rootInPropZone = this.calculator.rootInPropagationZone;
+        this.repeatCalculators.forEach((calculator, index) => {
+            calculator.rootInPropagationZone = rootInPropZone;
+            this.resetRepeatingCalculator(calculator, index);
+        });
+    }
+    onPartialSpacingChange(value:boolean) {
+        const partialSpace = this.calculator.partialSpace;
+        this.repeatCalculators.forEach((calculator, index) => {
+            calculator.partialSpace = partialSpace;
             this.resetRepeatingCalculator(calculator, index);
         });
     }
@@ -249,33 +261,32 @@ export class Calculator {
             value = 0;
         }
 
-        this._repeatCount = value;
+        if(this._repeatCount !== value) {
+            this._repeatCount = value;
 
-        for(let i=0; i < this.repeatCalculators.length; i++) {
-            let calculator = this.repeatCalculators[i];
-            if(calculator && i >= value) {
+            while(this.repeatCalculators.length > value) {
+                const calculator = this.repeatCalculators.pop();
                 this.observerLocator
                     .getObserver(calculator.order, 'rootInPropagationZone')
                     .unsubscribe(this.onRepeaterChange.bind(this));
                 this.observerLocator
                     .getObserver(calculator.order, 'partialSpace')
                     .unsubscribe(this.onRepeaterChange.bind(this));
-            } else {
-                if(typeof calculator === 'undefined') {
-                    calculator = this.createCalculator();
-                    this.observerLocator
-                        .getObserver(calculator.order, 'rootInPropagationZone')
-                        .subscribe(this.onRepeaterChange.bind(this));
-                    this.observerLocator
-                        .getObserver(calculator.order, 'partialSpace')
-                        .subscribe(this.onRepeaterChange.bind(this));
-                    this.repeatCalculators[i] = calculator;                
-                }                
             }
-        }
 
-        this.repeatCalculators.length = value;
-        this.repeatCalculators.forEach(this.resetRepeatingCalculator.bind(this));
+            while(this.repeatCalculators.length < value) {
+                const calculator = this.createCalculator();
+                this.observerLocator
+                    .getObserver(calculator.order, 'rootInPropagationZone')
+                    .subscribe(this.onRepeaterChange.bind(this));
+                this.observerLocator
+                    .getObserver(calculator.order, 'partialSpace')
+                    .subscribe(this.onRepeaterChange.bind(this));
+                this.repeatCalculators.push(calculator);
+            }
+
+            this.repeatCalculators.forEach(this.resetRepeatingCalculator.bind(this));
+        }
     }
 
     get repeatDays():number {
