@@ -7,7 +7,7 @@
         <ai-dialog-body>
             <form class="ui form segment">
                 <h4 class="ui dividing header">Requested Order</h4>
-                <div class="two fields">
+                <div class="three fields">
                     <div class="field">
                         <label for="customer">Customer</label>
                         <select name="customer" id="customer">
@@ -21,8 +21,6 @@
                             <span class="date-display">${dateDisplay}</span>
                         </div>
                     </div>
-                </div>
-                <div class="three fields">
                     <div class="field">
                         <label for="plant">Plant</label>
                         <select name="plant" id="plant">
@@ -30,27 +28,12 @@
                             <option repeat.for="p of plants" value.bind="p.name | escapeQuotes">${p.name}</option>
                         </select>
                     </div>
-                    <div class="field">
-                        <label for="pots-per-case">Pots Per Case</label>
-                        <input type="number" name="pots-per-case" id="pots-per-case" value.bind="calculator.potsPerCase" required>
-                    </div>
-                    <div class="field">
-                        <label for="quantity">Quantity</label>
-                        <input type="number" id="quantity" name="quantity" value.bind="calculator.orderQuantity & debounce" required>
-                    </div>
                 </div>
-
-                <div class="ui divider"></div>
-
                 <div class="three fields">
-                    <div class="ui field toggle checkbox">
-                        <input type="checkbox" name="root-in-prop-zone" id="root-in-prop-zone" checked.bind="calculator.rootInPropagationZone">
-                        <label for="root-in-prop-zone">Root in B/C</label>
-                    </div>
                     <div class="ui field">
                         <div class="ui toggle checkbox">
                             <input type="checkbox" id="repeating-order" checked.bind="isRepeatingOrder">
-                            <label for="repeating-order">Repeating Order</label>                            
+                            <label for="repeating-order">Repeating Order</label>
                         </div>
                         <div class="field fields" show.bind="isRepeatingOrder">
                             <div class="ui field inline eight wide">
@@ -63,21 +46,27 @@
                             </div>
                         </div>
                     </div>
-                    <div class="ui field toggle checkbox">
-                        <input type="checkbox" name="partial-space" id="partial-space" checked.bind="calculator.partialSpace">
-                        <label for="partial-space">Use partial spacing</label>
+                    <div class="field">
+                        <label for="pots-per-case">Pots Per Case</label>
+                        <input type="number" name="pots-per-case" id="pots-per-case" value.bind="calculator.potsPerCase" required>
+                    </div>
+                    <div class="field">
+                        <label for="quantity">Quantity</label>
+                        <input type="number" id="quantity" name="quantity" value.bind="calculator.orderQuantity & debounce" required>
                     </div>
                 </div>
+
+                <div class="ui divider"></div>
                 
                 <order-table calculator.bind="calculator"></order-table>
-                
 
                 <order-table repeat.for="i of numberRepeats" calculator.bind="repeatCalculators[i]"></order-table>
 
             </form>
         </ai-dialog-body>
         <ai-dialog-footer>
-            <button click.trigger="controller.cancel()">Cancel</button>
+            <button class="basic ui button" click.delegate="controller.cancel()">Cancel</button>
+            <button class="basic ui primary button" click.delegate="createOrder()">Save</button>
         </ai-dialog-footer>
     </ai-dialog>
 </template>

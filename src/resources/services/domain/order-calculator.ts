@@ -42,6 +42,11 @@ export class OrderCalculator {
         }
     }
 
+    setZone(zone:Zone):OrderCalculator {
+        this._order.zone = zone;
+        return this;
+    }
+
     setArrivalDate(date:Date):OrderCalculator {
         this._order.arrivalDate = date;
         this.resetFlowerDate();

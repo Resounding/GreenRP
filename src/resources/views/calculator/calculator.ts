@@ -1,4 +1,5 @@
 import {autoinject, computedFrom} from 'aurelia-framework';
+import {ObserverLocator} from 'aurelia-binding';
 import {EventAggregator} from 'aurelia-event-aggregator';
 import {DialogController, DialogService, DialogResult} from 'aurelia-dialog';
 import {log} from '../../services/log';
@@ -36,7 +37,7 @@ export class Calculator {
 
     constructor(private ordersService:OrdersService, private referenceService:ReferenceService, private capacityService:CapacityService,
                 private dialogService:DialogService, private controller:DialogController, private element:Element,
-                private events:EventAggregator) {
+                private observerLocator:ObserverLocator, private events:EventAggregator) {
         controller.settings.lock = true;
         controller.settings.position = position;
 
@@ -65,6 +66,9 @@ export class Calculator {
             })
         ]).then(() => {
             this.calculator = this.createCalculator();
+            this.observerLocator
+                .getObserver(this.calculator.order, 'zone')
+                .subscribe(this.onZoneChange.bind(this));
         });
     }
 
@@ -86,6 +90,9 @@ export class Calculator {
     detached() {
         $('#customer', this.element).dropdown('destroy');
         $('.calendar', this.element).calendar('destroy');
+         this.observerLocator
+                .getObserver(this.calculator.order, 'zone')
+                .unsubscribe(this.onZoneChange.bind(this));
     }
 
     @computedFrom('repeatCount', 'repeatDays')
@@ -110,18 +117,21 @@ export class Calculator {
         this.calculator.setArrivalDate(moment(value).toDate());
         log.debug(this.season);
     }
+    onZoneChange(value:Zone) {
+        this.repeatCalculators.forEach(calculator => {
+            calculator.order.zone = value;
+        });
+    }
 
     createCalculator():OrderCalculator {
         return new OrderCalculator(this._zones, this._weeks, this._seasons, this._propagationTimes, this._flowerTimes);
     }
 
-    createOrder(zone:CalculatorZone) {
+    createOrder() {
         let revision = 0;
 
         //noinspection JSUnusedLocalSymbols
         const saver = () => {
-            this.calculator.order.zone = zone;
-
             this.ordersService.create(this.calculator.getOrderDocument())
                 .then(result => {
                     this.controller.close(true, result);                    
@@ -201,9 +211,8 @@ export class Calculator {
         for(let i=0; i < this.repeatCalculators.length; i++) {
             if(typeof this.repeatCalculators[i] === 'undefined') {
                 const calculator = this.createCalculator();
-                calculator.setArrivalDate(this.calculator.order.arrivalDate);
-                calculator.setPlant(this.calculator.order.plant);
                 this.repeatCalculators[i] = calculator;
+                this.resetRepeatingCalculator(calculator, i);
             }
         }
     }
@@ -217,14 +226,16 @@ export class Calculator {
         this._repeatDays = value;
 
         if(this.calculator.order.arrivalDate) {
-            const firstArrival = moment(this.calculator.order.arrivalDate);
-            this.repeatCalculators.forEach((calculator, index) => {
-                const days = (index + 1) * value;
-                calculator.setArrivalDate(firstArrival.clone().add(days, 'days').toDate());
-            });
-
-            this.repeatDays = this.repeatDays;
+            this.repeatCalculators.forEach(this.resetRepeatingCalculator.bind(this));
         }
+    }
+
+    resetRepeatingCalculator(calculator:OrderCalculator, index:number) {
+        const firstArrival = moment(this.calculator.order.arrivalDate),
+            days = (index + 1) * this._repeatDays;
+
+        calculator.setArrivalDate(firstArrival.clone().add(days, 'days').toDate());
+        calculator.setPlant(this.calculator.order.plant);
     }
 }
 

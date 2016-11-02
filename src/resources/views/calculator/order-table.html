@@ -1,4 +1,5 @@
 <template>
+    <require from="styles/order-table.css"></require>
     <require from="./event-view"></require>
 
     <div class="two fields">
@@ -37,7 +38,9 @@
             <tr show.bind="calculator.order.stickDate">
                 <td colspan="3">&nbsp;</td>
                 <td class="center aligned" repeat.for="zone of calculator.zones">
-                    <button click.trigger="createOrder(zone)" class="basic ui icon button" hide.bind="zone.isPropagationZone">
+                    <button click.delegate="select(zone)" class="basic ui toggle icon button"
+                            hide.bind="zone.isPropagationZone"
+                            class.bind="(zone.name===calculator.order.zone.name) ? 'active' : ''">
                         <i class="checkmark box icon" show.bind="zone.canFit"></i>
                         <i class="warning sign box icon" hide.bind="zone.canFit"></i>
                     </button>
