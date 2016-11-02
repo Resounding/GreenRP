@@ -12,6 +12,7 @@ import {Prompt} from '../controls/prompt';
 import {ErrorNotification} from '../controls/error-notification';
 import {Plant} from '../../models/plant';
 import {Customer} from '../../models/customer';
+import {Order} from '../../models/order';
 import {Season} from '../../models/season';
 import {Zone} from '../../models/zone';
 import {SeasonTime} from '../../models/season-time';
@@ -19,6 +20,8 @@ import {CapacityWeek} from '../../models/capacity-week';
 
 @autoinject()
 export class Calculator {
+    static RepeaterResetEvent:string = 'Repeater Reset';
+
     private _repeatCount:number = 0;
     private _repeatDays:number = 1;
     private _isRepeatingOrder:boolean = false;
@@ -69,14 +72,15 @@ export class Calculator {
             this.observerLocator
                 .getObserver(this.calculator.order, 'zone')
                 .subscribe(this.onZoneChange.bind(this));
+            this.observerLocator
+                .getObserver(this.calculator, 'orderQuantity')
+                .subscribe(this.onQuantityChange.bind(this));
         });
     }
 
     attached() {
         $('#customer', this.element).dropdown({
-            onChange: (value:string) => {
-                this.calculator.order.customer = _.find(this.customers, c => c.name === value);
-            }
+            onChange: this.onCustomerChange.bind(this)
         });
         $('#plant', this.element).dropdown({
             onChange: this.onPlantChange.bind(this)
@@ -93,6 +97,9 @@ export class Calculator {
          this.observerLocator
                 .getObserver(this.calculator.order, 'zone')
                 .unsubscribe(this.onZoneChange.bind(this));
+        this.observerLocator
+                .getObserver(this.calculator, 'orderQuantity')
+                .unsubscribe(this.onQuantityChange.bind(this));
     }
 
     @computedFrom('repeatCount', 'repeatDays')
@@ -110,17 +117,39 @@ export class Calculator {
     }
 
     onPlantChange(value:string) {
-        this.calculator.setPlant(_.find(this.plants, p => p.name === value));
-        log.debug(this.season);
+        const plant = _.find(this.plants, p => p.name === value);
+        this.calculator.setPlant(plant);
+        this.repeatCalculators.forEach((calculator, index) => {
+            this.resetRepeatingCalculator(calculator, index);
+        });
     }
     onDateChange(value:string) {
-        this.calculator.setArrivalDate(moment(value).toDate());
-        log.debug(this.season);
-    }
-    onZoneChange(value:Zone) {
-        this.repeatCalculators.forEach(calculator => {
-            calculator.order.zone = value;
+        const date = moment(value).toDate();
+        this.calculator.setArrivalDate(date);
+        this.repeatCalculators.forEach((calculator, index) => {
+            this.resetRepeatingCalculator(calculator, index);
         });
+    }
+    onZoneChange(value:CalculatorZone) {
+        this.repeatCalculators.forEach((calculator, index) => {
+            calculator.order.zone = value;
+            this.resetRepeatingCalculator(calculator, index);
+        });
+    }
+    onQuantityChange(value:string) {
+        this.repeatCalculators.forEach((calculator, index) => {
+            this.resetRepeatingCalculator(calculator, index);
+        });
+    }
+    onCustomerChange(value:string) {
+        const customer = _.find(this.customers, c => c.name === value);
+        this.calculator.order.customer = customer;
+        this.repeatCalculators.forEach(calculator => {
+            calculator.order.customer = customer;
+        });        
+    }
+    onRepeaterChange(value:CalculatorZone) {
+        this.repeatCalculators.forEach(this.resetRepeatingCalculator.bind(this));
     }
 
     createCalculator():OrderCalculator {
@@ -168,17 +197,33 @@ export class Calculator {
             revision++;
             this.calculator.order._id = `${id} (${revision})`;
             saver();
+        },
+        saveBulk = () => {
+            const orders = [this.calculator.getOrderDocument()].concat(this.repeatCalculators.map(c => c.getOrderDocument()));
+
+            this.ordersService.createBulk(orders)
+                .then(result => {
+                    this.controller.close(true, result);                    
+                })
+                .catch(error => {
+                    log.error(error);
+                    this.dialogService.open({ viewModel: ErrorNotification, model: `There was a problem with one or more of the orders:\n\n${error.message}` })
+                });
         };
 
-        if(zone.canFit) {
-            saver();
+        if(this.isRepeatingOrder) {
+            saveBulk();
         } else {
-            this.dialogService.open({ viewModel: Prompt, model: `This order will put zone ${zone.name} over capacity. Are you sure you want to schedule this order?` })
-                .then((result:DialogResult) => {
-                    if(result.wasCancelled) return;
+            if(this.calculator.order.zone.canFit) {
+                saver();
+            } else {
+                this.dialogService.open({ viewModel: Prompt, model: `This order will put zone ${this.calculator.order.zone.name} over capacity. Are you sure you want to schedule this order?` })
+                    .then((result:DialogResult) => {
+                        if(result.wasCancelled) return;
 
-                    saver();
-                });
+                        saver();
+                    });
+            }
         }
     }
 
@@ -206,15 +251,31 @@ export class Calculator {
 
         this._repeatCount = value;
 
-        this.repeatCalculators.length = value;
-
         for(let i=0; i < this.repeatCalculators.length; i++) {
-            if(typeof this.repeatCalculators[i] === 'undefined') {
-                const calculator = this.createCalculator();
-                this.repeatCalculators[i] = calculator;
-                this.resetRepeatingCalculator(calculator, i);
+            let calculator = this.repeatCalculators[i];
+            if(calculator && i >= value) {
+                this.observerLocator
+                    .getObserver(calculator.order, 'rootInPropagationZone')
+                    .unsubscribe(this.onRepeaterChange.bind(this));
+                this.observerLocator
+                    .getObserver(calculator.order, 'partialSpace')
+                    .unsubscribe(this.onRepeaterChange.bind(this));
+            } else {
+                if(typeof calculator === 'undefined') {
+                    calculator = this.createCalculator();
+                    this.observerLocator
+                        .getObserver(calculator.order, 'rootInPropagationZone')
+                        .subscribe(this.onRepeaterChange.bind(this));
+                    this.observerLocator
+                        .getObserver(calculator.order, 'partialSpace')
+                        .subscribe(this.onRepeaterChange.bind(this));
+                    this.repeatCalculators[i] = calculator;                
+                }                
             }
         }
+
+        this.repeatCalculators.length = value;
+        this.repeatCalculators.forEach(this.resetRepeatingCalculator.bind(this));
     }
 
     get repeatDays():number {
@@ -232,10 +293,12 @@ export class Calculator {
 
     resetRepeatingCalculator(calculator:OrderCalculator, index:number) {
         const firstArrival = moment(this.calculator.order.arrivalDate),
-            days = (index + 1) * this._repeatDays;
+            days = (index + 1) * this._repeatDays,
+            thisArrival = firstArrival.clone().add(days, 'days').toDate(),
+            previous = index === 0 ? this.calculator : this.repeatCalculators[index-1];
 
-        calculator.setArrivalDate(firstArrival.clone().add(days, 'days').toDate());
-        calculator.setPlant(this.calculator.order.plant);
+        calculator.setRepeater(previous, thisArrival);
+        this.events.publish(Calculator.RepeaterResetEvent, calculator);
     }
 }
 

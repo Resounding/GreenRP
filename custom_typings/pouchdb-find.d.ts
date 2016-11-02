@@ -38,6 +38,7 @@ declare global {
         find<T>(request?:FindRequest):Promise<DocList<T>>;
         get(id: string, opts?: GetOptions):Promise<any>;
         put(item:any):Promise<PouchDB.Core.Response>;
+        bulkDocs(items:any[]):Promise<PouchDB.Core.Response[]>;
         remove(item:any):Promise<PouchDB.Core.Response>;
         sync(remote:PouchDB, opts?:PouchSyncOptions):PouchEventEmitter;
         debug:PouchDebug;

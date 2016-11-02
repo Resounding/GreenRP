@@ -1,5 +1,7 @@
 import {OrderCalculator} from '../../../../../src/resources/services/domain/order-calculator';
+import {CalculatorZone} from '../../../../../src/resources/services/domain/models/calculator-zone';
 import {Events, CalculatorWeek} from "../../../../../src/resources/services/domain/models/calculator-week";
+import {Customer} from '../../../../../src/resources/models/customer';
 import {Zone} from '../../../../../src/resources/models/zone';
 import {Season} from "../../../../../src/resources/models/season";
 import {Plant} from "../../../../../src/resources/models/plant";
@@ -690,7 +692,7 @@ describe('changing date', () => {
     });
 
     it('saves the potsPerCase for the order plant', () => {
-        calculator.order.zone = {name: 'A', autoSpace: false, tables: 500, isPropagationZone: false };
+        calculator.order.zone = new CalculatorZone({name: 'A', autoSpace: false, tables: 500, isPropagationZone: false });
         const order = calculator.getOrderDocument();
 
         expect(order.plant.potsPerCase).toEqual(8);
@@ -874,4 +876,147 @@ describe('order zones', () => {
         expect(orderWeek.zones['B']).toBeNull();
         expect(orderWeek.zones['C'].available).toEqual(96);
     });
+});
+
+describe('setRepeatingValues()', () => {
+    let calculator:OrderCalculator,
+        repeaters:OrderCalculator[],
+        zones:Zone[],
+        weeks:Map<string, CapacityWeek>,
+        seasons:Season[],
+        plant:Plant,
+        customer:Customer,
+        propagationTimes:SeasonTime[],
+        flowerTimes:SeasonTime[],
+        arrival:Date; // Friday, July 7, 2017
+
+    beforeEach(() => {
+        zones = [
+            { name: 'A', autoSpace: false, isPropagationZone: false, tables: 100},
+            { name: 'B', autoSpace: false, isPropagationZone: true, tables: 100},
+            { name: 'C', autoSpace: false, isPropagationZone: false, tables: 100}
+        ];
+        seasons = [
+            {
+                name: 'spring',
+                year: 2017,
+                week: 1
+            }
+        ];
+        plant = {
+            name: '6" Mums',
+            abbreviation: 'M',
+            size: '6"',
+            crop: 'Mums',
+            cuttingsPerPot: 1,
+            cuttingsPerTable: {
+                tight: 1000,
+                half: 500,
+                full: 250
+            },
+            potsPerCase: 8,
+            hasLightsOut: false
+        };
+        customer = {name: 'Sobeys', abbreviation: 'Sb'},
+        propagationTimes = [
+            {
+                plant: plant.name,
+                year: 2017,
+                times: 3
+            }
+        ];
+        flowerTimes = [
+            {
+                plant: plant.name,
+                year: 2017,
+                times: 3
+            }
+        ];
+        arrival = new Date(2017, 6, 7); // Friday, July 7, 2017
+
+        const rawWeeks = new ReferenceData().weeks,
+            capacityZones:CapacityWeekZones = {
+                A: {zone: zones[0], tables: zones[0].tables, available: zones[0].tables},
+                B: {zone: zones[1], tables: zones[1].tables, available: zones[1].tables},
+                C: {zone: zones[2], tables: zones[2].tables, available: zones[2].tables}
+            };
+        weeks = new Map<string, CapacityWeek>();
+        rawWeeks.forEach(w => {
+            const capacityWeek = new CapacityWeek(w);
+            capacityWeek.zones = capacityZones;
+            weeks.set(w._id, capacityWeek);
+        });
+
+        calculator = new OrderCalculator(zones, weeks, seasons, propagationTimes, flowerTimes)
+            .setPlant(plant)
+            .setArrivalDate(arrival);
+        calculator.orderQuantity = 1000;
+        repeaters = [
+            new OrderCalculator(zones, weeks, seasons, propagationTimes, flowerTimes),
+            new OrderCalculator(zones, weeks, seasons, propagationTimes, flowerTimes)
+        ];
+    });
+
+    it('sets values correctly', () => {
+        const arrivalDate = moment(arrival).add(5, 'days').toDate(),
+            repeater = repeaters[0];
+        repeater.setRepeater(calculator, arrivalDate);
+        expect(repeater.order.quantity).toEqual(1000);
+        expect(repeater.order.plant.name).toEqual(plant.name);
+        expect(repeater.order.customer.name).toEqual(customer.name);
+        expect(repeater.order.arrivalDate).toEqual(new Date(2017, 6, 12)); // July 12, 2017 - 5 days after the original
+    });
+
+    it('deducts previous quantities', () => {
+        const arrivalDate1 = moment(arrival).add(7, 'days').toDate(),
+            arrivalDate2 = moment(arrival).add(14, 'days').toDate(),
+            repeater1 = repeaters[0],
+            repeater2 = repeaters[1];
+        repeater1.setRepeater(calculator, arrivalDate1);
+        repeater2.setRepeater(repeater1, arrivalDate2);
+        
+        expect(calculator.weeks[0].zones['A'].available).toEqual(99); // 100 in zone - 1 for the week
+        expect(calculator.weeks[6].zones['A'].available).toEqual(96); // 100 in zone - 4 for the week
+
+        expect(repeater1.weeks[0].zones['A'].available).toEqual(98); // 100 in zone - 1 for the week - 1 for the previous
+        expect(repeater1.weeks[5].zones['A'].available).toEqual(92); // 100 in zone - 4 for the week - 4 for the previous
+        expect(repeater1.weeks[6].zones['A'].available).toEqual(96); // previous order is gone by this time
+
+        expect(repeater2.weeks[0].zones['A'].available).toEqual(97); // 100 in zone - 1 for the week - 1 for the previous - 1 for the week before that
+        expect(repeater2.weeks[4].zones['A'].available).toEqual(88); // 100 in zone - 4 for the week - 4 for the previous - 4 for the week before that
+        expect(repeater2.weeks[5].zones['A'].available).toEqual(92); // original order is gone
+        expect(repeater2.weeks[6].zones['A'].available).toEqual(96); // this is the only order left
+    });
+
+    it('works with rootInPropArea', () => {
+        const arrivalDate1 = moment(arrival).add(7, 'days').toDate(),
+            arrivalDate2 = moment(arrival).add(14, 'days').toDate(),
+            repeater1 = repeaters[0],
+            repeater2 = repeaters[1];
+
+        calculator.rootInPropagationZone = true;
+        repeater1.rootInPropagationZone = true;
+        repeater2.rootInPropagationZone = true;
+
+        repeater1.setRepeater(calculator, arrivalDate1);
+        repeater2.setRepeater(repeater1, arrivalDate2);
+        
+        expect(calculator.weeks[0].zones['B'].available).toEqual(99); // 100 in zone - 1 for the week
+        expect(calculator.weeks[1].zones['B'].available).toEqual(99); // 100 in zone - 1 for the week
+        expect(calculator.weeks[2].zones['B'].available).toEqual(99); // 100 in zone - 1 for the week
+        expect(calculator.weeks[3].zones['B']).toBeNull(); // out of prop zone
+        expect(calculator.weeks[6].zones['B']).toBeNull(); // out of prop zone
+
+        expect(repeater1.weeks[0].zones['B'].available).toEqual(98); // this order plus previous
+        expect(repeater1.weeks[1].zones['B'].available).toEqual(98); // this order plus previous
+        expect(repeater1.weeks[2].zones['B'].available).toEqual(99); // previous order is gone
+        expect(repeater1.weeks[3].zones['B']).toBeNull(); // out of prop zone
+        expect(repeater1.weeks[6].zones['B']).toBeNull(); // out of prop zone
+
+        expect(repeater2.weeks[0].zones['B'].available).toEqual(97); // this order plus previous 2
+        expect(repeater2.weeks[1].zones['B'].available).toEqual(98); // this order plus previous: initial is gone
+        expect(repeater2.weeks[2].zones['B'].available).toEqual(99); // previous order is gone
+        expect(repeater2.weeks[3].zones['B']).toBeNull(); // out of prop zone
+        expect(repeater2.weeks[6].zones['B']).toBeNull(); // out of prop zone
+    });    
 });

@@ -38,6 +38,47 @@ export class OrdersService {
         });
     }
 
+    createBulk(orders:Order[]):Promise<PouchDB.Core.Response> {
+        const orderDocs = orders.map(o => new OrderDocument(o).toJSON());
+
+        if(_.any(orderDocs, o => !o.customer)) {
+            return Promise.reject(Error('Please choose a customer.'));
+        } else if(_.any(orderDocs, o => !o.quantity)) {
+            return Promise.reject(Error('Please enter the quantity for the order.'));
+        } else if(_.any(orderDocs, o => !o.plant)) {
+            return Promise.reject(Error('Please choose a plant for the order.'));
+        } else if(_.any(orderDocs, o => !o._id)) {
+            return Promise.reject(Error('There was a problem creating the order. Please verify all fields have been entered.'));
+        }
+
+        return new Promise((resolve, reject) => {
+            return this.database.db.bulkDocs(orderDocs)
+                .then((result:PouchDB.Core.Response[]) => {
+                    const errors = [];
+
+                    result.forEach(result => {
+                        if(result.ok) {
+                            const order = orderDocs.find(o => o._id == result.id);
+                            if(order) {
+                                order._rev = result.rev;
+                                this.events.publish(OrdersService.OrdersChangedEvent);
+                            }
+                        } else if(result.error) {
+                            errors.push(result.message);
+                        }
+                    });
+                        
+                    if(errors.length) {
+                        return reject(errors);
+                    } else {
+                        return resolve(orderDocs);
+                    }
+                    
+                })
+                .catch(reject);
+        });
+    }
+
     getAll():Promise<OrderDocument[]> {
 
         return new Promise((resolve, reject) => {
