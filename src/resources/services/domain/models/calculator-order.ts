@@ -1,5 +1,6 @@
 import {Zone} from "../../../models/zone";
 import {Order, OrderDocument, OrderWeeksInHouse} from "../../../models/order";
+import {CalculatorZone} from "./calculator-zone";
 import {CalculatorWeek} from "./calculator-week";
 import {Customer} from "../../../models/customer";
 import {Plant} from "../../../models/plant";
@@ -15,7 +16,7 @@ export class CalculatorOrder implements Order {
     quantity:number = 0;
     customer:Customer = null;
     plant:Plant = null;
-    zone:Zone = null;
+    zone:CalculatorZone = null;
     weeksInHouse:OrderWeeksInHouse;
     rootInPropArea:boolean = false;
     partialSpace: boolean = false;

@@ -38,11 +38,11 @@
                         <div class="field fields" show.bind="isRepeatingOrder">
                             <div class="ui field inline eight wide">
                                 <label for="repeat-count"># times:</label>
-                                <input type="number" id="repeat-count" value.bind="repeatCount" style="width: 70px">
+                                <input type="number" id="repeat-count" value.bind="repeatCount & debounce" style="width: 70px">
                             </div>
                             <div class="ui field inline eight wide">
                                 <label for="repeat-days">days apart:</label>
-                                <input type="number" id="repeat-days" value.bind="repeatDays" style="width: 70px">
+                                <input type="number" id="repeat-days" value.bind="repeatDays & debounce" style="width: 70px">
                             </div>
                         </div>
                     </div>

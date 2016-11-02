@@ -8,7 +8,7 @@ import {CalculatorOrder} from './models/calculator-order';
 import {CalculatorZone} from "./models/calculator-zone";
 import {Zone} from '../../models/zone';
 import {Season} from '../../models/season';
-import {Week, WeekZones} from '../../models/week';
+import {Week, WeekZone, WeekZones} from '../../models/week';
 import {Plant} from "../../models/plant";
 import {SeasonTime} from "../../models/season-time";
 import {CapacityWeek} from "../../models/capacity-week";
@@ -42,7 +42,7 @@ export class OrderCalculator {
         }
     }
 
-    setZone(zone:Zone):OrderCalculator {
+    setZone(zone:CalculatorZone):OrderCalculator {
         this._order.zone = zone;
         return this;
     }
@@ -146,11 +146,46 @@ export class OrderCalculator {
         return this;
     }
 
+    setRepeater(previous:OrderCalculator, arrivalDate:Date) {
+        this.order.quantity = previous.orderQuantity;
+        this.order.plant = previous.order.plant;
+        this.order.arrivalDate = arrivalDate;
+        this.order.customer = previous.order.customer;
+        this.resetFlowerDate();
+        this.resetLightsOutDate();
+        this.resetStickDate();
+
+        var propZone = this.zones.find(z => z.isPropagationZone);
+
+        const previousWeeks = _.reduce(previous.weeks, (memo:Map<string, WeekZones>, week:CalculatorWeek) => {
+            const weekClone = _.clone(week),
+                zones = _.reduce(week.zones, (memo:WeekZones, z:WeekZone) => {
+                    if(z === null) {
+                        if(propZone) {
+                            memo[propZone.name] = {
+                                zone: propZone,
+                                available: propZone.tables,
+                                tables: 0
+                            };
+                        }
+                    } else {
+                        memo[z.zone.name] = _.clone(week.zones[z.zone.name])
+                    }
+                    return memo;
+                }, {});
+
+            weekClone.zones = zones;
+            
+            memo.set(week.week._id, weekClone.zones);
+            return memo;
+        }, new Map<string, WeekZones>());
+        this.resetWeeks(previousWeeks);
+    }
+
     get order():CalculatorOrder {
         return this._order;
     }
 
-    @computedFrom('plant', 'order.quantity', 'order.arrivalDate', 'order.flowerDate', 'order.lightsOutDate', 'order.stickDate', 'order.rootInPropArea', 'order.partialSpace')
     get weeks():CalculatorWeek[] {
         return this._weeks;
     }
@@ -159,7 +194,7 @@ export class OrderCalculator {
         return this.order.toOrderDocument(this.weeks, this.zones);
     }
 
-    private resetWeeks() {
+    private resetWeeks(previousWeeks?:Map<string, WeekZones>) {
 
         let stickEventCreated = false,
             partialSpaceEventCreated = false,
@@ -179,7 +214,7 @@ export class OrderCalculator {
             log.debug(`Ship week: ${shipWeek._id}`);
 
             const tables = this.spaceCalculator.getTables(shipWeek._id),
-                zones = this.getZones(shipWeek, tables),
+                zones = this.getZones(shipWeek, tables, false, previousWeeks),
                 tableCount = typeof tables === 'number' ? tables : tables.manualSpacing;
             weeks.push({
                 week: shipWeek,
@@ -202,7 +237,7 @@ export class OrderCalculator {
                 } else {
                     const tables = this.spaceCalculator.getTables(flowerWeek._id),
                         tableCount = typeof tables === 'number' ? tables : tables.manualSpacing,
-                        zones = this.getZones(flowerWeek, tables);
+                        zones = this.getZones(flowerWeek, tables, false, previousWeeks);
                     weeks.unshift({
                         week: flowerWeek,
                         events: [flowerEvent],
@@ -234,7 +269,7 @@ export class OrderCalculator {
                         
                     let tables = this.spaceCalculator.getTables(week._id),
                         tableCount = typeof tables === 'number' ? tables : tables.manualSpacing,
-                        zones = this.getZones(week, tables),
+                        zones = this.getZones(week, tables, false, previousWeeks),
                         calculatorWeek:CalculatorWeek = {
                         week: week,
                         events: [],
@@ -262,7 +297,7 @@ export class OrderCalculator {
                         if(week) {
                             tables = this.spaceCalculator.getTables(week._id);
                             tableCount = typeof tables === 'number' ? tables : tables.manualSpacing;
-                            zones = this.getZones(week, tables);
+                            zones = this.getZones(week, tables, false, previousWeeks);
                             calculatorWeek = {
                                 week: week,
                                 events: [
@@ -287,7 +322,7 @@ export class OrderCalculator {
                         if(week) {
                             tables = this.spaceCalculator.getTables(week._id);
                             tableCount = typeof tables === 'number' ? tables : tables.manualSpacing;
-                            zones = this.getZones(week, tables);
+                            zones = this.getZones(week, tables, false, previousWeeks);
                             calculatorWeek = {
                                 week: week,
                                 events: [
@@ -326,7 +361,7 @@ export class OrderCalculator {
                 if(week) {
                     const tables = this.spaceCalculator.getTables(week._id),
                         tableCount = typeof tables === 'number' ? tables : tables.manualSpacing,
-                        zones = this.getZones(week, tables);
+                        zones = this.getZones(week, tables, false, previousWeeks);
                     const calculatorWeek:CalculatorWeek = {
                         week: week,
                         events: [],
@@ -374,7 +409,7 @@ export class OrderCalculator {
                         if(week) {
                             const tables = this.spaceCalculator.getTables(week._id),
                                 tableCount = typeof tables === 'number' ? tables : tables.manualSpacing,
-                                zones = this.getZones(week, tables, true);
+                                zones = this.getZones(week, tables, true, previousWeeks);
                             const calculatorWeek = {
                                 week: week,
                                 events: [],
@@ -570,14 +605,20 @@ export class OrderCalculator {
         return this.seasonSelector.get(this._order.arrivalDate, this._order.plant.crop);
     }
 
-    private getZones(week:Week, tables:number|TableSpaceResult, usePropZone:boolean = false):WeekZones {
+    private getZones(week:Week, tables:number|TableSpaceResult, usePropZone:boolean, previousWeeks:Map<string, WeekZones> = new Map<string, WeekZones>()):WeekZones {
         const zones = { },
-            keys = Object.keys(week.zones);
+            keys = Object.keys(week.zones),
+            previousZones = previousWeeks.get(week._id);
         for(const key of keys) {
             const zone = _.clone(week.zones[key]),
                 tableCount = typeof tables === 'number' ? tables : (zone.zone.autoSpace ? tables.autoSpacing : tables.manualSpacing),
                 isPropZone = (this.propagationZone && key === this.propagationZone.name),
-                noPropZone = !usePropZone || !this.order.rootInPropArea;
+                noPropZone = !usePropZone || !this.order.rootInPropArea,
+                previousZone = previousZones && previousZones[key];
+
+            if(previousZone && typeof previousZone.available === 'number') {
+                zone.available = previousZone.available;
+            }
             
             // reduce the prop zone if you're using it, reduce anything else if you're not
             if((usePropZone && this.order.rootInPropArea && isPropZone) || (!isPropZone && noPropZone)) {
