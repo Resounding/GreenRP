@@ -44,27 +44,32 @@ export class ZoneDetail {
         this.loadOrders();
     }
 
+    //noinspection JSMethodCanBeStatic
     close() {
         $('#zone-detail-sidebar').sidebar('hide');
     }
 
     loadOrders() {
-        let orders:OrderDocument[],
-            plants:Plant[];
+        // this gets called whenever an order is created/deleted.
+        // but if we don't have a year/zone, just ignore
+        if(this.year && this.zone) {
+            let orders: OrderDocument[],
+                plants: Plant[];
 
-        Promise.all([
-            this.orderService.getAll()
-                .then(result => orders = result),
-            this.referenceService.plants()
-                .then(result => plants = result)
-        ])
-        .then(() => {
-           this.zoneDetailService.createModel(plants, orders, this.year, this.zone)
-                .then(result => {
-                    this.model = result;
-                    console.log(this.model);
+            Promise.all([
+                this.orderService.getAll()
+                    .then(result => orders = result),
+                this.referenceService.plants()
+                    .then(result => plants = result)
+            ])
+                .then(() => {
+                    this.zoneDetailService.createModel(plants, orders, this.year, this.zone)
+                        .then(result => {
+                            this.model = result;
+                            console.log(this.model);
+                        });
                 });
-        });
+        }
     }
 
     static ShowZoneDetailEvent:string = 'show-zone-detail';

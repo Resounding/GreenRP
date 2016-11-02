@@ -18,6 +18,11 @@ export class WeekDetailFilter {
         }
     }
 
+    get weekId():string {
+        if(!this.endDate) return null;
+        return moment(this.endDate).toWeekNumberId();
+    }
+
     get weekNumber():number {
         if(!this.endDate) return 0;
         return moment(this.endDate).isoWeek();
@@ -46,10 +51,11 @@ export class WeekDetailOrder {
         this.shipWeek = moment(order.arrivalDate).isoWeek();
         this.zone = order.zone.name;
 
-        const filterWeek = filter.weekNumber,
+        const filterWeekId = filter.weekId,
+            filterWeek = filter.weekNumber,
             filterYear = filter.yearNumber,
-            week = _.find(order.zone.weeks, week => {
-                return week.week === filterWeek && week.year === filterYear;
+            week = _.find(order.weeksInHouse, (value, key) => {
+                return key === filterWeekId;
             }),
             tables = week ? week.tables : 0;
         this.tables = tables;

@@ -1,6 +1,6 @@
 import {autoinject} from 'aurelia-framework';
 import {ReferenceService} from "../data/reference-service";
-import {Order, OrderDocument} from "../../models/order";
+import {OrderDocument} from "../../models/order";
 import {Plant} from "../../models/plant";
 import {Week} from "../../models/week";
 import {Zone} from "../../models/zone";
@@ -35,20 +35,21 @@ export class ZoneDetailService {
                         return memo;
                     }, new Map<string, Map<string,number>>()),
                     zoneOrders = orders
-                        .filter((o:OrderDocument) => o.zone.name === zone.name)
                         .reduce((memo:Map<string, Map<string,number>>, o:OrderDocument) => {
-                            o.zone.weeks.forEach(w => {
-                                const id = `week:${w.year}.${w.week}`,
-                                    plantWeek = memo.get(o.plant.name);
+                            _.forEach(o.weeksInHouse, (value, key) => {
+                                const plantWeek = memo.get(o.plant.name);
 
-                                if(!plantWeek.has(id)) {
-                                    plantWeek.set(id, 0);
+                                if(!plantWeek.has(key)) {
+                                    plantWeek.set(key, 0);
                                 }
 
-                                const wasUsed = plantWeek.get(id),
-                                    isUsed = wasUsed + w.tables;
+                                let tables = plantWeek.get(key);
 
-                                plantWeek.set(id, isUsed);
+                                if(value.zone === zone.name) {
+                                    tables += value.tables;
+                                }
+
+                                plantWeek.set(key, tables);
                             });
                             return memo;
                         }, plantOrders),

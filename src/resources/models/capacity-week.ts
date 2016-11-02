@@ -1,5 +1,5 @@
 import {Week} from "./week";
-import {OrderDocument, OrderWeek} from "./order";
+import {OrderDocument, WeekInHouse} from "./order";
 import {Zone} from "./zone";
 
 interface CapacityWeekZone {
@@ -37,24 +37,22 @@ export class CapacityWeek implements Week {
         });
     }
 
-    addOrder(order:OrderDocument, week:OrderWeek):void {
-        const zone = this.getZone(order, week);
+    addOrder(week:WeekInHouse):void {
+        const zone = this.zones[week.zone];
         zone.available -= week.tables;
     }
 
     removeOrder(order:OrderDocument) {
-        order.zone.weeks.forEach(w => {
-            const key = `week:${w.year}.${w.week}`;
-
-            const zone = this.getZone(order, w);
+        _.forEach(order.weeksInHouse, (value, key) => {
+            const zone = this.getZone(order, value);
 
             if(key === this._id && zone.zone.name in this.zones) {
-                zone.available += w.tables;
+                zone.available += value.tables;
             }
         });
     }
 
-    getZone(order:OrderDocument, week:OrderWeek):CapacityWeekZone {
+    getZone(order:OrderDocument, week:WeekInHouse):CapacityWeekZone {
 
         if(order.lightsOutDate && order.rootInPropArea) {
 

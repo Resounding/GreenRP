@@ -414,6 +414,16 @@ describe('the order calculator', () => {
                 autoSpace: false,
                 isPropagationZone: false
             },
+            weeksInHouse: {
+                'week:2017-17': { zone: 'A', tables: 1, year: 2017, week: 17 },
+                'week:2017-18': { zone: 'A', tables: 1, year: 2017, week: 18 },
+                'week:2017-19': { zone: 'A', tables: 1, year: 2017, week: 19 },
+                'week:2017-20': { zone: 'A', tables: 1, year: 2017, week: 20 },
+                'week:2017-21': { zone: 'A', tables: 1, year: 2017, week: 21 },
+                'week:2017-22': { zone: 'A', tables: 2, year: 2017, week: 22 },
+                'week:2017-23': { zone: 'A', tables: 2, year: 2017, week: 23 },
+                'week:2017-24': { zone: 'A', tables: 2, year: 2017, week: 24 }
+            },
             rootInPropArea: false,
             partialSpace: false
         }),
@@ -551,7 +561,6 @@ describe('the order calculator', () => {
 describe('changing date', () => {
     let calculator:OrderCalculator,
         zones:Zone[],
-        rawWeeks:Week[],
         weeks:Map<string, CapacityWeek>,
         seasons:Season[],
         plant:Plant,
@@ -560,7 +569,9 @@ describe('changing date', () => {
         arrival:Date; // Friday, July 7, 2017
 
     beforeEach(() => {
-        zones = [];
+        zones = [
+            { name: 'A', tables: 100, autoSpace: false, isPropagationZone: false}
+        ];
         seasons = [
             {
                 name: 'spring',
@@ -689,7 +700,6 @@ describe('changing date', () => {
 describe('order zones', () => {
     let calculator:OrderCalculator,
         zones:Zone[],
-        rawWeeks:Week[],
         weeks:Map<string, CapacityWeek>,
         seasons:Season[],
         plant:Plant,
