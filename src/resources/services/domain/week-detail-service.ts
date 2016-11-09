@@ -40,6 +40,7 @@ export class WeekDetailOrder {
     pots:number;
     tables:number;
     shipWeek:number;
+    flowerDate:string;
     isShippingThisWeek:boolean;
     isFloweringThisWeek:boolean;
     zone:string;
@@ -48,6 +49,7 @@ export class WeekDetailOrder {
         this.batch = order.orderNumber;
         this.plant = order.plant.name;
         this.pots = order.quantity;
+        this.flowerDate = moment(order.flowerDate).format('MMM D');
         this.shipWeek = moment(order.arrivalDate).isoWeek();
         this.zone = order.zone.name;
 
