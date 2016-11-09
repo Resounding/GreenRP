@@ -17,6 +17,7 @@ export interface Order {
     _id:string;
     _rev:string;
     type:string;
+    orderNumber:string;
     arrivalDate:Date;
     flowerDate:Date;
     lightsOutDate:Date;
@@ -34,6 +35,7 @@ export class OrderDocument implements Order {
     _id:string;
     _rev:string;
     type:string;
+    orderNumber:string;
     arrivalDate:Date;
     flowerDate:Date;
     lightsOutDate:Date;
@@ -51,13 +53,7 @@ export class OrderDocument implements Order {
             _.extend(this, args);
         }
 
-        if(!this._id && this.customer && this.plant && this.arrivalDate) {
-            const arrival = moment(this.arrivalDate),
-                week = arrival.isoWeek(),
-                year = arrival.isoWeekYear(),
-                day = arrival.isoWeekday();
-            this._id = `${this.plant.abbreviation}${this.customer.abbreviation}${year}-${week}-${day}`;
-        }
+        this.orderNumber = this.orderNumber || this.createOrderNumber();
 
         if(!this.type) {
             this.type = OrderDocument.OrderDocumentType;
@@ -92,11 +88,24 @@ export class OrderDocument implements Order {
         }
     }
 
+    createOrderNumber():string {
+        const plant = this.plant ? this.plant.abbreviation : '',
+            customer = this.customer ? this.customer.abbreviation : '',
+            arrival = moment(this.arrivalDate),
+            week = this.arrivalDate ? arrival.isoWeek() : '',
+            year = arrival.isoWeekYear(),
+            day = arrival.isoWeekday(),
+            orderNumber = `${plant}${customer}${year}-${week}-${day}`;
+
+        return orderNumber;
+    }
+
     toJSON() {
         return {
             _id: this._id,
             _rev: this._rev,
             type: this.type,
+            orderNumber: this.createOrderNumber(),
             arrivalDate: moment(this.arrivalDate).format('YYYY-MM-DD'),
             flowerDate: moment(this.flowerDate).format('YYYY-MM-DD'),
             lightsOutDate: moment(this.lightsOutDate).format('YYYY-MM-DD'),

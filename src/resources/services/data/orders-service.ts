@@ -19,14 +19,13 @@ export class OrdersService {
             return Promise.reject(Error('Please enter the quantity for the order.'));
         } else if(!orderDoc.plant) {
             return Promise.reject(Error('Please choose a plant for the order.'));
-        } else if(!orderDoc._id) {
-            return Promise.reject(Error('There was a problem creating the order. Please verify all fields have been entered.'));
         }
 
         return new Promise((resolve, reject) => {
-            return this.database.db.put(orderDoc)
+            return this.database.db.post(orderDoc)
                 .then((result:PouchDB.Core.Response) => {
                     if(result.ok) {
+                        orderDoc._id = result.id;
                         orderDoc._rev = result.rev;
                         this.events.publish(OrdersService.OrdersChangedEvent);
                         resolve(orderDoc);
@@ -47,8 +46,6 @@ export class OrdersService {
             return Promise.reject(Error('Please enter the quantity for the order.'));
         } else if(_.any(orderDocs, o => !o.plant)) {
             return Promise.reject(Error('Please choose a plant for the order.'));
-        } else if(_.any(orderDocs, o => !o._id)) {
-            return Promise.reject(Error('There was a problem creating the order. Please verify all fields have been entered.'));
         }
 
         return new Promise((resolve, reject) => {
@@ -60,6 +57,7 @@ export class OrdersService {
                         if(result.ok) {
                             const order = orderDocs.find(o => o._id == result.id);
                             if(order) {
+                                order._id = result.id;
                                 order._rev = result.rev;
                                 this.events.publish(OrdersService.OrdersChangedEvent);
                             }
@@ -71,6 +69,7 @@ export class OrdersService {
                     if(errors.length) {
                         return reject(errors);
                     } else {
+                        this.events.publish(OrdersService.OrdersChangedEvent);
                         return resolve(orderDocs);
                     }
                     

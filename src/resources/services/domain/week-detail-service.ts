@@ -45,7 +45,7 @@ export class WeekDetailOrder {
     zone:string;
 
     constructor(public order:OrderDocument, filter:WeekDetailFilter) {
-        this.batch = order._id;
+        this.batch = order.orderNumber;
         this.plant = order.plant.name;
         this.pots = order.quantity;
         this.shipWeek = moment(order.arrivalDate).isoWeek();
