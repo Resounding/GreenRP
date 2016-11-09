@@ -82,7 +82,10 @@ export class Calculator {
     }
 
     attached() {
-        $('#customer', this.element).dropdown({
+        $('.dropdown.customer', this.element).dropdown({
+            allowAdditions: true,
+            selectOnKeydown: true,
+            forceSelection: true,
             onChange: this.onCustomerChange.bind(this)
         });
         $('#plant', this.element).dropdown({
@@ -96,6 +99,7 @@ export class Calculator {
 
     detached() {
         $('#customer', this.element).dropdown('destroy');
+        $('#plant', this.element).dropdown('destroy');
         $('.calendar', this.element).calendar('destroy');
          this.observerLocator
                 .getObserver(this.calculator.order, 'zone')
@@ -154,7 +158,7 @@ export class Calculator {
         });
     }
     onCustomerChange(value:string) {
-        const customer = _.find(this.customers, c => c.name === value);
+        const customer = _.find(this.customers, c => c.name === value) || { name: value, abbreviation: value };
         this.calculator.order.customer = customer;
         this.repeatCalculators.forEach(calculator => {
             calculator.order.customer = customer;

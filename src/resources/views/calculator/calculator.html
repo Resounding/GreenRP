@@ -10,10 +10,14 @@
                 <div class="three fields">
                     <div class="field">
                         <label for="customer">Customer</label>
-                        <select name="customer" id="customer">
-                            <option value="">Choose Customer</option>
-                            <option repeat.for="c of customers" value="${c.name}">${c.name}</option>
-                        </select>
+                        <div class="ui search selection dropdown customer">
+                            <input type="hidden" name="customer" id="customer">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">Choose Customer</div>
+                            <div class="menu">
+                                <div repeat.for="c of customers" class="item" data-value="${c.name}">${c.name}</div>
+                            </div>
+                        </div>
                     </div>
                     <div class="field">
                         <label>Arrival Date</label>

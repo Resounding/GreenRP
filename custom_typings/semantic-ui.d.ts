@@ -9,6 +9,7 @@ interface dropdownOptions {
     allowAdditions?: boolean;
     forceSelection?: boolean;
     placeholder?: string;
+    selectOnKeydown?: boolean;
     onChange?(changed:string):void;
     onAdd?(added:string)
 }
