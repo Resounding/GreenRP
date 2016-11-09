@@ -97,7 +97,7 @@
                     "node_modules/pouchdb/dist/pouchdb.js",
                     "node_modules/pouchdb-find/dist/pouchdb.find.js",
                     "node_modules/semantic-ui-css/semantic.js",
-                    "node_modules/semantic-ui/dist/components/calendar.js",
+                    "node_modules/semantic-ui-calendar/dist/calendar.js",
                     "scripts/pdfmake.min.js",
                     "scripts/vfs_fonts.js",
                     "scripts/moment-plugins.js",
