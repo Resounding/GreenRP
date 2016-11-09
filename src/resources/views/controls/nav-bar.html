@@ -6,7 +6,7 @@
                     <img src="images/logo.png" alt="Logo" class="logo">
                     <span>Boekestyn Greenhouses</span>
                 </a>
-                <a repeat.for="item of router.navigation" href.bind="item.href" class="item ${item.isActive? 'active' : ''}">
+                <a repeat.for="item of authorizedRoutes" href.bind="item.navModel.href" class="item ${item.navModel.isActive? 'active' : ''}">
                     ${item.title}
                 </a>
                 <button type="button" class="item" click.trigger="showCalculator()" show.bind="canCreateOrders">
@@ -30,7 +30,7 @@
                 <img src="images/logo.png" alt="Logo" class="logo">
                 <span>Boekestyn Greenhouses</span>
             </a>
-            <a repeat.for="item of router.navigation" href.bind="item.href" class="item ${item.isActive? 'active' : ''}">
+            <a repeat.for="item of authorizedRoutes" href.bind="item.href" class="item ${item.isActive? 'active' : ''}">
                 ${item.title}
             </a>
             <a type="button" class="item" click.trigger="showCalculator()" show.bind="canCreateOrders">

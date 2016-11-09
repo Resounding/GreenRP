@@ -12,7 +12,8 @@ export class App {
         config.addAuthorizeStep(AuthorizeStep);
         config.title = 'Boekestyn Greenhouses Resource Planning app';
         config.map([
-            {route: ['', 'home/:year'], name: 'home', moduleId: 'resources/views/home/index', title: 'Home', nav: true, settings: { auth: true }}
+            {route: ['', 'home/:year'], name: 'home', moduleId: 'resources/views/home/index', title: 'Home', nav: true, settings: { auth: true }},
+            {route: 'plants', name: 'plants', moduleId: 'resources/views/plants/index', title: 'Plants', nav: true, settings: { auth: true, roles: ['grower', 'administrator'] }}
         ]);
 
         this.router = router;

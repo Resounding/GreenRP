@@ -36,6 +36,24 @@ export class ReferenceService {
         });
     }
 
+    savePlant(plant:Plant):Promise<PouchDB.Core.Response> {
+        return new Promise((resolve, reject) => {
+            this.database.db.get('plants')
+                .then(result => {
+                    const index = _.findIndex(result.plants, p => p.name === plant.name);
+                    if(index === -1) {
+                        result.plants.push(plant);
+                    } else {
+                        result.plants[index] = plant;
+                    }
+                    this.database.db.put(result)
+                        .then(resolve)
+                        .catch(reject);
+                })
+                .catch(reject);
+        });
+    }
+
     zones():Promise<Zone[]> {
         return new Promise((resolve, reject) => {
 

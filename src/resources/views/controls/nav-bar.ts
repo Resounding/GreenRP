@@ -1,5 +1,5 @@
 import {autoinject, bindable} from 'aurelia-framework';
-import {Router} from 'aurelia-router';
+import {Router, RouteConfig} from 'aurelia-router';
 import {DialogService} from 'aurelia-dialog';
 import {Authentication, Roles} from '../../services/authentication';
 import {Database} from '../../services/database';
@@ -9,10 +9,19 @@ import {log} from '../../services/log';
 @autoinject()
 export class NavBar {
     @bindable router:Router;
+    authorizedRoutes:RouteConfig[] = [];
 
     constructor(private element:Element, private auth:Authentication, private database:Database, private dialogService:DialogService) { }
 
     attached() {
+        this.router.routes.forEach(r => {
+            // prevent duplicates
+            if(this.authorizedRoutes.some(ar => r.moduleId === ar.moduleId)) return false;
+            if(!Array.isArray(r.settings.roles) || r.settings.roles.some(this.auth.isInRole)){
+                this.authorizedRoutes.push(r);
+            }
+        });
+
         let $fixedMenu = $('#fixed-menu', this.element),
             $mainMenu = $('#main-menu', this.element);
 

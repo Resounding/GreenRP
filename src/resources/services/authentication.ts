@@ -75,11 +75,11 @@ export class Authentication {
     }
 
     isAuthenticated():boolean {
-        return user_info !== null;
+        return Authentication.isLoggedIn();
     }
 
     isInRole(role:string):boolean {
-        return this.isAuthenticated() && user_info.roles.indexOf(role) !== -1;
+        return Authentication.isInRole(role);
     }
 
     get userInfo():UserInfo {
@@ -90,15 +90,33 @@ export class Authentication {
         return user_info !== null;
     }
 
+    static isInRole(role:string) {
+        return Authentication.isLoggedIn() && user_info.roles.indexOf(role) !== -1;
+    }
+
     static AuthenticatedEvent:string = 'authenticated';
 }
 
 export class AuthorizeStep {
     run(navigationInstruction:NavigationInstruction, next: Next) {
-        if(navigationInstruction.getAllInstructions().some(i => i.config.settings.auth )) {
+        const instructions:NavigationInstruction[] = navigationInstruction.getAllInstructions(); 
+        if(instructions.some(i => i.config.settings.auth )) {
             var loggedIn = Authentication.isLoggedIn();
             if(!loggedIn) {
                 return next.cancel(new Redirect('login'));
+            }
+        }
+        // if this route is only accessible to some roles...
+        if(instructions.some(i => Array.isArray(i.config.settings.roles))) {
+            // and there are some 
+            if(instructions.some(i => {
+                // no roles requirement: no problem
+                if(!Array.isArray(i.config.settings.roles)) return false;
+                const roles:string[] = i.config.settings.roles;
+                // if they're not in any of the roles, redirect home.
+                if(roles.every(r => !Authentication.isInRole(r))) return true;
+            })) {
+                return next.cancel(new Redirect('home'));
             }
         }
 

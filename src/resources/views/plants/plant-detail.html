@@ -1,0 +1,69 @@
+<template>
+    <require from="styles/plant-detail.css"></require>
+
+    <ai-dialog id="plant-detail">
+        <ai-dialog-header>
+            <h2 show.bind="isNew">New Plant</h2>
+            <h2 hide.bind="isNew">Edit Plant</h2>
+        </ai-dialog-header>
+        <ai-dialog-body>
+            <form class="ui form segment">                
+                <div class="fields row">
+                    <div class="field two wide">
+                        <label for="size">Size</label>
+                        <input type="text" name="size" id="size" value.bind="plant.size" attach-focus="true">
+                    </div>
+                    <div class="field six wide">
+                        <label for="crop">Crop</label>
+                        <input type="text" name="crop" id="crop" value.bind="plant.crop">
+                    </div>
+                    <div class="field two wide">
+                        <label for="abbreviation">Abbreviation</label>
+                        <input type="text" name="abbreviation" id="abbreviation" value.bind="plant.abbreviation">
+                    </div>
+                    <div class="field one wide">&nbsp;</div>
+                    <div class="field five wide">
+                        <!-- spacer -->
+                        <label>&nbsp;</label>
+                        <div class="ui toggle checkbox">
+                            <input type="checkbox" checked.bind="plant.hasLightsOut">
+                            <label>Has Lights Out</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="divider">&nbsp;</div>
+                <div class="fields row">
+                    <div class="field three wide">
+                        <label for="cuttingsPerPot">Cuttings per Pot</label>
+                        <input type="number" name="cuttingsPerPot" id="cuttingsPerPot" value.bind="plant.cuttingsPerPot">
+                    </div>
+                    <div class="field one wide">&nbsp;</div>
+                    <div class="field four wide">
+                        <label for="cuttingsPerTableTight">Cuttings per Table: Tight</label>
+                        <input type="number" name="cuttingsPerTableTight" id="cuttingsPerTableTight" value.bind="plant.cuttingsPerTable.tight">
+                    </div>
+                    <div class="field four wide">
+                        <label for="cuttingsPerTableHalf">Cuttings per Table: Half</label>
+                        <input type="number" name="cuttingsPerTableHalf" id="cuttingsPerTableHalf" value.bind="plant.cuttingsPerTable.half">
+                    </div>
+                    <div class="field four wide">
+                        <label for="cuttingsPerTableFull">Cuttings per Table: Full</label>
+                        <input type="number" name="cuttingsPerTableFull" id="cuttingsPerTableFull" value.bind="plant.cuttingsPerTable.full">
+                    </div>
+                </div>
+            </form>
+        </ai-dialog-body>
+        <ai-dialog-footer>
+            <button class="ui basic red button left floated" click.delegate="delete()" data-tooltip="Click to Delete this Order" hide.bind="isNew">
+                <i class="trash button icon"></i>
+                Delete
+            </button>
+
+            <button class="ui basic button" click.delegate="cancel()">Cancel</button>
+            <button class="ui basic primary button" click.delegate="save()">
+                <i class="save button icon"></i>
+                Save
+            </button>
+        </ai-dialog-footer>
+    </ai-dialog>
+</template>

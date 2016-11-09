@@ -1,6 +1,7 @@
 import {autoinject, computedFrom} from 'aurelia-framework';
 import {DialogController, DialogService, DialogResult} from 'aurelia-dialog';
 import {Prompt} from "../controls/prompt";
+import {log} from '../../services/log';
 import {Authentication, Roles} from '../../services/authentication';
 import {CapacityService} from '../../services/domain/capacity-service';
 import {OrderCalculator} from '../../services/domain/order-calculator';
@@ -103,7 +104,7 @@ export class OrderDetail {
                 this.controller.close(true);
             })
             .catch((err) => {
-                console.log(err);
+                log.error(err);
                 alert(err);
             });
     }
