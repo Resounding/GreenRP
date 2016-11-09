@@ -81,7 +81,8 @@
                 "source": [
                     "[**/*.js]",
                     "**/*.{css,html}"
-                ]
+                ],
+                "rev": "stage & prod"
             },
             {
                 "name": "vendor-bundle.js",
