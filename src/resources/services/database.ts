@@ -46,7 +46,8 @@ export class Database {
                     if(change.direction === 'pull' && _.isArray(change.change.docs)) {
 
                         let ordersSynced:boolean = _.any(change.change.docs, doc => doc.type === OrderDocument.OrderDocumentType),
-                            zonesSynced:boolean = _.any(change.change.docs, doc => doc._id === 'zones');
+                            zonesSynced:boolean = _.any(change.change.docs, doc => doc._id === 'zones'),
+                            plantsSynced:boolean = _.any(change.change.docs, doc => doc._id === 'plants');
 
                         if(ordersSynced) {
                             this.events.publish(Database.OrdersSyncChangeEvent);
@@ -54,6 +55,10 @@ export class Database {
 
                         if(zonesSynced) {
                             this.events.publish(Database.ZonesSyncChangeEvent);
+                        }
+
+                        if(plantsSynced) {
+                            this.events.publish(Database.PlantsSyncChangeEvent);
                         }
                     }
                 })
@@ -71,4 +76,5 @@ export class Database {
 
     static OrdersSyncChangeEvent:string = 'OrdersSyncChangeEvent';
     static ZonesSyncChangeEvent:string = 'ZonesSyncChangeEvent';
+    static PlantsSyncChangeEvent:string = 'PlantsSyncChangeEvent';
 }

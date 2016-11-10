@@ -5,6 +5,7 @@ interface CuttingsPerTable {
 }
 
 export interface Plant {
+    id:number;
     name:string;
     abbreviation:string;
     crop:string;
@@ -16,14 +17,15 @@ export interface Plant {
 }
 
 export class PlantDocument implements Plant {
-    name:string;
-    abbreviation:string;
-    crop:string;
-    size:string;
-    cuttingsPerPot:number;
-    cuttingsPerTable:CuttingsPerTable;
-    potsPerCase:number;
-    hasLightsOut:boolean;
+    id:number;
+    name:string = '';
+    abbreviation:string = '';
+    crop:string = '';
+    size:string = '';
+    cuttingsPerPot:number = 1;
+    cuttingsPerTable:CuttingsPerTable = {full: 0, tight: 0};
+    potsPerCase:number = 0;
+    hasLightsOut:boolean = false;
 
     constructor(args?:Plant) {
         if(args) {

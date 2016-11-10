@@ -1,20 +1,32 @@
 import {autoinject} from 'aurelia-framework';
+import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {DialogController, DialogService, DialogResult} from 'aurelia-dialog';
+import {Database} from '../../services/database';
 import {ReferenceService} from '../../services/data/reference-service'
-import {Plant,Spacings} from '../../models/plant';
+import {Plant, PlantDocument,Spacings} from '../../models/plant';
 import {PlantDetail} from './plant-detail';
 
 @autoinject
 export class CropIndex {
     plants:Plant[];
+    plantSyncChangeSubscription:Subscription;
     
-    constructor(private referenceService:ReferenceService, private dialogService:DialogService) {
+    constructor(private referenceService:ReferenceService, private dialogService:DialogService,
+        private events:EventAggregator) {
         this.loadPlants();
+    }
+
+    activate() {
+        this.plantSyncChangeSubscription = this.events.subscribe(Database.PlantsSyncChangeEvent, this.loadPlants.bind(this));
+    }
+
+    deactivate() {
+
     }
 
     loadPlants() {
         return this.referenceService.plants()
-            .then(result => this.plants = result);
+            .then(result => this.plants = _.sortBy(result, p => p.crop.toLowerCase() + p.size));
     }
 
     cuttingsPerTable(plant:Plant) {
@@ -27,6 +39,17 @@ export class CropIndex {
             }
             return memo;
         }, []).join(', ');
+    }
+
+    addPlant() {
+        this.dialogService.open({
+            viewModel: PlantDetail,
+            model: new PlantDocument()
+        }).then((result:DialogResult) => {
+            if(result.wasCancelled) return;
+
+            this.loadPlants();
+        });
     }
 
     detail(plant:Plant) {

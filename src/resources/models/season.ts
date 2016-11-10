@@ -1,8 +1,5 @@
 interface SeasonCropWeeks {
-    Mums: number;
-    Kalanchoe: number;
-    Cyclamen: number;
-    Gerbera: number;
+    [index:string]: number;
 }
 
 export interface Season {
