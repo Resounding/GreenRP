@@ -20,15 +20,18 @@
                     <div class="field two wide">
                         <label for="abbreviation">Abbreviation</label>
                         <input type="text" name="abbreviation" id="abbreviation" value.bind="plant.abbreviation">
-                    </div>
-                    <div class="field one wide">&nbsp;</div>
-                    <div class="field five wide">
+                    </div>                    
+                    <div class="field four wide">
                         <!-- spacer -->
                         <label>&nbsp;</label>
                         <div class="ui toggle checkbox">
                             <input type="checkbox" checked.bind="plant.hasLightsOut">
                             <label>Has Lights Out</label>
                         </div>
+                    </div>
+                    <div class="field two wide">
+                        <label for="potsPerCase">Pots per case</label>
+                        <input type="number" name="potsPerCase" id="potsPerCase" value.bind="plant.potsPerCase">
                     </div>
                 </div>
                 <div class="ui divider">&nbsp;</div>
