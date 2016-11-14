@@ -46,6 +46,7 @@ export class PlantDetail {
                     }
                     const week = typeof s.week === 'number' ? s.week : s.week[this.plant.crop];
                     this.seasons[s.year][s.name] = week;
+                    this.verifyCurrentSeason();
                 });
             });
 
