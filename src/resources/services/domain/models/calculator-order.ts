@@ -48,7 +48,7 @@ export class CalculatorOrder implements Order {
             let zoneName:string;
             // TODO: this isn't right. need to find the actual zone
             if(lightsOutDate) {
-                if (lightsOutYear < w.week.year || lightsOutYear === w.week.year && w.week.week < lightsOutWeek) {
+                if (w.week.year < lightsOutYear || lightsOutYear === w.week.year && w.week.week < lightsOutWeek) {
                     if(propZone) {
                         zoneName = propZone.name;
                     }
