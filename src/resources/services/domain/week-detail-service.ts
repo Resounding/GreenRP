@@ -50,8 +50,7 @@ export class WeekDetailOrder {
         this.plant = order.plant.name;
         this.pots = order.quantity;
         this.flowerDate = moment(order.flowerDate).format('MMM D');
-        this.shipWeek = moment(order.arrivalDate).isoWeek();
-        this.zone = order.zone.name;
+        this.shipWeek = moment(order.arrivalDate).isoWeek();        
 
         const filterWeekId = filter.weekId,
             filterWeek = filter.weekNumber,
@@ -61,6 +60,7 @@ export class WeekDetailOrder {
             }),
             tables = week ? week.tables : 0;
         this.tables = tables;
+        this.zone = week ? week.zone : order.zone.name;
 
         const shippingDate = moment(order.arrivalDate),
             shippingWeek = shippingDate.isoWeek(),
@@ -110,7 +110,9 @@ export class WeekDetailService {
         function zones(order:OrderDocument):boolean {
             if(!filter.zone) return true;
 
-            return filter.zone === order.zone.name;
+            return _.any(_.values(order.weeksInHouse), (w) => {
+                return  w.zone === filter.zone && w.week === filter.weekNumber && w.year === filter.yearNumber;
+            });
         }
 
         function sortOrder(a:OrderDocument, b:OrderDocument):number {
