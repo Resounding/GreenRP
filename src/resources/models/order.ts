@@ -27,7 +27,6 @@ export interface Order {
     plant:Plant;
     zone:Zone;
     weeksInHouse:OrderWeeksInHouse;
-    rootInPropArea:boolean;
     partialSpace:boolean;
 }
 

@@ -1,16 +1,11 @@
 <template>
     <require from="styles/order-table.css"></require>
     <require from="./event-view"></require>
+    <require from="./zone-cell"></require>
 
-    <div class="two fields">
-        <div class="ui field toggle checkbox">
-            <input type="checkbox" name="root-in-prop-zone" id="root-in-prop-zone" checked.bind="calculator.rootInPropagationZone">
-            <label for="root-in-prop-zone">Root in B/C</label>
-        </div>
-        <div class="ui field toggle checkbox">
-            <input type="checkbox" name="partial-space" id="partial-space" checked.bind="calculator.partialSpace">
-            <label for="partial-space">Use partial spacing</label>
-        </div>
+    <div class="ui field toggle checkbox right floated">
+        <input type="checkbox" name="partial-space" id="partial-space" checked.bind="calculator.partialSpace">
+        <label for="partial-space">Use partial spacing</label>
     </div>
 
     <table class="ui table">
@@ -19,7 +14,11 @@
                 <th class="center aligned">Event</th>
                 <th class="center aligned">Week</th>
                 <th class="center aligned">Tables</th>
-                <th class="center aligned" repeat.for="z of calculator.zones">${z.name}</th>
+                <th class="center aligned" repeat.for="z of calculator.zones">
+                    <button click.delegate="select(z)" class="basic ui toggle icon button fluid"
+                            show.bind="calculator.order.stickDate">${z.name}</button>
+                    <span hide.bind="calculator.order.stickDate">${z.name}</span>
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -31,24 +30,10 @@
                 </td>
                 <td class="center aligned">${week.week.week}</td>
                 <td class="center aligned">${week.tables|numericFormat}</td>
-                <td class="center aligned ${week.zones[z].available < 0 ? 'negative' : 'positive'}" repeat.for="z of week.zones | keys">
-                    ${week.zones[z].available}
+                <td class="center aligned" repeat.for="zone of week.zones | keys">
+                    <zone-cell calculator.bind="calculator" week.bind="week" zone.bind="week.zones[zone]"></zone-cell>
                 </td>
             </tr>
         </tbody>
-        <tfoot>
-            <tr show.bind="calculator.order.stickDate">
-                <td colspan="3">&nbsp;</td>
-                <td class="center aligned" repeat.for="zone of calculator.zones">
-                    <button click.delegate="select(zone)" class="basic ui toggle icon button"
-                            hide.bind="zone.isPropagationZone"
-                            class.bind="(zone.name===calculator.order.zone.name) ? 'active' : ''">
-                        <i class="checkmark box icon" show.bind="zone.canFit"></i>
-                        <i class="warning sign box icon" hide.bind="zone.canFit"></i>
-                    </button>
-                    <span show.bind="zone.isPropagationZone">&nbsp;</span>
-                </td>
-            </tr>
-        </tfoot>
     </table>
 </template>

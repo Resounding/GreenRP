@@ -44,6 +44,44 @@ export class OrderCalculator {
 
     setZone(zone:CalculatorZone):OrderCalculator {
         this._order.zone = zone;
+        this._weeks.forEach(w => {
+            _.forEach(w.zones, (z, name) => {
+                if(z) {
+                    z.selected = name === zone.name;
+                }
+            });
+        });
+        this.resetWeeks();
+        return this;
+    }
+
+    setZoneForWeek(zone:Zone, week:Week):OrderCalculator {
+        const thisWeek = this._weeks.find(w => w.week._id === week._id);
+        if(thisWeek) {
+            _.forEach(thisWeek.zones, (z, name) => {
+                if(z) {
+                    z.selected = name === zone.name;
+                }
+            });
+
+            this.resetWeeks();
+        }
+        return this;
+    }
+
+    setZoneFromEventOnward(zoneName:string, weekId:string):OrderCalculator {
+        let  weekIndex = this._weeks.findIndex(w => w.week._id === weekId);
+        if(weekIndex !== -1) {
+            for(; weekIndex < this._weeks.length; weekIndex++) {
+                const thisWeek = this._weeks[weekIndex];
+                 _.forEach(thisWeek.zones, (z, name) => {
+                    if(z) {
+                        z.selected = name === zoneName;
+                    }
+                });
+            }
+            this.resetWeeks();
+        }
         return this;
     }
 
@@ -98,18 +136,6 @@ export class OrderCalculator {
     set potsPerCase(potsPerCase:number) {
         if(this._order && this._order.plant) {
             this._order.plant.potsPerCase = numeral(potsPerCase).value();
-        }
-    }
-
-    @computedFrom('order.rootInPropArea')
-    get rootInPropagationZone():boolean {
-        return this._order && this._order.rootInPropArea;
-    }
-
-    set rootInPropagationZone(value:boolean) {
-        if(this._order) {
-            this._order.rootInPropArea = value;
-            this.resetWeeks();
         }
     }
 
@@ -187,7 +213,7 @@ export class OrderCalculator {
     }
 
     
-    @computedFrom('plant', 'order.quantity', 'order.arrivalDate', 'order.flowerDate', 'order.lightsOutDate', 'order.stickDate', 'order.rootInPropArea', 'order.partialSpace')
+    @computedFrom('plant', 'order.quantity', 'order.arrivalDate', 'order.flowerDate', 'order.lightsOutDate', 'order.stickDate', 'order.partialSpace')
     get weeks():CalculatorWeek[] {
         return this._weeks;
     }
@@ -502,7 +528,8 @@ export class OrderCalculator {
         }
 
         this.zones.forEach(z => z.weeks = weeks);
-        this._weeks = weeks;
+        this._weeks.splice(0, this._weeks.length);
+        this._weeks.splice(0, 0, ...weeks);
     }
 
     private getShipWeek():Week {
@@ -610,12 +637,12 @@ export class OrderCalculator {
     private getZones(week:Week, tables:number|TableSpaceResult, usePropZone:boolean, previousWeeks:Map<string, WeekZones> = new Map<string, WeekZones>()):WeekZones {
         const zones = { },
             keys = Object.keys(week.zones),
-            previousZones = previousWeeks.get(week._id);
+            previousZones = previousWeeks.get(week._id),
+            selectionWeek = this._weeks.find(w => w.week._id === week._id);
         for(const key of keys) {
             const zone = _.clone(week.zones[key]),
                 tableCount = typeof tables === 'number' ? tables : (zone.zone.autoSpace ? tables.autoSpacing : tables.manualSpacing),
                 isPropZone = (this.propagationZone && key === this.propagationZone.name),
-                noPropZone = !usePropZone || !this.order.rootInPropArea,
                 previousZone = previousZones && previousZones[key];
 
             if(previousZone && typeof previousZone.available === 'number') {
@@ -623,12 +650,12 @@ export class OrderCalculator {
             }
             
             // reduce the prop zone if you're using it, reduce anything else if you're not
-            if((usePropZone && this.order.rootInPropArea && isPropZone) || (!isPropZone && noPropZone)) {
+            if((usePropZone && isPropZone) || !isPropZone) {
                 zone.available -= tableCount;
                 zone.tables = tableCount;
-            } else if(usePropZone && this.order.rootInPropArea && !isPropZone) {
-                zone.tables = 0;
             }
+
+            zone.selected = selectionWeek && selectionWeek.zones[zone.zone.name] && selectionWeek.zones[zone.zone.name].selected;
 
             if(usePropZone || !isPropZone) {
                 zones[key] = zone;

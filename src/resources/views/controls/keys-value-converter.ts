@@ -3,3 +3,9 @@ export class KeysValueConverter {
         return Reflect.ownKeys(obj);
     }
 }
+
+export class ValuesValueConverter {
+    toView(obj) {
+        return _.values(obj);
+    }
+}

@@ -75,9 +75,6 @@ export class Calculator {
             this.observerLocator
                 .getObserver(this.calculator, 'orderQuantity')
                 .subscribe(this.onQuantityChange.bind(this));
-            this.observerLocator
-                .getObserver(this.calculator, 'rootInPropagationZone')
-                .subscribe(this.onRootInPropagationZoneChange.bind(this));
         });
     }
 
@@ -140,13 +137,6 @@ export class Calculator {
     }
     onQuantityChange(value:string) {
         this.repeatCalculators.forEach((calculator, index) => {
-            this.resetRepeatingCalculator(calculator, index);
-        });
-    }
-    onRootInPropagationZoneChange(value:boolean) {
-        const rootInPropZone = this.calculator.rootInPropagationZone;
-        this.repeatCalculators.forEach((calculator, index) => {
-            calculator.rootInPropagationZone = rootInPropZone;
             this.resetRepeatingCalculator(calculator, index);
         });
     }
@@ -271,18 +261,12 @@ export class Calculator {
             while(this.repeatCalculators.length > value) {
                 const calculator = this.repeatCalculators.pop();
                 this.observerLocator
-                    .getObserver(calculator.order, 'rootInPropagationZone')
-                    .unsubscribe(this.onRepeaterChange.bind(this));
-                this.observerLocator
                     .getObserver(calculator.order, 'partialSpace')
                     .unsubscribe(this.onRepeaterChange.bind(this));
             }
 
             while(this.repeatCalculators.length < value) {
                 const calculator = this.createCalculator();
-                this.observerLocator
-                    .getObserver(calculator.order, 'rootInPropagationZone')
-                    .subscribe(this.onRepeaterChange.bind(this));
                 this.observerLocator
                     .getObserver(calculator.order, 'partialSpace')
                     .subscribe(this.onRepeaterChange.bind(this));

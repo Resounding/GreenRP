@@ -1,6 +1,7 @@
 import {bindable, autoinject} from 'aurelia-framework';
 import {Event, Events} from "../../services/domain/models/calculator-week";
 import {OrderCalculator} from "../../services/domain/order-calculator";
+import {CalculatorZone} from "../../services/domain/models/calculator-zone";
 
 @autoinject()
 export class EventViewCustomElement {
@@ -19,6 +20,9 @@ export class EventViewCustomElement {
         if(this.event.readonly) {
             $('div', this.element).popup();
         }
+        $('.dropdown', this.element).dropdown({
+            onChange: this.onMove.bind(this)
+        });
     }
 
     detached() {
@@ -27,6 +31,8 @@ export class EventViewCustomElement {
         if(this.event.readonly) {
             $('div', this.element).popup('destroy');
         }
+
+        $('.dropdown', this.element).dropdown('destroy');
     }
 
     onDateChange(value:string) {
@@ -57,5 +63,10 @@ export class EventViewCustomElement {
         function isDifferent(compare:Date):boolean {
             return !moment(compare).isSame(date);
         }
+    }
+
+    onMove(value:string) {
+        const weekId = moment(this.event.date).toWeekNumberId();
+        this.calculator.setZoneFromEventOnward(value, weekId);
     }
 }
