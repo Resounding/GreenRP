@@ -22,7 +22,8 @@ class ReferenceData {
                         isPropagationZone: false
                 },
                 available: 50,
-                tables: 50
+                tables: 50,
+                selected: false
             },
             'B/C': {
                 zone: {
@@ -32,7 +33,8 @@ class ReferenceData {
                         isPropagationZone: true
                 },
                 available: 20,
-                tables: 80
+                tables: 80,
+                selected: false
             },
             D: {
                 zone: {
@@ -42,7 +44,8 @@ class ReferenceData {
                         isPropagationZone: false
                 },
                 available: 50,
-                tables: 50
+                tables: 50,
+                selected: false
             },
             E: {
                 zone: {
@@ -52,7 +55,8 @@ class ReferenceData {
                         isPropagationZone: false
                 },
                 available: 80,
-                tables: 20
+                tables: 20,
+                selected: false
             },
             'F/G': {
                 zone: {
@@ -62,7 +66,8 @@ class ReferenceData {
                         isPropagationZone: false
                 },
                 available: 80,
-                tables: 20
+                tables: 20,
+                selected: false
             }
         };
 
@@ -98,19 +103,19 @@ describe('the order calculator', () => {
         ];
         weeks = new Map<string, CapacityWeek>([
             ['week:2017.1', new CapacityWeek({_id: 'week:2017.1', year: 2017, week: 1, zones: {
-                A: { zone: zones[0], available: 10, tables: 0 },
-                B: { zone: zones[1], available: 5, tables: 0 },
-                C: { zone: zones[2], available: 50, tables: 0 }
+                A: { zone: zones[0], available: 10, tables: 0, selected: false },
+                B: { zone: zones[1], available: 5, tables: 0, selected: false },
+                C: { zone: zones[2], available: 50, tables: 0, selected: false }
             }})],
             ['week:2017.2', new CapacityWeek({_id: 'week:2017.2', year: 2017, week: 2, zones: {
-                A: { zone: zones[0], available: 20, tables: 0 },
-                B: { zone: zones[1], available: 0, tables: 0 },
-                C: { zone: zones[2], available: 10, tables: 0 }
+                A: { zone: zones[0], available: 20, tables: 0, selected: false },
+                B: { zone: zones[1], available: 0, tables: 0, selected: false },
+                C: { zone: zones[2], available: 10, tables: 0, selected: false }
             }})],
             ['week:2017.3', new CapacityWeek({_id: 'week:2017.1', year: 2017, week: 3, zones: {
-                A: { zone: zones[0], available: 5, tables: 0 },
-                B: { zone: zones[1], available: 5, tables: 0 },
-                C: { zone: zones[2], available: 5, tables: 0 }
+                A: { zone: zones[0], available: 5, tables: 0, selected: false },
+                B: { zone: zones[1], available: 5, tables: 0, selected: false },
+                C: { zone: zones[2], available: 5, tables: 0, selected: false }
             }})]
         ]);
         seasons = [
@@ -227,7 +232,7 @@ describe('the order calculator', () => {
     it('adds weeks for lights-out', () => {
         const
             date = new Date(2017, 0, 9),
-            mum:Plant = { name: "4.5\" Mums", abbreviation: 'M', crop: 'Mums', size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
+            mum:Plant = { id: 1, name: "4.5\" Mums", abbreviation: 'M', crop: 'Mums', size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
                 tight: 1000,
                 half: 800,
                 full: 500
@@ -257,7 +262,7 @@ describe('the order calculator', () => {
     it('names the event lights-out if plant has lights out', () => {
         const
             date = new Date(2017, 0, 9),
-            mum:Plant = { name: "4.5\" Mums", abbreviation: 'M', crop: 'Mums', size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
+            mum:Plant = { id: 1, name: "4.5\" Mums", abbreviation: 'M', crop: 'Mums', size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
                 tight: 1000,
                 half: 800,
                 full: 500
@@ -297,7 +302,7 @@ describe('the order calculator', () => {
     it('names the event spacing if plant doesn\'t have lights out', () => {
         const
             date = new Date(2017, 0, 9),
-            mum:Plant = { name: "4.5\" Kalanchoe", abbreviation: 'K', crop: 'Kalanchoe', size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
+            mum:Plant = { id: 1, name: "4.5\" Kalanchoe", abbreviation: 'K', crop: 'Kalanchoe', size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
                 tight: 1000,
                 half: 800,
                 full: 500
@@ -337,7 +342,7 @@ describe('the order calculator', () => {
     it('adds weeks for sticking', () => {
         const
             date = new Date(2017, 0, 9),
-            mum:Plant = { name: "4.5\" Mums", abbreviation: 'M', crop: 'Mums', size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
+            mum:Plant = { id: 1, name: "4.5\" Mums", abbreviation: 'M', crop: 'Mums', size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
                 tight: 1000,
                 half: 800,
                 full: 500
@@ -399,6 +404,7 @@ describe('the order calculator', () => {
         const order:OrderDocument = new OrderDocument({
             _id: '123',
             _rev: '1',
+            orderNumber: 'WK2016-07',
             type: OrderDocument.OrderDocumentType,
             arrivalDate: new Date(2017, 5, 12), // June 12, 2017: Week 24
             flowerDate: new Date(2017,5, 8), // June 8, 2017: Week 23
@@ -406,7 +412,7 @@ describe('the order calculator', () => {
             stickDate: new Date(2017, 3, 13), // Apr 13, 2017: 5 weeks before lights-out
             quantity:1000,
             customer:{name: 'Sobeys', abbreviation: 'Sb'},
-            plant:{name: '4.5" Mums', abbreviation: 'M', size: '4.5"', crop: 'Mums', cuttingsPerPot: 5, cuttingsPerTable: {
+            plant:{id: 1234, name: '4.5" Mums', abbreviation: 'M', size: '4.5"', crop: 'Mums', cuttingsPerPot: 5, cuttingsPerTable: {
                 full: 500,
                 tight: 1000
             }, potsPerCase: 8, hasLightsOut: true},
@@ -426,7 +432,6 @@ describe('the order calculator', () => {
                 'week:2017-23': { zone: 'A', tables: 2, year: 2017, week: 23 },
                 'week:2017-24': { zone: 'A', tables: 2, year: 2017, week: 24 }
             },
-            rootInPropArea: false,
             partialSpace: false
         }),
         thisFlowerTimes:SeasonTime[] = [
@@ -449,7 +454,7 @@ describe('the order calculator', () => {
     it('adds the partial space event if partially spaced', () => {
         const
             date = new Date(2017, 0, 9),
-            gerbera:Plant = { name: "4.5\" Gerbera", abbreviation: 'G', crop: 'Gerbera', size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
+            gerbera:Plant = { id: 4, name: "4.5\" Gerbera", abbreviation: 'G', crop: 'Gerbera', size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
                     tight: 1000,
                     half: 800,
                     full: 500
@@ -510,7 +515,7 @@ describe('the order calculator', () => {
     it('sets the partial spacing events as readonly', () => {
         const
             date = new Date(2017, 0, 9),
-            gerbera:Plant = { name: "4.5\" Gerbera", abbreviation: 'G', crop: 'Kalanchoe', size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
+            gerbera:Plant = { id: 1, name: "4.5\" Gerbera", abbreviation: 'G', crop: 'Kalanchoe', size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
                     tight: 1000,
                     half: 800,
                     full: 500
@@ -582,6 +587,7 @@ describe('changing date', () => {
             }
         ];
         plant = {
+            id: 1,
             name: '6" Mums',
             abbreviation: 'M',
             size: '6"',
@@ -723,6 +729,7 @@ describe('order zones', () => {
             }
         ];
         plant = {
+            id: 1,
             name: '6" Mums',
             abbreviation: 'M',
             size: '6"',
@@ -769,113 +776,6 @@ describe('order zones', () => {
             .setPlant(plant)
             .setArrivalDate(arrival);
     });
-
-    it('sets the zones when rootInPropArea is false', () => {        
-        propagationTimes = [
-            {
-                plant: plant.name,
-                year: 2017,
-                times: 2
-            }
-        ];
-        flowerTimes = [
-            {
-                plant: plant.name,
-                year: 2017,
-                times: 2
-            }
-        ];
-        calculator = new OrderCalculator(zones, weeks, seasons, propagationTimes, flowerTimes)
-            .setPlant(plant)
-            .setArrivalDate(arrival);
-        calculator.orderQuantity = 1000;
-
-        const orderWeeks = calculator.weeks;
-        let orderWeek:CalculatorWeek = orderWeeks[0];
-
-        expect(orderWeek.tables).toEqual(1);
-        expect(orderWeek.zones['A'].available).toEqual(99);
-        expect(orderWeek.zones['B'].available).toEqual(100);
-        expect(orderWeek.zones['C'].available).toEqual(99);
-
-        orderWeek = orderWeeks[1];
-        expect(orderWeek.tables).toEqual(1);
-        expect(orderWeek.zones['A'].available).toEqual(99);
-        expect(orderWeek.zones['B'].available).toEqual(100);
-        expect(orderWeek.zones['C'].available).toEqual(99);
-
-        orderWeek = orderWeeks[2];
-        expect(orderWeek.tables).toEqual(4);
-        expect(orderWeek.zones['A'].available).toEqual(96);
-        expect(orderWeek.zones['B']).toBeNull();
-        expect(orderWeek.zones['C'].available).toEqual(96);
-
-        orderWeek = orderWeeks[3];
-        expect(orderWeek.tables).toEqual(4);
-        expect(orderWeek.zones['A'].available).toEqual(96);
-        expect(orderWeek.zones['B']).toBeNull();
-        expect(orderWeek.zones['C'].available).toEqual(96);
-
-        orderWeek = orderWeeks[4];
-        expect(orderWeek.tables).toEqual(4);
-        expect(orderWeek.zones['A'].available).toEqual(96);
-        expect(orderWeek.zones['B']).toBeNull();
-        expect(orderWeek.zones['C'].available).toEqual(96);
-    });
-
-    it('sets the zones when rootInPropArea is true', () => {        
-        propagationTimes = [
-            {
-                plant: plant.name,
-                year: 2017,
-                times: 2
-            }
-        ];
-        flowerTimes = [
-            {
-                plant: plant.name,
-                year: 2017,
-                times: 2
-            }
-        ];
-        calculator = new OrderCalculator(zones, weeks, seasons, propagationTimes, flowerTimes)
-            .setPlant(plant)
-            .setArrivalDate(arrival);
-        calculator.orderQuantity = 1000;
-        calculator.rootInPropagationZone = true;
-
-        const orderWeeks = calculator.weeks;
-        let orderWeek:CalculatorWeek = orderWeeks[0];
-
-        expect(orderWeek.tables).toEqual(1);
-        expect(orderWeek.zones['A'].available).toEqual(100);
-        expect(orderWeek.zones['B'].available).toEqual(99);
-        expect(orderWeek.zones['C'].available).toEqual(100);
-
-        orderWeek = orderWeeks[1];
-        expect(orderWeek.tables).toEqual(1);
-        expect(orderWeek.zones['A'].available).toEqual(100);
-        expect(orderWeek.zones['B'].available).toEqual(99);
-        expect(orderWeek.zones['C'].available).toEqual(100);
-
-        orderWeek = orderWeeks[2];
-        expect(orderWeek.tables).toEqual(4);
-        expect(orderWeek.zones['A'].available).toEqual(96);
-        expect(orderWeek.zones['B']).toBeNull();
-        expect(orderWeek.zones['C'].available).toEqual(96);
-
-        orderWeek = orderWeeks[3];
-        expect(orderWeek.tables).toEqual(4);
-        expect(orderWeek.zones['A'].available).toEqual(96);
-        expect(orderWeek.zones['B']).toBeNull();
-        expect(orderWeek.zones['C'].available).toEqual(96);
-
-        orderWeek = orderWeeks[4];
-        expect(orderWeek.tables).toEqual(4);
-        expect(orderWeek.zones['A'].available).toEqual(96);
-        expect(orderWeek.zones['B']).toBeNull();
-        expect(orderWeek.zones['C'].available).toEqual(96);
-    });
 });
 
 describe('setRepeatingValues()', () => {
@@ -904,6 +804,7 @@ describe('setRepeatingValues()', () => {
             }
         ];
         plant = {
+            id: 1,
             name: '6" Mums',
             abbreviation: 'M',
             size: '6"',
@@ -951,6 +852,7 @@ describe('setRepeatingValues()', () => {
             .setPlant(plant)
             .setArrivalDate(arrival);
         calculator.orderQuantity = 1000;
+        calculator.order.customer = customer;
         repeaters = [
             new OrderCalculator(zones, weeks, seasons, propagationTimes, flowerTimes),
             new OrderCalculator(zones, weeks, seasons, propagationTimes, flowerTimes)
@@ -986,37 +888,5 @@ describe('setRepeatingValues()', () => {
         expect(repeater2.weeks[4].zones['A'].available).toEqual(88); // 100 in zone - 4 for the week - 4 for the previous - 4 for the week before that
         expect(repeater2.weeks[5].zones['A'].available).toEqual(92); // original order is gone
         expect(repeater2.weeks[6].zones['A'].available).toEqual(96); // this is the only order left
-    });
-
-    it('works with rootInPropArea', () => {
-        const arrivalDate1 = moment(arrival).add(7, 'days').toDate(),
-            arrivalDate2 = moment(arrival).add(14, 'days').toDate(),
-            repeater1 = repeaters[0],
-            repeater2 = repeaters[1];
-
-        calculator.rootInPropagationZone = true;
-        repeater1.rootInPropagationZone = true;
-        repeater2.rootInPropagationZone = true;
-
-        repeater1.setRepeater(calculator, arrivalDate1);
-        repeater2.setRepeater(repeater1, arrivalDate2);
-        
-        expect(calculator.weeks[0].zones['B'].available).toEqual(99); // 100 in zone - 1 for the week
-        expect(calculator.weeks[1].zones['B'].available).toEqual(99); // 100 in zone - 1 for the week
-        expect(calculator.weeks[2].zones['B'].available).toEqual(99); // 100 in zone - 1 for the week
-        expect(calculator.weeks[3].zones['B']).toBeNull(); // out of prop zone
-        expect(calculator.weeks[6].zones['B']).toBeNull(); // out of prop zone
-
-        expect(repeater1.weeks[0].zones['B'].available).toEqual(98); // this order plus previous
-        expect(repeater1.weeks[1].zones['B'].available).toEqual(98); // this order plus previous
-        expect(repeater1.weeks[2].zones['B'].available).toEqual(99); // previous order is gone
-        expect(repeater1.weeks[3].zones['B']).toBeNull(); // out of prop zone
-        expect(repeater1.weeks[6].zones['B']).toBeNull(); // out of prop zone
-
-        expect(repeater2.weeks[0].zones['B'].available).toEqual(97); // this order plus previous 2
-        expect(repeater2.weeks[1].zones['B'].available).toEqual(98); // this order plus previous: initial is gone
-        expect(repeater2.weeks[2].zones['B'].available).toEqual(99); // previous order is gone
-        expect(repeater2.weeks[3].zones['B']).toBeNull(); // out of prop zone
-        expect(repeater2.weeks[6].zones['B']).toBeNull(); // out of prop zone
-    });    
+    }); 
 });

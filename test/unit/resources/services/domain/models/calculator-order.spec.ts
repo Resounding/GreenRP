@@ -70,7 +70,6 @@ describe('calculator order', () => {
             expect(order.lightsOutDate).toEqual(orderDoc.lightsOutDate);
             expect(order.stickDate).toEqual(orderDoc.stickDate);
             expect(order.quantity).toEqual(orderDoc.quantity);
-            expect(order.rootInPropArea).toEqual(orderDoc.rootInPropArea);
             expect(order.partialSpace).toEqual(orderDoc.partialSpace);
             expect(order.customer.name).toEqual(orderDoc.customer.name);
             expect(order.plant.name).toEqual(orderDoc.plant.name);
@@ -81,50 +80,50 @@ describe('calculator order', () => {
             weeks = [
                 {
                     week: { _id: 'week:2017.1', year: 2017, week: 1, zones: {
-                        A: { available: 75, tables: 25, zone: { name: 'A', autoSpace: false, isPropagationZone: false, tables: 100 } },
-                        B: { available: 75, tables: 25, zone: { name: 'B', autoSpace: false, isPropagationZone: true, tables: 100 } },
-                        C: { available: 75, tables: 25, zone: { name: 'C', autoSpace: false, isPropagationZone: false, tables: 100 } },
-                        F: { available: 75, tables: 25, zone: { name: 'F', autoSpace: true, isPropagationZone: false, tables: 100 } }
+                        A: { available: 75, tables: 25, zone: { name: 'A', autoSpace: false, isPropagationZone: false, tables: 100 }, selected: true },
+                        B: { available: 75, tables: 25, zone: { name: 'B', autoSpace: false, isPropagationZone: true, tables: 100 }, selected: false },
+                        C: { available: 75, tables: 25, zone: { name: 'C', autoSpace: false, isPropagationZone: false, tables: 100 }, selected: false },
+                        F: { available: 75, tables: 25, zone: { name: 'F', autoSpace: true, isPropagationZone: false, tables: 100 }, selected: false }
                     } },
                     events: [],
                     tables: 25,
                     zones: {
-                        A: { available: 75, tables: 25, zone: { name: 'A', autoSpace: false, isPropagationZone: false, tables: 100 } },
-                        B: { available: 75, tables: 25, zone: { name: 'B', autoSpace: false, isPropagationZone: true, tables: 100 } },
-                        C: { available: 75, tables: 25, zone: { name: 'C', autoSpace: false, isPropagationZone: false, tables: 100 } },
-                        F: { available: 75, tables: 25, zone: { name: 'F', autoSpace: true, isPropagationZone: false, tables: 100 } }
+                        A: { available: 75, tables: 25, zone: { name: 'A', autoSpace: false, isPropagationZone: false, tables: 100 }, selected: true },
+                        B: { available: 75, tables: 25, zone: { name: 'B', autoSpace: false, isPropagationZone: true, tables: 100 }, selected: false },
+                        C: { available: 75, tables: 25, zone: { name: 'C', autoSpace: false, isPropagationZone: false, tables: 100 }, selected: false },
+                        F: { available: 75, tables: 25, zone: { name: 'F', autoSpace: true, isPropagationZone: false, tables: 100 }, selected: false }
                     }                    
                  },
                  {
                     week: { _id: 'week:2017.2', year: 2017, week: 2, zones: {
-                        A: { available: 50, tables: 50, zone: { name: 'A', autoSpace: false, isPropagationZone: false, tables: 100 } },
-                        B: { available: 50, tables: 50, zone: { name: 'B', autoSpace: false, isPropagationZone: true, tables: 100 } },
-                        C: { available: 50, tables: 50, zone: { name: 'C', autoSpace: false, isPropagationZone: false, tables: 100 } },
-                        F: { available: 50, tables: 50, zone: { name: 'F', autoSpace: true, isPropagationZone: false, tables: 100 } }
+                        A: { available: 50, tables: 50, zone: { name: 'A', autoSpace: false, isPropagationZone: false, tables: 100 }, selected: true },
+                        B: { available: 50, tables: 50, zone: { name: 'B', autoSpace: false, isPropagationZone: true, tables: 100 }, selected: false },
+                        C: { available: 50, tables: 50, zone: { name: 'C', autoSpace: false, isPropagationZone: false, tables: 100 }, selected: false },
+                        F: { available: 50, tables: 50, zone: { name: 'F', autoSpace: true, isPropagationZone: false, tables: 100 }, selected: false }
                     } },
                     events: [],
                     tables: 50,
                     zones: {
-                        A: { available: 50, tables: 50, zone: { name: 'A', autoSpace: false, isPropagationZone: false, tables: 100 } },
-                        B: { available: 50, tables: 50, zone: { name: 'B', autoSpace: false, isPropagationZone: true, tables: 100 } },
-                        C: { available: 50, tables: 50, zone: { name: 'C', autoSpace: false, isPropagationZone: false, tables: 100 } },
-                        F: { available: 50, tables: 50, zone: { name: 'F', autoSpace: true, isPropagationZone: false, tables: 100 } }
+                        A: { available: 50, tables: 50, zone: { name: 'A', autoSpace: false, isPropagationZone: false, tables: 100 }, selected: true },
+                        B: { available: 50, tables: 50, zone: { name: 'B', autoSpace: false, isPropagationZone: true, tables: 100 }, selected: false },
+                        C: { available: 50, tables: 50, zone: { name: 'C', autoSpace: false, isPropagationZone: false, tables: 100 }, selected: false },
+                        F: { available: 50, tables: 50, zone: { name: 'F', autoSpace: true, isPropagationZone: false, tables: 100 }, selected: false }
                     }                    
                  },
                  {
                     week: { _id: 'week:2017.3', year: 2017, week: 3, zones: {
-                        A: { available: 50, tables: 50, zone: { name: 'A', autoSpace: false, isPropagationZone: false, tables: 100 } },
-                        B: { available: 50, tables: 50, zone: { name: 'B', autoSpace: false, isPropagationZone: true, tables: 100 } },
-                        C: { available: 50, tables: 50, zone: { name: 'C', autoSpace: false, isPropagationZone: false, tables: 100 } },
-                        F: { available: 50, tables: 50, zone: { name: 'F', autoSpace: true, isPropagationZone: false, tables: 100 } }
+                        A: { available: 50, tables: 50, zone: { name: 'A', autoSpace: false, isPropagationZone: false, tables: 100 }, selected: true },
+                        B: { available: 50, tables: 50, zone: { name: 'B', autoSpace: false, isPropagationZone: true, tables: 100 }, selected: false },
+                        C: { available: 50, tables: 50, zone: { name: 'C', autoSpace: false, isPropagationZone: false, tables: 100 }, selected: false },
+                        F: { available: 50, tables: 50, zone: { name: 'F', autoSpace: true, isPropagationZone: false, tables: 100 }, selected: false }
                     } },
                     events: [],
                     tables: 50,
                     zones: {
-                        A: { available: 50, tables: 50, zone: { name: 'A', autoSpace: false, isPropagationZone: false, tables: 100 } },
-                        B: { available: 50, tables: 50, zone: { name: 'B', autoSpace: false, isPropagationZone: true, tables: 100 } },
-                        C: { available: 50, tables: 50, zone: { name: 'C', autoSpace: false, isPropagationZone: false, tables: 100 } },
-                        F: { available: 50, tables: 50, zone: { name: 'F', autoSpace: true, isPropagationZone: false, tables: 100 } }
+                        A: { available: 50, tables: 50, zone: { name: 'A', autoSpace: false, isPropagationZone: false, tables: 100 }, selected: true },
+                        B: { available: 50, tables: 50, zone: { name: 'B', autoSpace: false, isPropagationZone: true, tables: 100 }, selected: false },
+                        C: { available: 50, tables: 50, zone: { name: 'C', autoSpace: false, isPropagationZone: false, tables: 100 }, selected: false },
+                        F: { available: 50, tables: 50, zone: { name: 'F', autoSpace: true, isPropagationZone: false, tables: 100 }, selected: false }
                     }                    
                  }
             ];
@@ -147,50 +146,50 @@ describe('calculator order', () => {
             weeks = [
                 {
                     week: { _id: 'week:2017.1', year: 2017, week: 1, zones: {
-                        A: { available: 50, tables: 50, zone: { name: 'A', autoSpace: false, isPropagationZone: false, tables: 100 } },
-                        B: { available: 50, tables: 50, zone: { name: 'B', autoSpace: false, isPropagationZone: true, tables: 100 } },
-                        C: { available: 50, tables: 50, zone: { name: 'C', autoSpace: false, isPropagationZone: false, tables: 100 } },
-                        F: { available: 75, tables: 25, zone: { name: 'F', autoSpace: true, isPropagationZone: false, tables: 100 } }
+                        A: { available: 50, tables: 50, zone: { name: 'A', autoSpace: false, isPropagationZone: false, tables: 100 }, selected: false },
+                        B: { available: 50, tables: 50, zone: { name: 'B', autoSpace: false, isPropagationZone: true, tables: 100 }, selected: false },
+                        C: { available: 50, tables: 50, zone: { name: 'C', autoSpace: false, isPropagationZone: false, tables: 100 }, selected: false },
+                        F: { available: 75, tables: 25, zone: { name: 'F', autoSpace: true, isPropagationZone: false, tables: 100 }, selected: true }
                     } },
                     events: [],
                     tables: 50,
                     zones: {
-                        A: { available: 50, tables: 50, zone: { name: 'A', autoSpace: false, isPropagationZone: false, tables: 100 } },
-                        B: { available: 50, tables: 50, zone: { name: 'B', autoSpace: false, isPropagationZone: true, tables: 100 } },
-                        C: { available: 50, tables: 50, zone: { name: 'C', autoSpace: false, isPropagationZone: false, tables: 100 } },
-                        F: { available: 75, tables: 25, zone: { name: 'F', autoSpace: true, isPropagationZone: false, tables: 100 } }
+                        A: { available: 50, tables: 50, zone: { name: 'A', autoSpace: false, isPropagationZone: false, tables: 100 }, selected: false },
+                        B: { available: 50, tables: 50, zone: { name: 'B', autoSpace: false, isPropagationZone: true, tables: 100 }, selected: false },
+                        C: { available: 50, tables: 50, zone: { name: 'C', autoSpace: false, isPropagationZone: false, tables: 100 }, selected: false },
+                        F: { available: 75, tables: 25, zone: { name: 'F', autoSpace: true, isPropagationZone: false, tables: 100 }, selected: true }
                     }                    
                  },
                  {
                     week: { _id: 'week:2017.2', year: 2017, week: 2, zones: {
-                        A: { available: 50, tables: 50, zone: { name: 'A', autoSpace: false, isPropagationZone: false, tables: 100 } },
-                        B: { available: 50, tables: 50, zone: { name: 'B', autoSpace: false, isPropagationZone: true, tables: 100 } },
-                        C: { available: 50, tables: 50, zone: { name: 'C', autoSpace: false, isPropagationZone: false, tables: 100 } },
-                        F: { available: 50, tables: 50, zone: { name: 'F', autoSpace: true, isPropagationZone: false, tables: 100 } }
+                        A: { available: 50, tables: 50, zone: { name: 'A', autoSpace: false, isPropagationZone: false, tables: 100 }, selected: false },
+                        B: { available: 50, tables: 50, zone: { name: 'B', autoSpace: false, isPropagationZone: true, tables: 100 }, selected: false },
+                        C: { available: 50, tables: 50, zone: { name: 'C', autoSpace: false, isPropagationZone: false, tables: 100 }, selected: false },
+                        F: { available: 50, tables: 50, zone: { name: 'F', autoSpace: true, isPropagationZone: false, tables: 100 }, selected: true }
                     } },
                     events: [],
                     tables: 50,
                     zones: {
-                        A: { available: 50, tables: 50, zone: { name: 'A', autoSpace: false, isPropagationZone: false, tables: 100 } },
-                        B: { available: 50, tables: 50, zone: { name: 'B', autoSpace: false, isPropagationZone: true, tables: 100 } },
-                        C: { available: 50, tables: 50, zone: { name: 'C', autoSpace: false, isPropagationZone: false, tables: 100 } },
-                        F: { available: 50, tables: 50, zone: { name: 'F', autoSpace: true, isPropagationZone: false, tables: 100 } }
+                        A: { available: 50, tables: 50, zone: { name: 'A', autoSpace: false, isPropagationZone: false, tables: 100 }, selected: false },
+                        B: { available: 50, tables: 50, zone: { name: 'B', autoSpace: false, isPropagationZone: true, tables: 100 }, selected: false },
+                        C: { available: 50, tables: 50, zone: { name: 'C', autoSpace: false, isPropagationZone: false, tables: 100 }, selected: false },
+                        F: { available: 50, tables: 50, zone: { name: 'F', autoSpace: true, isPropagationZone: false, tables: 100 }, selected: true }
                     }                    
                  },
                  {
                     week: { _id: 'week:2017.3', year: 2017, week: 3, zones: {
-                        A: { available: 50, tables: 50, zone: { name: 'A', autoSpace: false, isPropagationZone: false, tables: 100 } },
-                        B: { available: 50, tables: 50, zone: { name: 'B', autoSpace: false, isPropagationZone: true, tables: 100 } },
-                        C: { available: 50, tables: 50, zone: { name: 'C', autoSpace: false, isPropagationZone: false, tables: 100 } },
-                        F: { available: 50, tables: 50, zone: { name: 'F', autoSpace: true, isPropagationZone: false, tables: 100 } }
+                        A: { available: 50, tables: 50, zone: { name: 'A', autoSpace: false, isPropagationZone: false, tables: 100 }, selected: false },
+                        B: { available: 50, tables: 50, zone: { name: 'B', autoSpace: false, isPropagationZone: true, tables: 100 }, selected: false },
+                        C: { available: 50, tables: 50, zone: { name: 'C', autoSpace: false, isPropagationZone: false, tables: 100 }, selected: false },
+                        F: { available: 50, tables: 50, zone: { name: 'F', autoSpace: true, isPropagationZone: false, tables: 100 }, selected: true }
                     } },
                     events: [],
                     tables: 50,
                     zones: {
-                        A: { available: 50, tables: 50, zone: { name: 'A', autoSpace: false, isPropagationZone: false, tables: 100 } },
-                        B: { available: 50, tables: 50, zone: { name: 'B', autoSpace: false, isPropagationZone: true, tables: 100 } },
-                        C: { available: 50, tables: 50, zone: { name: 'C', autoSpace: false, isPropagationZone: false, tables: 100 } },
-                        F: { available: 50, tables: 50, zone: { name: 'F', autoSpace: true, isPropagationZone: false, tables: 100 } }
+                        A: { available: 50, tables: 50, zone: { name: 'A', autoSpace: false, isPropagationZone: false, tables: 100 }, selected: false },
+                        B: { available: 50, tables: 50, zone: { name: 'B', autoSpace: false, isPropagationZone: true, tables: 100 }, selected: false },
+                        C: { available: 50, tables: 50, zone: { name: 'C', autoSpace: false, isPropagationZone: false, tables: 100 }, selected: false },
+                        F: { available: 50, tables: 50, zone: { name: 'F', autoSpace: true, isPropagationZone: false, tables: 100 }, selected: true }
                     }                    
                  }
             ];
@@ -207,7 +206,7 @@ describe('calculator order', () => {
             order = calculatorOrder.toOrderDocument(weeks, allZones);
             let week = order.weeksInHouse['week:2017.1'];
             expect(week.week).toEqual(1);
-            expect(week.tables).toEqual(50);
+            expect(week.tables).toEqual(25);
         });
 
     });

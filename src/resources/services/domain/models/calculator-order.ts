@@ -36,11 +36,14 @@ export class CalculatorOrder implements Order {
         delete zone.weeks;
 
         const weeksInHouse = weeks.reduce((memo: OrderWeeksInHouse, w:CalculatorWeek):OrderWeeksInHouse => {
-            const selectedZone = _.find(w.zones, (zone, name) => zone && zone.selected),
-                zoneName = selectedZone.zone.name,
-                tables = selectedZone.tables;
+            const selectedZone = _.find(w.zones, (zone, name) => zone && zone.selected);
+            if(selectedZone) {
+                const
+                    zoneName = selectedZone.zone.name,
+                    tables = selectedZone.tables;
 
-            memo[w.week._id] = { zone: zoneName, tables: tables, week: w.week.week, year: w.week.year };
+                memo[w.week._id] = { zone: zoneName, tables: tables, week: w.week.week, year: w.week.year };
+            }
             return memo;
         }, <OrderWeeksInHouse>{});
 

@@ -1,10 +1,11 @@
 import {OrderDocument, Order} from "../../../../src/resources/models/order";
 
 describe('orders', () => {
-   it('creates the id properly', () => {
+   it('creates the orderNumber properly', () => {
        const order:Order = {
            _id: null,
            _rev: '1',
+           orderNumber: null,
            type: 'order',
            customer: { name: 'Shaws', abbreviation: 'Shw'},
            arrivalDate: new Date(2017, 4, 12),
@@ -14,6 +15,7 @@ describe('orders', () => {
            quantity: 1000,
            partialSpace: false,
            plant: {
+               id: 1,
                name: '6" Mums',
                abbreviation: '6M',
                crop: 'Mums',
@@ -26,11 +28,11 @@ describe('orders', () => {
                potsPerCase: 8,
                hasLightsOut: true
            },
-           zone: null,
-           rootInPropArea: false
+           weeksInHouse: {},
+           zone: null
        },
        doc = new OrderDocument(order);
 
-       expect(doc._id).toEqual('6MShw2017-19-5')
+       expect(doc.orderNumber).toEqual('6MShw2017-19-5')
    });
 });

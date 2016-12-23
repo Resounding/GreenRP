@@ -111,7 +111,7 @@ export class WeekDetailService {
             if(!filter.zone) return true;
 
             return _.any(_.values(order.weeksInHouse), (w) => {
-                return  w.zone === filter.zone && w.week === filter.weekNumber && w.year === filter.yearNumber;
+                return  w.zone === filter.zone && (filter.weekNumber === 0 || w.week === filter.weekNumber) && (filter.yearNumber === 0 || w.year === filter.yearNumber);
             });
         }
 

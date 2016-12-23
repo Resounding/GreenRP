@@ -61,6 +61,7 @@ describe('week detail service', () => {
                     toJSON: () => null,
                     _id: '6M:Weg:2017-12-3',
                     _rev: '1',
+                    orderNumber: '6MWeg2017-12-3',
                     type: 'order',
                     rootInPropArea: false,
                     partialSpace: false,
@@ -71,6 +72,7 @@ describe('week detail service', () => {
                     quantity: 10000,
                     customer: {name: 'Wegmans', abbreviation: 'Weg'},
                     plant: {
+                        id: 1,
                         name: '6" Mums',
                         abbreviation: '6M',
                         crop: 'Mums',
@@ -85,27 +87,28 @@ describe('week detail service', () => {
                         hasLightsOut: true
                     },
                     weeksInHouse: {
-                        'week:2017.3': {year: 2017, week: 3, tables: 7},
-                        'week:2017.4': {year: 2017, week: 4, tables: 7},
-                        'week:2017.5': {year: 2017, week: 5, tables: 7},
-                        'week:2017.6': {year: 2017, week: 6, tables: 7},
-                        'week:2017.7': {year: 2017, week: 7, tables: 7},
-                        'week:2017.8': {year: 2017, week: 8, tables: 20},
-                        'week:2017.9': {year: 2017, week: 9, tables: 20},
-                        'week:2017.10': {year: 2017, week: 10, tables: 20},
-                        'week:2017.11': {year: 2017, week: 11, tables: 20},
-                        'week:2017.12': {year: 2017, week: 12, tables: 20}
+                        'week:2017.3': {year: 2017, week: 3, tables: 7, zone: 'A'},
+                        'week:2017.4': {year: 2017, week: 4, tables: 7, zone: 'A'},
+                        'week:2017.5': {year: 2017, week: 5, tables: 7, zone: 'A'},
+                        'week:2017.6': {year: 2017, week: 6, tables: 7, zone: 'A'},
+                        'week:2017.7': {year: 2017, week: 7, tables: 7, zone: 'A'},
+                        'week:2017.8': {year: 2017, week: 8, tables: 20, zone: 'A'},
+                        'week:2017.9': {year: 2017, week: 9, tables: 20, zone: 'A'},
+                        'week:2017.10': {year: 2017, week: 10, tables: 20, zone: 'A'},
+                        'week:2017.11': {year: 2017, week: 11, tables: 20, zone: 'A'},
+                        'week:2017.12': {year: 2017, week: 12, tables: 20, zone: 'A'}
                     },
                     zone: {
                         name: 'A', tables: 325, autoSpace: false, isPropagationZone: false
-                    }
+                    },
+                    createOrderNumber: () => null
                 },                
                 week = {_id: 'week:2017.12', year: 2017, week: 12, zones: null},
                 filter = new WeekDetailFilter(week);
 
             let wdo = new WeekDetailOrder(order, filter);
 
-            expect(wdo.batch).toEqual('6M:Weg:2017-12-3');
+            expect(wdo.batch).toEqual(order.orderNumber);
             expect(wdo.plant).toEqual('6" Mums');
             expect(wdo.pots).toEqual(10000);
             expect(wdo.shipWeek).toEqual(12);
@@ -135,7 +138,7 @@ describe('week detail service', () => {
                 _id: '6M:Weg:2017-12-3',
                 _rev: '1',
                 type: 'order',
-                rootInPropArea: false,
+                orderNumber: 'Wg2017-12-3',
                 partialSpace: false,
                 arrivalDate: new Date(2017, 2, 22),
                 flowerDate: new Date(2017, 2, 17),
@@ -144,6 +147,7 @@ describe('week detail service', () => {
                 quantity: 10000,
                 customer: {name: 'Wegmans', abbreviation: 'Weg'},
                 plant: {
+                    id: 1,
                     name: '6" Mums',
                     abbreviation: '6M',
                     crop: 'Mums',
@@ -157,7 +161,8 @@ describe('week detail service', () => {
                     hasLightsOut: true
                 },
                 weeksInHouse: {
-
+                    'week:2017.3': {year: 2017, week: 3, tables: 7, zone: 'A'},
+                    'week:2017.4': {year: 2017, week: 4, tables: 7, zone: 'A'}
                 },
                 zone: {
                     name: 'A', tables: 325, autoSpace: false, isPropagationZone: false
@@ -167,7 +172,7 @@ describe('week detail service', () => {
                 _id: '6M:Weg:2017-13-3',
                 _rev: '1',
                 type: 'order',
-                rootInPropArea: false,
+                orderNumber: 'Wg2017-13-3',
                 partialSpace: false,
                 arrivalDate: new Date(2017, 2, 29),
                 flowerDate: new Date(2017, 2, 24),
@@ -176,6 +181,7 @@ describe('week detail service', () => {
                 quantity: 10000,
                 customer: {name: 'Wegmans', abbreviation: 'Weg'},
                 plant: {
+                    id: 1,
                     name: '6" Mums',
                     abbreviation: '6M',
                     crop: 'Mums',
@@ -190,7 +196,8 @@ describe('week detail service', () => {
                     hasLightsOut: true
                 },
                 weeksInHouse: {
-
+                    'week:2017.3': {year: 2017, week: 3, tables: 7, zone: 'A'},
+                    'week:2017.4': {year: 2017, week: 4, tables: 7, zone: 'A'}
                 },
                 zone: {
                     name: 'A', tables: 325, autoSpace: false, isPropagationZone: false
@@ -200,7 +207,7 @@ describe('week detail service', () => {
                 _id: '6M:shw:2017-40-5',
                 _rev: '1',
                 type: 'order',
-                rootInPropArea: false,
+                orderNumber: '6MShw2017-40-5',
                 partialSpace: false,
                 arrivalDate: new Date(2017, 9, 6),
                 flowerDate: new Date(2017, 9, 2),
@@ -209,6 +216,7 @@ describe('week detail service', () => {
                 quantity: 12500,
                 customer: {name: 'Shaws', abbreviation: 'Shw'},
                 plant: {
+                    id: 1,
                     name: '4.5" Kolanchoe',
                     abbreviation: '4K',
                     crop: 'Kolanchoe',
@@ -222,7 +230,8 @@ describe('week detail service', () => {
                     hasLightsOut: true
                 },
                 weeksInHouse: {
-
+                    'week:2017.3': {year: 2017, week: 3, tables: 7, zone: 'D'},
+                    'week:2017.4': {year: 2017, week: 4, tables: 7, zone: 'D'}
                 },
                 zone: {
                     name: 'D', tables: 220, autoSpace: false, isPropagationZone: false
