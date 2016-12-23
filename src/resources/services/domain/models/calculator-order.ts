@@ -28,7 +28,7 @@ export class CalculatorOrder implements Order {
     }
 
     toOrderDocument(weeks:CalculatorWeek[], zones:Zone[]):OrderDocument {
-        const zone = _.clone(_.find(zones, z => z.name === this.zone.name));
+        const zone = _.clone(_.find(zones, z => z && z.name === this.zone.name));
 
 
         //noinspection TypeScriptUnresolvedVariable
@@ -36,7 +36,7 @@ export class CalculatorOrder implements Order {
         delete zone.weeks;
 
         const weeksInHouse = weeks.reduce((memo: OrderWeeksInHouse, w:CalculatorWeek):OrderWeeksInHouse => {
-            const selectedZone = _.find(w.zones, (zone, name) => zone.selected),
+            const selectedZone = _.find(w.zones, (zone, name) => zone && zone.selected),
                 zoneName = selectedZone.zone.name,
                 tables = selectedZone.tables;
 

@@ -15,7 +15,7 @@
                 <th class="center aligned">Week</th>
                 <th class="center aligned">Tables</th>
                 <th class="center aligned" repeat.for="z of calculator.zones">
-                    <button click.delegate="select(z)" class="basic ui toggle icon button fluid"
+                    <button type="button" click.delegate="select(z)" class="basic ui toggle icon button fluid"
                             show.bind="calculator.order.stickDate">${z.name}</button>
                     <span hide.bind="calculator.order.stickDate">${z.name}</span>
                 </th>

@@ -77,8 +77,12 @@ export class OrderDetail {
         this.calculator.setArrivalDate(moment(value).toDate());
     }
 
-    setZone(zone:CalculatorZone) {
-        this.calculator.order.zone = zone;
+    selectZone(zone:CalculatorZone) {
+        const z = _.clone(zone);
+        z.weeks = void 0;
+        z.__metadata__ = void 0;
+
+        this.calculator.setZone(z);
     }
 
     delete() {

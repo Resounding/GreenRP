@@ -1,6 +1,7 @@
 <template>
     <require from="styles/order-detail.css"></require>
     <require from="../calculator/event-view"></require>
+    <require from="../calculator/zone-cell"></require>
 
     <ai-dialog id="order-detail">
         <ai-dialog-header>
@@ -39,11 +40,7 @@
 
                 <div class="ui divider"></div>
 
-                <div class="ui toggle checkbox">
-                    <input type="checkbox" name="root-in-prop-zone" id="root-in-prop-zone" checked.bind="calculator.rootInPropagationZone">
-                    <label for="root-in-prop-zone">Root in B/C</label>
-                </div>
-                <div class="ui toggle checkbox right floated">
+                <div class="ui field toggle checkbox right floated">
                     <input type="checkbox" name="partial-space" id="partial-space" checked.bind="calculator.partialSpace">
                     <label for="partial-space">Use partial spacing</label>
                 </div>
@@ -54,7 +51,11 @@
                             <th class="center aligned">Event</th>
                             <th class="center aligned">Week</th>
                             <th class="center aligned">Tables</th>
-                            <th class="center aligned" repeat.for="z of calculator.zones">${z.name}</th>
+                            <th class="center aligned" repeat.for="z of calculator.zones">
+                                <button type="button" click.delegate="selectZone(z)" class="basic ui toggle icon button fluid"
+                                    show.bind="calculator.order.stickDate">${z.name}</button>
+                                <span hide="calculator.order.stickDate">${z.name}</span>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -66,38 +67,22 @@
                             </td>
                             <td class="center aligned">${week.week.week}</td>
                             <td class="center aligned">${week.tables|numericFormat}</td>
-                            <td class="center aligned ${week.zones[z].available < 0 ? 'negative' : 'positive'}" repeat.for="z of week.zones | keys">
-                                ${week.zones[z].available}
+                            <td class="center aligned" repeat.for="z of week.zones | keys">
+                                <zone-cell calculator.bind="calculator" week.bind="week" zone.bind="week.zones[z]"></zone-cell>
                             </td>
                         </tr>
                     </tbody>
-                    <tfoot if.bind="canSaveChanges">
-                        <tr>
-                            <td colspan="3">&nbsp;</td>
-                            <td class="center aligned" repeat.for="z of calculator.zones">
-                                <button click.trigger="setZone(z)" class="basic ui toggle icon button"
-                                     hide.bind="z.isPropagationZone"
-                                    class.bind="(z.name===calculator.order.zone.name) ? 'active' : ''"
-                                    data-tooltip="${(z.name===calculator.order.zone.name) ? 'Clicking save will move the order to this zone.' : 'Click to move the order to this zone.'}">
-                                    <i class="checkmark box icon" show.bind="z.canFit"></i>
-                                    <i class="warning sign box icon" hide.bind="z.canFit"></i>
-                                </button>
-                                <span show.bind="z.isPropagationZone">&nbsp;</span>
-                            </td>
-                        </tr>
-                    </tfoot>
                 </table>
-
             </form>
         </ai-dialog-body>
         <ai-dialog-footer>
-            <button class="ui basic red button left floated" click.delegate="delete()" data-tooltip="Click to Delete this Order" show.bind="canSaveChanges">
+            <button type="button" class="ui basic red button left floated" click.delegate="delete()" data-tooltip="Click to Delete this Order" show.bind="canSaveChanges">
                 <i class="trash button icon"></i>
                 Delete
             </button>
 
-            <button class="ui basic button" click.delegate="cancel()">${canSaveChanges ? 'Cancel' : 'Close'}</button>
-            <button class="ui basic primary button" click.delegate="save()" show.bind="canSaveChanges">
+            <button type="button" class="ui basic button" click.delegate="cancel()">${canSaveChanges ? 'Cancel' : 'Close'}</button>
+            <button type="button" class="ui basic primary button" click.delegate="save()" show.bind="canSaveChanges">
                 <i class="save button icon"></i>
                 Save
             </button>

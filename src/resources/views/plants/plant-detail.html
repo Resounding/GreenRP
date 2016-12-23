@@ -55,12 +55,12 @@
                     </div>
                 </div>
                 <h4 class="ui horizontal divider header">
-                    <button class="tiny ui basic button" click.delegate="previousSeason()">
+                    <button type="button" class="tiny ui basic button" click.delegate="previousSeason()">
                         &lt;
                     </button>
                     Seasons
                     (<span innerHTML.bind="currentYear"></span>)
-                    <button class="tiny ui basic button" click.delegate="nextSeason()">
+                    <button type="button" class="tiny ui basic button" click.delegate="nextSeason()">
                         &gt;
                     </button>
                 </h4>
@@ -95,12 +95,12 @@
                     </div>
                 </div>
                 <h4 class="ui horizontal divider header">
-                    <button class="tiny ui basic button" click.delegate="previousSeason()">
+                    <button type="button" class="tiny ui basic button" click.delegate="previousSeason()">
                         &lt;
                     </button>
                     Propagation Times
                     (<span innerHTML.bind="currentYear"></span>)
-                    <button class="tiny ui basic button" click.delegate="nextSeason()">
+                    <button type="button" class="tiny ui basic button" click.delegate="nextSeason()">
                         &gt;
                     </button>
                 </h4>
@@ -135,12 +135,12 @@
                     </div>
                 </div>
                 <h4 class="ui horizontal divider header">
-                    <button class="tiny ui basic button" click.delegate="previousSeason()">
+                    <button type="button" class="tiny ui basic button" click.delegate="previousSeason()">
                         &lt;
                     </button>
                     Flower Times
                     (<span innerHTML.bind="currentYear"></span>)
-                    <button class="tiny ui basic button" click.delegate="nextSeason()">
+                    <button type="button" class="tiny ui basic button" click.delegate="nextSeason()">
                         &gt;
                     </button>
                 </h4>
@@ -177,13 +177,13 @@
             </form>
         </ai-dialog-body>
         <ai-dialog-footer>
-            <button class="ui basic red button left floated" click.delegate="delete()" data-tooltip="Click to Delete this Plant" hide.bind="isNew">
+            <button type="button" class="ui basic red button left floated" click.delegate="delete()" data-tooltip="Click to Delete this Plant" hide.bind="isNew">
                 <i class="trash button icon"></i>
                 Delete
             </button>
 
-            <button class="ui basic button" click.delegate="cancel()">Cancel</button>
-            <button class="ui basic primary button" click.delegate="save()">
+            <button type="button" class="ui basic button" click.delegate="cancel()">Cancel</button>
+            <button type="button" class="ui basic primary button" click.delegate="save()">
                 <i class="save button icon"></i>
                 Save
             </button>

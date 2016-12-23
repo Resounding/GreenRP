@@ -23,14 +23,14 @@
                 <tr>
                     <th>Week</th>
                     <th repeat.for="zone of zones" class="center aligned">
-                        <button class="ui basic button" click.delegate="showZoneDetails(zone)">${zone.name}</button>
+                        <button type="button" class="ui basic button" click.delegate="showZoneDetails(zone)">${zone.name}</button>
                     </th>
                 </tr>
             </thead>
             <tbody>
                 <tr repeat.for="key,value of weeks">
                     <td>
-                        <button class="ui basic button" click.delegate="showWeekDetails(value)">${value.week}</button>
+                        <button type="button" class="ui basic button" click.delegate="showWeekDetails(value)">${value.week}</button>
                     </td>
                     <td repeat.for="zone of zones">${value.zones[zone.name].available|numericFormat}</td>
                 </tr>

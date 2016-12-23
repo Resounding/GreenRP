@@ -104,6 +104,19 @@ export class Calculator {
         this.observerLocator
                 .getObserver(this.calculator, 'orderQuantity')
                 .unsubscribe(this.onQuantityChange.bind(this));
+
+        this._zones = null;
+        this._seasons = null;
+        this._weeks.clear();
+        this._weeks = null;
+        this._propagationTimes = null;
+        this._flowerTimes = null;
+
+        this.customers = null;
+        this.plants = null;
+        this.season = null;
+        this.calculator = null;
+        this.repeatCalculators = null;
     }
 
     @computedFrom('calculator.order.arrivalDate')
@@ -220,15 +233,12 @@ export class Calculator {
         if(this.isRepeatingOrder) {
             saveBulk();
         } else {
-            if(this.calculator.order.zone.canFit) {
-                saver();
+            
+            // any weeks where all zones are unselected?
+            if(_.any(this.calculator.weeks, w => _.all(w.zones, z => !z || !z.selected))) {
+                this.dialogService.open({ viewModel: ErrorNotification, model: 'Please ensure that all weeks have a zone selected.' });
             } else {
-                this.dialogService.open({ viewModel: Prompt, model: `This order will put zone ${this.calculator.order.zone.name} over capacity. Are you sure you want to schedule this order?` })
-                    .then((result:DialogResult) => {
-                        if(result.wasCancelled) return;
-
-                        saver();
-                    });
+                saver();
             }
         }
     }

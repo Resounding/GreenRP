@@ -39,6 +39,14 @@ export class OrderCalculator {
 
         if(order && _.isDate(order.arrivalDate)){
             this.resetWeeks();
+            this._weeks.forEach(w => {
+                    const weekInHouse = order.weeksInHouse[w.week._id];
+                    if(weekInHouse) {
+                        _.forEach(w.zones, (z, name) => {
+                            if(z) z.selected = name === weekInHouse.zone;
+                        });
+                    }
+            });
         }
     }
 
