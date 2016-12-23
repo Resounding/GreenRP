@@ -705,7 +705,7 @@ describe('changing date', () => {
     });    
 });
 
-describe('order zones', () => {
+describe('setting zones', () => {
     let calculator:OrderCalculator,
         zones:Zone[],
         weeks:Map<string, CapacityWeek>,
@@ -761,9 +761,9 @@ describe('order zones', () => {
 
         const rawWeeks = new ReferenceData().weeks,
             capacityZones:CapacityWeekZones = {
-                A: Object.assign({}, zones[0], { available: zones[0].tables }),
-                B: Object.assign({}, zones[1], { available: zones[1].tables }),
-                C: Object.assign({}, zones[2], { available: zones[2].tables })
+                A: Object.assign({}, zones[0], { available: zones[0].tables, zone: zones[0] }),
+                B: Object.assign({}, zones[1], { available: zones[1].tables, zone: zones[1] }),
+                C: Object.assign({}, zones[2], { available: zones[2].tables, zone: zones[2] })
             };
         weeks = new Map<string, CapacityWeek>();
         rawWeeks.forEach(w => {
@@ -775,6 +775,59 @@ describe('order zones', () => {
         calculator = new OrderCalculator(zones, weeks, seasons, propagationTimes, flowerTimes)
             .setPlant(plant)
             .setArrivalDate(arrival);
+    });
+
+    describe('setZone', () => {
+        it('sets all the zones', () => {
+            calculator.setZone({ name: 'A', tables: 100, autoSpace: false, isPropagationZone: false, weeks: [], canFit: true });
+            const order = calculator.getOrderDocument();
+            _.forEach(order.weeksInHouse, (week) => {
+                expect(week.zone).toEqual('A');
+            });
+        });
+    });
+
+    describe('setZoneForWeek', () => {
+        it('sets the zone for only that week', () => {
+            calculator.setZone({ name: 'C', tables: 100, autoSpace: false, isPropagationZone: false, weeks: [], canFit: true });
+            const threeWeeksBefore = moment(arrival).subtract(3, 'weeks'),
+                zoneA:Zone = {name: 'A', autoSpace: false, isPropagationZone: false, tables: 100},
+                weekIdToSet = threeWeeksBefore.toWeekNumberId(),
+                weekToSet:Week = {_id: weekIdToSet, week: threeWeeksBefore.isoWeek(), year: threeWeeksBefore.isoWeekYear(), zones: {}};
+            calculator.setZoneForWeek(zoneA, weekToSet);
+            const order = calculator.getOrderDocument(),
+                weekIds = Object.keys(order.weeksInHouse);
+
+            for(let i=0; i<weekIds.length; i++) {
+                const weekId = weekIds[i];
+                if(weekId === weekIdToSet) {
+                    expect(order.weeksInHouse[weekId].zone).toEqual('A');
+                } else {
+                    expect(order.weeksInHouse[weekId].zone).toEqual('C');
+                }
+            }
+
+        });
+    });
+
+    describe('setZoneFromEventOnward', () => {
+        it('sets all the zones from that week forward', () => {
+            calculator.setZone({ name: 'C', tables: 100, autoSpace: false, isPropagationZone: false, weeks: [], canFit: true });
+            const twoWeeksBefore = moment(arrival).subtract(2, 'weeks');
+            calculator.setZoneFromEventOnward('A', twoWeeksBefore.toWeekNumberId());
+            const order = calculator.getOrderDocument(),
+                weekIds = Object.keys(order.weeksInHouse);
+
+            for(let i=0; i<weekIds.length; i++) {
+                const weekId = weekIds[i];
+                if(i<weekIds.length - 3) {
+                    expect(order.weeksInHouse[weekId].zone).toEqual('C');
+                } else {
+                    expect(order.weeksInHouse[weekId].zone).toEqual('A');
+                }
+            }
+
+        });
     });
 });
 
