@@ -20,7 +20,9 @@ export interface Order {
     orderNumber:string;
     arrivalDate:Date;
     flowerDate:Date;
+    partialSpaceDate:Date;
     lightsOutDate:Date;
+    fullSpaceDate:Date;
     stickDate:Date;
     quantity:number;
     customer:Customer;
@@ -37,7 +39,9 @@ export class OrderDocument implements Order {
     orderNumber:string;
     arrivalDate:Date;
     flowerDate:Date;
+    partialSpaceDate:Date;
     lightsOutDate:Date;
+    fullSpaceDate:Date;
     stickDate:Date;
     quantity:number;
     customer:Customer;
@@ -85,6 +89,20 @@ export class OrderDocument implements Order {
                 this.stickDate = stickDate.toDate();
             }
         }
+
+        if(this.partialSpace && this.partialSpaceDate) {
+            const partialSpaceDate = moment(this.partialSpaceDate);
+            if(partialSpaceDate.isValid()) {
+                this.partialSpaceDate = partialSpaceDate.toDate();
+            }
+        }
+
+        if(this.partialSpace && this.fullSpaceDate) {
+            const fullSpaceDate = moment(this.fullSpaceDate);
+            if(fullSpaceDate.isValid()) {
+                this.fullSpaceDate = fullSpaceDate.toDate();
+            }
+        }
     }
 
     createOrderNumber():string {
@@ -107,7 +125,9 @@ export class OrderDocument implements Order {
             orderNumber: this.createOrderNumber(),
             arrivalDate: moment(this.arrivalDate).format('YYYY-MM-DD'),
             flowerDate: moment(this.flowerDate).format('YYYY-MM-DD'),
+            partialSpaceDate: _.isDate(this.partialSpaceDate) ? moment(this.partialSpaceDate).format('YYYY-MM-DD') : null,
             lightsOutDate: moment(this.lightsOutDate).format('YYYY-MM-DD'),
+            fullSpaceDate: _.isDate(this.fullSpaceDate) ? moment(this.fullSpaceDate).format('YYYY-MM-DD') : null,
             stickDate: moment(this.stickDate).format('YYYY-MM-DD'),
             quantity: numeral(this.quantity).value(),
             customer: this.customer,

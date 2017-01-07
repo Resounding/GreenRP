@@ -12,7 +12,7 @@ import {Week, WeekZones} from "../../../../../src/resources/models/week";
 
 class ReferenceData {
     get weeks():Week[] {
-        const start = moment().startOf('year'),
+        const start = moment(new Date(2016,1,1)).startOf('year'),
             zones:WeekZones =  {
             A: {
                 zone: {
@@ -407,7 +407,9 @@ describe('the order calculator', () => {
             orderNumber: 'WK2016-07',
             type: OrderDocument.OrderDocumentType,
             arrivalDate: new Date(2017, 5, 12), // June 12, 2017: Week 24
+            partialSpaceDate: null,
             flowerDate: new Date(2017,5, 8), // June 8, 2017: Week 23
+            fullSpaceDate: null,
             lightsOutDate:new Date(2017, 4, 18), // May 18, 2017: 3 weeks before flower: week 20
             stickDate: new Date(2017, 3, 13), // Apr 13, 2017: 5 weeks before lights-out
             quantity:1000,
@@ -510,58 +512,6 @@ describe('the order calculator', () => {
         expect(partialSpaceWeek.events[0].name).toEqual('Partial Space');
         expect(lightsOutWeek.events[0].name).toEqual('Lights Out');
         expect(fullSpaceWeek.events[0].name).toEqual('Full Space');
-    });
-
-    it('sets the partial spacing events as readonly', () => {
-        const
-            date = new Date(2017, 0, 9),
-            gerbera:Plant = { id: 1, name: "4.5\" Gerbera", abbreviation: 'G', crop: 'Kalanchoe', size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
-                    tight: 1000,
-                    half: 800,
-                    full: 500
-                },
-                potsPerCase: 8,
-                hasLightsOut: true
-            };
-
-        seasons = [
-            {
-                name: 'spring',
-                year: 2017,
-                week: 1
-            }
-        ];
-        propagationTimes = [
-            {
-                plant: gerbera.name,
-                times: 3,
-                year: 2017
-            }
-        ];
-        flowerTimes = [
-            {
-                plant: gerbera.name,
-                year: 2017,
-                times: 8
-            }
-        ];
-
-        let rawWeeks = new ReferenceData().weeks;
-        weeks = new Map<string, CapacityWeek>();
-        rawWeeks.forEach(w => weeks.set(w._id, new CapacityWeek(w)));
-
-        calculator = new OrderCalculator(zones, weeks, seasons, propagationTimes, flowerTimes);
-        calculator.setArrivalDate(date);
-        calculator.setPlant(gerbera);
-        calculator.partialSpace = true;
-
-        let partialSpaceEvent = calculator.weeks[2].events[0],
-            fullSpaceEvent = calculator.weeks[4].events[0];
-
-        expect(partialSpaceEvent.name).toEqual('Partial Space');
-        expect(partialSpaceEvent.readonly).toEqual(true);
-        expect(fullSpaceEvent.name).toEqual('Full Space');
-        expect(fullSpaceEvent.readonly).toEqual(true);
     });
 });
 
@@ -702,7 +652,57 @@ describe('changing date', () => {
         const order = calculator.getOrderDocument();
 
         expect(order.plant.potsPerCase).toEqual(8);
-    });    
+    });
+
+    it('sets the partial space date', () => {
+        const
+            date = new Date(2017, 0, 9),
+            gerbera:Plant = { id: 4, name: "4.5\" Gerbera", abbreviation: 'G', crop: 'Gerbera', size: "4.5", cuttingsPerPot: 1, cuttingsPerTable: {
+                    tight: 1000,
+                    half: 800,
+                    full: 500
+                },
+                potsPerCase: 8,
+                hasLightsOut: true
+            };
+
+        seasons = [{ name: 'spring', year: 2017, week: 1 }];
+        propagationTimes = [{ plant: gerbera.name, times: 3, year: 2017 }];
+        flowerTimes = [{ plant: gerbera.name, year: 2017, times: 8 }];
+
+        let rawWeeks = new ReferenceData().weeks;
+        weeks = new Map<string, CapacityWeek>();
+        rawWeeks.forEach(w => weeks.set(w._id, new CapacityWeek(w)));
+
+        calculator = new OrderCalculator(zones, weeks, seasons, propagationTimes, flowerTimes);
+        calculator.setArrivalDate(date);
+        calculator.setPlant(gerbera);
+        calculator.partialSpace = true;
+
+        let partialSpaceWeek = calculator.weeks[2],
+            lightsOutWeek = calculator.weeks[3],
+            fullSpaceWeek = calculator.weeks[4];
+
+        expect(partialSpaceWeek.events[0].name).toEqual('Partial Space');
+        expect(lightsOutWeek.events[0].name).toEqual('Lights Out');
+        expect(fullSpaceWeek.events[0].name).toEqual('Full Space');
+
+        let newPartialSpaceDate = moment(calculator.order.lightsOutDate).subtract(1, 'day').toDate(),
+            newFullSpaceDate = moment(calculator.order.lightsOutDate).add(1, 'day').toDate();
+
+        calculator.setPartialSpaceDate(newPartialSpaceDate);
+        calculator.setFullSpaceDate(newFullSpaceDate);
+
+        partialSpaceWeek = calculator.weeks[2];
+        lightsOutWeek = calculator.weeks[3];
+        fullSpaceWeek = calculator.weeks[4];
+
+        expect(partialSpaceWeek.events.length).toEqual(0);
+        expect(lightsOutWeek.events[0].name).toEqual('Partial Space');
+        expect(lightsOutWeek.events[1].name).toEqual('Lights Out');
+        expect(lightsOutWeek.events[2].name).toEqual('Full Space');
+        expect(fullSpaceWeek.events.length).toEqual(0);
+    });
 });
 
 describe('setting zones', () => {
