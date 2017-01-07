@@ -304,10 +304,11 @@ export class OrderCalculator {
         if(fullSpaceWeek) {
             log.debug(`Full space  week: ${fullSpaceWeek._id}`);
             
-            const fullSpaceDate = moment(this._order.lightsOutDate).add(1, 'week'),
+            const fullSpaceDate = this.getFullSpaceDate(),
                 fullSpaceStartOfWeek = fullSpaceDate.clone().startOf('isoweek'),
                 fullSpaceId = fullSpaceDate.toWeekNumberId(),
-                loopDate = moment(this._order.flowerDate).startOf('isoweek');
+                lightsOutId = moment(this._order.lightsOutDate).toWeekNumberId(),
+                loopDate = moment(this._order.flowerDate).subtract(1, 'week').startOf('isoweek');
             while(loopDate.isSameOrAfter(fullSpaceStartOfWeek)) {
                 let id = loopDate.toWeekNumberId(),
                     week = this.allWeeks.get(id);
@@ -329,39 +330,58 @@ export class OrderCalculator {
                         calculatorWeek.events.push({
                             name: Events.FullSpaceEventName,
                             date: fullSpaceDate.toDate(),
-                            readonly: true
                         });
                         fullSpaceEventCreated = true;
+
+                        // if lights-out falls on the same week as full spacing...
+                        if(lightsOutId === week._id) {
+                            calculatorWeek.events.push({
+                                name: Events.LightsOutEventName,
+                                date: this._order.lightsOutDate,
+                            });
+                            lightsOutEventCreated = true;
+                        }
                     }
 
                     weeks.unshift(calculatorWeek);
                     
                     if(isFullSpaceWeek) {
-                        // now add lights-out...
-                        loopDate.subtract(1, 'week');
-                        id = loopDate.toWeekNumberId();
-                        week = this.allWeeks.get(id);
+                        if(!lightsOutEventCreated) {
+                            const lightsOutStartOfWeek = moment(this._order.lightsOutDate).startOf('isoweek');
+                            while(loopDate.isSameOrAfter(fullSpaceStartOfWeek)) {
+                                // now add lights-out...
+                                loopDate.subtract(1, 'week');
+                                id = loopDate.toWeekNumberId();
+                                week = this.allWeeks.get(id);
 
-                        if(week) {
-                            tables = this.spaceCalculator.getTables(week._id);
-                            tableCount = typeof tables === 'number' ? tables : tables.manualSpacing;
-                            zones = this.getZones(week, tables, false, previousWeeks);
-                            calculatorWeek = {
-                                week: week,
-                                events: [
-                                    {
-                                        name: Events.LightsOutEventName,
-                                        date: this._order.lightsOutDate
+                                if(week) {
+                                    tables = this.spaceCalculator.getTables(week._id);
+                                    tableCount = typeof tables === 'number' ? tables : tables.manualSpacing;
+                                    zones = this.getZones(week, tables, false, previousWeeks);
+                                    calculatorWeek = {
+                                        week: week,
+                                        events: [ ],
+                                        tables: tableCount,
+                                        zones: zones
+                                    };
+
+                                    if(id === lightsOutId) {
+                                        calculatorWeek.events.push({
+                                            name: Events.LightsOutEventName,
+                                            date: this._order.lightsOutDate
+                                        });
+                                        lightsOutEventCreated = true;
                                     }
-                                ],
-                                tables: tableCount,
-                                zones: zones
-                            };
 
-                            weeks.unshift(calculatorWeek);
-                            lightsOutEventCreated = true;
+                                    weeks.unshift(calculatorWeek);
+                                }
+                            }
                         }
 
+                        const partialSpaceDate = this.getPartialSpaceDate(), 
+                            partialSpaceId = partialSpaceDate.toWeekNumberId(),
+                            partialSpaceStartOfWeek = partialSpaceDate.clone().startOf('isoweek');
+                            //TODO: while loop here
                         // ... & partial space
                         loopDate.subtract(1, 'week');
                         id = loopDate.toWeekNumberId();
@@ -371,13 +391,13 @@ export class OrderCalculator {
                             tables = this.spaceCalculator.getTables(week._id);
                             tableCount = typeof tables === 'number' ? tables : tables.manualSpacing;
                             zones = this.getZones(week, tables, false, previousWeeks);
+                            
                             calculatorWeek = {
                                 week: week,
                                 events: [
                                     {
                                         name: Events.PartialSpaceEventName,
-                                        date:fullSpaceDate.clone().subtract(2, 'weeks').toDate(),
-                                        readonly: true
+                                        date: partialSpaceDate.toDate(),
                                     }
                                 ],
                                 tables: tableCount,
@@ -598,11 +618,6 @@ export class OrderCalculator {
         }
 
         this._order.lightsOutDate = date;
-
-        //const partialSpaceDate = this.getPartialSpaceDate(),
-        //    fullSpaceDate = this.getFullSpaceDate();
-        //this._order.partialSpaceDate = partialSpaceDate ? partialSpaceDate.toDate() : null;
-        //this._order.fullSpaceDate = fullSpaceDate ? fullSpaceDate.toDate() : null;
 
         return date;
     }
