@@ -21,8 +21,8 @@ export class SpaceCalculator {
                 isPartialSpacing = this.order.partialSpace;
 
             if(isPartialSpacing) {
-                const partialSpaceDate = lightsOutDate.clone().subtract(1, 'week'),
-                    fullSpaceDate = lightsOutDate.clone().add(1, 'week');
+                const partialSpaceDate = _.isDate(this.order.partialSpaceDate) ? moment(this.order.partialSpaceDate) : lightsOutDate.clone().subtract(1, 'week'),
+                    fullSpaceDate = _.isDate(this.order.fullSpaceDate) ? moment(this.order.fullSpaceDate) : lightsOutDate.clone().add(1, 'week');
 
                 while(loop.isBefore(partialSpaceDate)) {
                     if(loop.toWeekNumberId() === weekId) {
@@ -32,7 +32,7 @@ export class SpaceCalculator {
                 }
                 // now we're partially spaced. zones that are manually spaced are still tight
                 spacingOption = <SpacingOptions>Spacings.Half;
-                while(loop.isBefore(lightsOutDate)) {
+                while(loop.isSameOrBefore(lightsOutDate)) {
                     if(loop.toWeekNumberId() === weekId) {
                         return this.calculateTables(spacingOption, <SpacingOptions>Spacings.Tight);
                     }
