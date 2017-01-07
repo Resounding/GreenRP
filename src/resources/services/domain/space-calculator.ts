@@ -21,8 +21,8 @@ export class SpaceCalculator {
                 isPartialSpacing = this.order.partialSpace;
 
             if(isPartialSpacing) {
-                const partialSpaceDate = _.isDate(this.order.partialSpaceDate) ? moment(this.order.partialSpaceDate) : lightsOutDate.clone().subtract(1, 'week'),
-                    fullSpaceDate = _.isDate(this.order.fullSpaceDate) ? moment(this.order.fullSpaceDate) : lightsOutDate.clone().add(1, 'week');
+                const partialSpaceDate = (_.isDate(this.order.partialSpaceDate) ? moment(this.order.partialSpaceDate) : lightsOutDate.clone().subtract(1, 'week')).startOf('isoweek'),
+                    fullSpaceDate = (_.isDate(this.order.fullSpaceDate) ? moment(this.order.fullSpaceDate) : lightsOutDate.clone().add(1, 'week')).startOf('isoweek');
 
                 while(loop.isBefore(partialSpaceDate)) {
                     if(loop.toWeekNumberId() === weekId) {
@@ -32,14 +32,15 @@ export class SpaceCalculator {
                 }
                 // now we're partially spaced. zones that are manually spaced are still tight
                 spacingOption = <SpacingOptions>Spacings.Half;
-                while(loop.isSameOrBefore(lightsOutDate)) {
+                while(loop.isBefore(fullSpaceDate)) {
                     if(loop.toWeekNumberId() === weekId) {
-                        return this.calculateTables(spacingOption, <SpacingOptions>Spacings.Tight);
+                        return this.calculateTables(spacingOption, spacingOption);
                     }
                     loop.add(1, 'week');
                 }
+                spacingOption = <SpacingOptions>Spacings.Full;
                 // after lights-out, zones that are manually spaced are full
-                while(loop.isBefore(fullSpaceDate)) {
+                while(loop.isBefore(this.order.arrivalDate)) {
                     if(loop.toWeekNumberId() === weekId) {
                         return this.calculateTables(spacingOption, <SpacingOptions>Spacings.Full);
                     }
