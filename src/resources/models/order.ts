@@ -89,6 +89,20 @@ export class OrderDocument implements Order {
                 this.stickDate = stickDate.toDate();
             }
         }
+
+        if(this.partialSpace && this.partialSpaceDate) {
+            const partialSpaceDate = moment(this.partialSpaceDate);
+            if(partialSpaceDate.isValid()) {
+                this.partialSpaceDate = partialSpaceDate.toDate();
+            }
+        }
+
+        if(this.partialSpace && this.fullSpaceDate) {
+            const fullSpaceDate = moment(this.fullSpaceDate);
+            if(fullSpaceDate.isValid()) {
+                this.fullSpaceDate = fullSpaceDate.toDate();
+            }
+        }
     }
 
     createOrderNumber():string {
