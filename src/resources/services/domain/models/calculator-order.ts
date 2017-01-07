@@ -12,7 +12,9 @@ export class CalculatorOrder implements Order {
     orderNumber:string;
     arrivalDate:Date = null;
     flowerDate:Date = null;
+    partialSpaceDate:Date = null;
     lightsOutDate:Date = null;
+    fullSpaceDate:Date;
     stickDate:Date = null;
     quantity:number = 0;
     customer:Customer = null;
@@ -54,7 +56,9 @@ export class CalculatorOrder implements Order {
             orderNumber: this.orderNumber,
             arrivalDate: this.arrivalDate,
             flowerDate: this.flowerDate,
+            partialSpaceDate: this.partialSpaceDate,
             lightsOutDate: this.lightsOutDate,
+            fullSpaceDate: this.fullSpaceDate,
             stickDate: this.stickDate,
             quantity: this.quantity,
             customer: this.customer,

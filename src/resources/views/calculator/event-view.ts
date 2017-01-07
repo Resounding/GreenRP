@@ -17,9 +17,6 @@ export class EventViewCustomElement {
             onChange: this.onDateChange.bind(this)
         }).calendar('set date', this.event.date);
 
-        if(this.event.readonly) {
-            $('div', this.element).popup();
-        }
         $('.dropdown', this.element).dropdown({
             onChange: this.onMove.bind(this)
         });
@@ -27,11 +24,6 @@ export class EventViewCustomElement {
 
     detached() {
         $('.calendar', this.element).calendar('destroy');
-
-        if(this.event.readonly) {
-            $('div', this.element).popup('destroy');
-        }
-
         $('.dropdown', this.element).dropdown('destroy');
     }
 
@@ -57,6 +49,16 @@ export class EventViewCustomElement {
             case Events.ShipEventName:
                 if(isDifferent(this.calculator.order.arrivalDate)) {
                     this.calculator.setArrivalDate(date);
+                }
+                break;
+            case Events.PartialSpaceEventName:
+                if(isDifferent(this.calculator.order.partialSpaceDate)) {
+                    this.calculator.setPartialSpaceDate(date);
+                }
+                break;
+            case Events.FullSpaceEventName:
+                if(isDifferent(this.calculator.order.fullSpaceDate)) {
+                    this.calculator.setFullSpaceDate(date);
                 }
         }
         

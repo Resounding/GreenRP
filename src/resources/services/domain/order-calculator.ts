@@ -173,6 +173,18 @@ export class OrderCalculator {
         return this;
     }
 
+    setPartialSpaceDate(date:Date):OrderCalculator {
+        this._order.partialSpaceDate = date;
+        this.resetWeeks();
+        return this;
+    }
+
+    setFullSpaceDate(date:Date):OrderCalculator {
+        this._order.fullSpaceDate = date;
+        this.resetWeeks();
+        return this;
+    }
+
     setStickDate(date:Date):OrderCalculator {
         this._order.stickDate = date;
         this.resetWeeks();
@@ -496,7 +508,7 @@ export class OrderCalculator {
             if(week) {
                 week.events.unshift({
                     name: Events.PartialSpaceEventName,
-                    date: moment(this._order.lightsOutDate).subtract(1, 'week').toDate()
+                    date: this.getPartialSpaceDate().toDate()
                 });
             }
         }
@@ -540,7 +552,7 @@ export class OrderCalculator {
         this._weeks.splice(0, 0, ...weeks);
     }
 
-    private getShipWeek():Week {
+    private getShipWeek():CapacityWeek {
         if(!this._order.arrivalDate) {
             log.debug('No arrival date - ship week null');
             return null;
@@ -561,7 +573,7 @@ export class OrderCalculator {
         return date;
     }
 
-    private getFlowerWeek():Week {
+    private getFlowerWeek():CapacityWeek {
         if(!this._order.flowerDate) return null;
 
         const id = moment(this._order.flowerDate).toWeekNumberId();
@@ -586,28 +598,50 @@ export class OrderCalculator {
         }
 
         this._order.lightsOutDate = date;
+
+        //const partialSpaceDate = this.getPartialSpaceDate(),
+        //    fullSpaceDate = this.getFullSpaceDate();
+        //this._order.partialSpaceDate = partialSpaceDate ? partialSpaceDate.toDate() : null;
+        //this._order.fullSpaceDate = fullSpaceDate ? fullSpaceDate.toDate() : null;
+
         return date;
     }
 
-    private getLightsOutWeek():Week {
+    private getLightsOutWeek():CapacityWeek {
         if(!this._order.lightsOutDate) return null;
 
         const id = moment(this._order.lightsOutDate).toWeekNumberId();
         return this.allWeeks.get(id);
     }
 
-    private getPartialSpaceWeek():Week {
+    private getPartialSpaceWeek():CapacityWeek {
         if(!this._order.partialSpace || !this._order.lightsOutDate) return null;
 
-        const id = moment(this._order.lightsOutDate).subtract(1, 'week').toWeekNumberId();
+        let id:string = this.getPartialSpaceDate().toWeekNumberId();
         return this.allWeeks.get(id);
     }
 
-    private getFullSpaceWeek():Week {
+    private getPartialSpaceDate():moment.Moment {
         if(!this._order.partialSpace || !this._order.lightsOutDate) return null;
 
-        const id = moment(this._order.lightsOutDate).add(1, 'week').toWeekNumberId();
+        return _.isDate(this._order.partialSpaceDate) ?
+            moment(this._order.partialSpaceDate) :
+            moment(this._order.lightsOutDate).subtract(1, 'week');
+    }
+
+    private getFullSpaceWeek():CapacityWeek {
+        if(!this._order.partialSpace || !this._order.lightsOutDate) return null;
+
+        let id:string = this.getFullSpaceDate().toWeekNumberId();
         return this.allWeeks.get(id);
+    }
+
+    private getFullSpaceDate():moment.Moment {
+        if(!this._order.partialSpace || !this._order.lightsOutDate) return null;
+
+        return _.isDate(this._order.fullSpaceDate) ?
+            moment(this._order.fullSpaceDate) :
+            moment(this._order.lightsOutDate).add(1, 'week');
     }
 
     private resetStickDate():Date {
@@ -633,7 +667,7 @@ export class OrderCalculator {
         return date;
     }
 
-    private getStickWeek():Week {
+    private getStickWeek():CapacityWeek {
         const id = moment(this._order.stickDate).toWeekNumberId();
         return this.allWeeks.get(id);
     }
