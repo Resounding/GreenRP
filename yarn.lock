@@ -2,6 +2,27 @@
 # yarn lockfile v1
 
 
+"@types/debug@*":
+  version "0.0.29"
+  resolved "https://registry.yarnpkg.com/@types/debug/-/debug-0.0.29.tgz#a1e514adfbd92f03a224ba54d693111dbf1f3754"
+
+"@types/node@*":
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.0.tgz#c081147b109da5f9c57af70571771be97ce9c0ba"
+
+"@types/pouchdb-core@*", "@types/pouchdb-core@^6.0.2":
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/@types/pouchdb-core/-/pouchdb-core-6.0.2.tgz#247b0961ccb1145ef91dc683839eaed7c7de92ae"
+  dependencies:
+    "@types/debug" "*"
+    "@types/node" "*"
+
+"@types/pouchdb-find@^0.10.0":
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/@types/pouchdb-find/-/pouchdb-find-0.10.0.tgz#aabd9d59ddc5d01e6a8609078bb68de6346f9ab7"
+  dependencies:
+    "@types/pouchdb-core" "*"
+
 abbrev@1, abbrev@~1.0.9:
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.0.9.tgz#91b4792588a7738c25f35dd6f63752a2f8776135"
@@ -301,9 +322,9 @@ aurelia-bootstrapper@^2.0.1:
     aurelia-templating-resources "^1.0.0"
     aurelia-templating-router "^1.0.0"
 
-aurelia-cli@^0.23.0:
-  version "0.23.0"
-  resolved "https://registry.yarnpkg.com/aurelia-cli/-/aurelia-cli-0.23.0.tgz#b33e0bdf576bb5ca5daac5036f555ad0c555f852"
+aurelia-cli@^0.24.0:
+  version "0.24.0"
+  resolved "https://registry.yarnpkg.com/aurelia-cli/-/aurelia-cli-0.24.0.tgz#c5be520ba4a2549ebd938bd48c9d753eef91dbee"
   dependencies:
     aurelia-dependency-injection "^1.0.0"
     aurelia-polyfills "^1.0.0"
@@ -1094,21 +1115,15 @@ debug@0.7.4:
   version "0.7.4"
   resolved "https://registry.yarnpkg.com/debug/-/debug-0.7.4.tgz#06e1ea8082c2cb14e39806e22e2f6f757f92af39"
 
-debug@2, debug@2.3.2:
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/debug/-/debug-2.3.2.tgz#94cb466ef7d6d2c7e5245cdd6e4104f2d0d70d30"
-  dependencies:
-    ms "0.7.2"
-
-debug@2.2.0, debug@~2.2.0:
+debug@2, debug@2.2.0, debug@2.X, debug@^2.1.0, debug@^2.2.0, debug@~2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.2.0.tgz#f87057e995b1a1f6ae6a4960664137bc56f039da"
   dependencies:
     ms "0.7.1"
 
-debug@2.X, debug@^2.1.0, debug@^2.2.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/debug/-/debug-2.3.0.tgz#3912dc55d7167fc3af17d2b85c13f93deaedaa43"
+debug@2.6.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.0.tgz#bc596bcabe7617f11d9fa15361eded5608b8499b"
   dependencies:
     ms "0.7.2"
 
@@ -3871,9 +3886,9 @@ pouchdb-extend@^0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/pouchdb-extend/-/pouchdb-extend-0.1.2.tgz#d1ce511bf704ed2e29f7bf428a416acfffa124b8"
 
-pouchdb-find@^0.10.3:
-  version "0.10.3"
-  resolved "https://registry.yarnpkg.com/pouchdb-find/-/pouchdb-find-0.10.3.tgz#b60d41e1da123c6325ce9d7f3f86cc386420b7a6"
+pouchdb-find@^0.10.4:
+  version "0.10.4"
+  resolved "https://registry.yarnpkg.com/pouchdb-find/-/pouchdb-find-0.10.4.tgz#c8601200b695ea1ddc796761c675eed32984acc8"
   dependencies:
     argsarray "0.0.1"
     debug "^2.1.0"
@@ -3903,14 +3918,14 @@ pouchdb-upsert@~2.0.1:
   dependencies:
     pouchdb-promise "^5.4.3"
 
-pouchdb@^6.1.0:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/pouchdb/-/pouchdb-6.1.0.tgz#bc79a39a7e8cf1a91e4252c4821ce036b795de80"
+pouchdb@^6.1.1:
+  version "6.1.1"
+  resolved "https://registry.yarnpkg.com/pouchdb/-/pouchdb-6.1.1.tgz#cb477cc5e3f8fa36aafdcf9223fb77c7ffe5069a"
   dependencies:
     argsarray "0.0.1"
     buffer-from "0.1.1"
     clone-buffer "1.0.0"
-    debug "2.3.2"
+    debug "2.6.0"
     double-ended-queue "2.1.0-0"
     immediate "3.0.6"
     inherits "2.0.3"
@@ -3921,7 +3936,7 @@ pouchdb@^6.1.0:
     lie "3.1.0"
     ltgt "2.1.2"
     readable-stream "1.0.33"
-    request "2.78.0"
+    request "2.79.0"
     scope-eval "0.0.3"
     spark-md5 "3.0.0"
     through2 "2.0.1"
@@ -4278,7 +4293,7 @@ replace-ext@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/replace-ext/-/replace-ext-0.0.1.tgz#29bbd92078a739f0bcce2b4ee41e837953522924"
 
-request@2, request@2.78.0, request@^2.74.0, request@^2.75.0:
+request@2, request@^2.74.0, request@^2.75.0:
   version "2.78.0"
   resolved "https://registry.yarnpkg.com/request/-/request-2.78.0.tgz#e1c8dec346e1c81923b24acdb337f11decabe9cc"
   dependencies:
@@ -4326,6 +4341,31 @@ request@2.65.0:
     stringstream "~0.0.4"
     tough-cookie "~2.2.0"
     tunnel-agent "~0.4.1"
+
+request@2.79.0:
+  version "2.79.0"
+  resolved "https://registry.yarnpkg.com/request/-/request-2.79.0.tgz#4dfe5bf6be8b8cdc37fcf93e04b65577722710de"
+  dependencies:
+    aws-sign2 "~0.6.0"
+    aws4 "^1.2.1"
+    caseless "~0.11.0"
+    combined-stream "~1.0.5"
+    extend "~3.0.0"
+    forever-agent "~0.6.1"
+    form-data "~2.1.1"
+    har-validator "~2.0.6"
+    hawk "~3.1.3"
+    http-signature "~1.1.0"
+    is-typedarray "~1.0.0"
+    isstream "~0.1.2"
+    json-stringify-safe "~5.0.1"
+    mime-types "~2.1.7"
+    oauth-sign "~0.8.1"
+    qs "~6.3.0"
+    stringstream "~0.0.4"
+    tough-cookie "~2.3.0"
+    tunnel-agent "~0.4.1"
+    uuid "^3.0.0"
 
 request@~2.75.0:
   version "2.75.0"
@@ -4418,9 +4458,9 @@ scope-eval@0.0.3:
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/scope-eval/-/scope-eval-0.0.3.tgz#166f2ccd1f3754429dec511805501f9d6923b5ec"
 
-semantic-ui-calendar@^0.0.4:
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/semantic-ui-calendar/-/semantic-ui-calendar-0.0.4.tgz#d4117d44a088ee7e27abcdf2662513f2d1ede368"
+semantic-ui-calendar@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/semantic-ui-calendar/-/semantic-ui-calendar-0.0.6.tgz#a3b1c249e4ed345714f1ad393baa01a3775b9150"
 
 semantic-ui-css@^2.2.4:
   version "2.2.4"
@@ -4916,15 +4956,15 @@ touch@^1.0.0:
   dependencies:
     nopt "~1.0.10"
 
-tough-cookie@^2.0.0, tough-cookie@~2.3.0:
+tough-cookie@^2.0.0, tough-cookie@~2.2.0:
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/tough-cookie/-/tough-cookie-2.2.2.tgz#c83a1830f4e5ef0b93ef2a3488e724f8de016ac7"
+
+tough-cookie@~2.3.0:
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/tough-cookie/-/tough-cookie-2.3.2.tgz#f081f76e4c85720e6c37a5faced737150d84072a"
   dependencies:
     punycode "^1.4.1"
-
-tough-cookie@~2.2.0:
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/tough-cookie/-/tough-cookie-2.2.2.tgz#c83a1830f4e5ef0b93ef2a3488e724f8de016ac7"
 
 trim-newlines@^1.0.0:
   version "1.0.0"
@@ -4968,6 +5008,10 @@ typescript@1.8.10, typescript@^1.8.10:
 typescript@^2.1.4:
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.1.4.tgz#b53b69fb841126acb1dd4b397d21daba87572251"
+
+typescript@^2.1.5:
+  version "2.1.5"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.1.5.tgz#6fe9479e00e01855247cea216e7561bafcdbcd4a"
 
 typings-core@^2.0.0:
   version "2.2.0"
@@ -5179,6 +5223,10 @@ utils-merge@1.0.0:
 uuid@^2.0.1:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-2.0.3.tgz#67e2e863797215530dff318e5bf9dcebfd47b21a"
+
+uuid@^3.0.0:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.0.1.tgz#6544bba2dfda8c1cf17e629a3a305e2bb1fee6c1"
 
 v8flags@^2.0.9:
   version "2.0.11"

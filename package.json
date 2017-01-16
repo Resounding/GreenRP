@@ -8,7 +8,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@types/pouchdb-core": "^6.0.0",
+    "@types/pouchdb-core": "^6.0.2",
     "@types/pouchdb-find": "^0.10.0",
     "aurelia-animator-css": "^1.0.1",
     "aurelia-bootstrapper": "^2.0.1",
@@ -19,9 +19,9 @@
     "jquery": "^3.1.0",
     "moment": "^2.14.1",
     "numeral": "^1.5.3",
-    "pouchdb": "^6.1.0",
-    "pouchdb-find": "^0.10.3",
-    "semantic-ui-calendar": "^0.0.4",
+    "pouchdb": "^6.1.1",
+    "pouchdb-find": "^0.10.4",
+    "semantic-ui-calendar": "^0.0.6",
     "semantic-ui-css": "^2.2.4",
     "toastr": "^2.1.2",
     "underscore": "^1.8.3",
@@ -29,7 +29,7 @@
   },
   "peerDependencies": {},
   "devDependencies": {
-    "aurelia-cli": "^0.23.0",
+    "aurelia-cli": "^0.24.0",
     "aurelia-testing": "^1.0.0-beta.2.0.1",
     "aurelia-tools": "^1.0.0",
     "browser-sync": "^2.13.0",
@@ -49,7 +49,7 @@
     "karma-jasmine": "^1.0.2",
     "karma-typescript-preprocessor": "^0.2.1",
     "tslint": "^3.11.0",
-    "typescript": "^2.1.4",
+    "typescript": "^2.1.5",
     "typings": "^2.0.0",
     "uglify-js": "^2.6.3"
   }
