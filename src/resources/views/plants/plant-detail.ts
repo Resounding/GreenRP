@@ -145,11 +145,11 @@ export class PlantDetail {
         plant.size = numeral(plant.size).value().toString();
         plant.name = `${plant.size}" ${plant.crop}`;
         plant.cuttingsPerPot = numeral(plant.cuttingsPerPot).value();
+        const half = numeral(plant.cuttingsPerTable.half).value();
         plant.cuttingsPerTable = {
             tight: numeral(plant.cuttingsPerTable.tight).value(),
             full: numeral(plant.cuttingsPerTable.full).value()
         };
-        const half = numeral(plant.cuttingsPerTable.half).value();
         if(half) {
             plant.cuttingsPerTable.half = half;
         }
