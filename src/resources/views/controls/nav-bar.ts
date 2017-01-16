@@ -4,12 +4,14 @@ import {DialogService} from 'aurelia-dialog';
 import {Authentication, Roles} from '../../services/authentication';
 import {Database} from '../../services/database';
 import {Calculator} from '../calculator/calculator';
+import {Search} from '../search/search';
 import {log} from '../../services/log';
 
 @autoinject()
 export class NavBar {
     @bindable router:Router;
     authorizedRoutes:RouteConfig[] = [];
+    year:number;
 
     constructor(private element:Element, private auth:Authentication, private database:Database, private dialogService:DialogService) { }
 
@@ -46,6 +48,24 @@ export class NavBar {
 
             log.debug(response.output);
         })
+    }
+
+    showSearch() {
+        let year:number = new Date().getFullYear();
+
+        const params = this.router.currentInstruction.params;
+        if('year' in params) {
+            const yearParam:number = parseInt(params.year);
+            if(!isNaN(yearParam)) {
+                year = yearParam;
+            }
+        }
+
+
+        this.dialogService.open({
+            viewModel: Search,
+            model: year
+        });
     }
 
     get userName():string {

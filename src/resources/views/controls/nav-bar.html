@@ -9,6 +9,10 @@
                 <a repeat.for="item of authorizedRoutes" href.bind="item.navModel.href" class="item ${item.navModel.isActive? 'active' : ''}">
                     ${item.title}
                 </a>
+                <button type="button" class="item" click.trigger="showSearch()">
+                    <i class="icon search"></i>
+                    Search
+                </button>
                 <button type="button" class="item" click.trigger="showCalculator()" show.bind="canCreateOrders">
                     <i class="icon plus"></i>
                     New Order
