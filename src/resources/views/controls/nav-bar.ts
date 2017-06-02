@@ -74,6 +74,10 @@ export class NavBar {
     }
 
     get canCreateOrders():boolean {
-        return this.auth.isInRole(Roles.Grower) || this.auth.isInRole(Roles.Administrator);
+        return this.auth.isInRole(Roles.ProductionManager) || this.auth.isInRole(Roles.Administrator);
+    }
+
+    get canSearch():boolean {
+        return this.auth.isInRole(Roles.ProductionManager) || this.auth.isInRole(Roles.Administrator);
     }
 }

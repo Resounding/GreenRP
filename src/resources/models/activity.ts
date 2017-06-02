@@ -1,5 +1,4 @@
 import { Zone } from './zone';
-import {Plant} from './plant';
 
 export interface Activity {
     _id?:string;
@@ -10,7 +9,7 @@ export interface Activity {
     status:ActivityStatus;
     workType:WorkType;
     description:string;
-    plant?:Plant;
+    crop?:string;
     zone?:Zone;
     assignedTo?:string;
 }
@@ -24,7 +23,7 @@ export class ActivityDocument implements Activity {
     status:ActivityStatus = ActivityStatuses.NotStarted;
     workType:WorkType = WorkTypes.Other;
     description:string;
-    plant?:Plant = null;
+    crop?:string = null;
     zone?:Zone = null;
     assignedTo?:string = null;
 
@@ -56,7 +55,7 @@ export class ActivityDocument implements Activity {
             workType: this.workType,
             status: this.status,
             description: this.description,
-            plant: this.plant,
+            crop:this.crop,
             zone: this.zone,
             assignedTo: this.assignedTo
         };

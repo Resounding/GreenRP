@@ -58,13 +58,13 @@
                 </div>
                 <div class="fields row">
                     <div class="field eight wide">
-                        <label for="plant">Plant</label>
-                        <div class="ui search selection dropdown plant">
-                            <input type="hidden" id="plant">
+                        <label for="crop">Crop</label>
+                        <div class="ui search selection dropdown crop">
+                            <input type="hidden" id="crop">
                             <i class="dropdown icon"></i>
-                            <div class="default text">Choose Plant</div>
+                            <div class="default text">Choose Crop</div>
                             <div class="menu">
-                                <div repeat.for="p of plants" class="item" data-value="${p.id}">${p.name}</div>
+                                <div repeat.for="o of orders" class="item">${o}</div>
                             </div>
                         </div>
                     </div>

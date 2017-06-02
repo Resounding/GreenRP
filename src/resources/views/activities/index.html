@@ -4,6 +4,13 @@
     <div class="ui segments">
         <div class="ui clearing segment">
             <h2 class="ui left floated">Activities</h2>
+            <div class="ui container">
+                <div class="ui toggle checkbox left floated" show.bind="canShowAll">
+                    <input type="checkbox" id="showall" checked.bind="showAll">
+                    <label for="repeating-order">Show All Users</label>
+                </div>
+            </div>
+
             <button type="button" class="basic ui positive right floated button" click.delegate="add()">
                 <i class="plus icon"></i>
                 Add Activity
@@ -32,7 +39,7 @@
                         <td>${a.assignedToDisplay}</td>
                         <td></td>
                         <td></td>
-                        <td>${a.plant.name}</td>
+                        <td>${a.crop}</td>
                         <td>${a.status}</td>
                         <td>
                             <a href="#">Journal</a>

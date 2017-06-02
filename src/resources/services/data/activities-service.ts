@@ -81,4 +81,25 @@ export class ActivitiesService {
             }
         });
     }
+
+    delete(activity:ActivityDocument):Promise<ActivitySaveResult> {
+        return new Promise((resolve, reject) => {
+            const result:ActivitySaveResult = {
+                ok: true,
+                errors: [],
+                activity: activity
+            };
+
+            this.database.db.remove(activity._id, activity._rev)
+                .then((response:PouchDB.Core.Response) => {
+                    if(response.ok) {
+                        this.events.publish(ActivitiesService.ActivitiesChangedEvent);
+                        return resolve(result);
+                    }
+
+                    return reject(response);
+                })
+                .catch(reject);
+        });
+    }
 }

@@ -74,6 +74,14 @@ export class Authentication {
         return Promise.resolve();
     }
 
+    refreshProfile():Promise<UserInfo> {
+        if(!this.isAuthenticated()) {
+            return Promise.reject(new Error('Not logged in'));
+        }
+
+        return this.login(this.userInfo.name, this.userInfo.password);
+    }
+
     isAuthenticated():boolean {
         return Authentication.isLoggedIn();
     }
@@ -129,4 +137,5 @@ export class Roles {
     static Sales:string = 'sales';
     static ProductionManager:string = 'production manager';
     static Administrator:string = 'administrator';
+    static LabourSupervisor:string = 'labour supervisor';
 }

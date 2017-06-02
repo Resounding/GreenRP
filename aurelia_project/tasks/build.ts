@@ -26,5 +26,5 @@ function writeBundles() {
 
 function copyTheme() {
     return gulp.src(project.paths.theme)
-        .pipe(gulp.dest('themes/'));
+        .pipe(gulp.dest('styles/themes/'));
 }

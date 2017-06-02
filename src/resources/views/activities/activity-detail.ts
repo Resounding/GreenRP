@@ -1,25 +1,28 @@
+import { Prompt } from '../controls/prompt';
 import {autoinject} from 'aurelia-framework';
-import {DialogController} from 'aurelia-dialog';
+import {DialogController, DialogService} from 'aurelia-dialog';
 import {log} from '../../services/log';
 import {ActivitiesService} from '../../services/data/activities-service';
+import {OrdersService} from '../../services/data/orders-service';
 import {ReferenceService} from '../../services/data/reference-service';
 import {UsersService, User} from '../../services/data/users-service';
 import {ActivityDocument, ActivityStatus, ActivityStatuses, WorkType, WorkTypes} from '../../models/activity';
-import {Plant} from "../../models/plant";
+import {OrderDocument} from '../../models/order';
 import {Zone} from '../../models/zone';
 
 @autoinject
 export class ActivityDetail {
     errors:string[] = [];
     activity:ActivityDocument;
-    plants:Plant[];
+    orders:string[];
     zones:Zone[];
     workTypes:WorkType[];
     statuses:ActivityStatus[];
-    users:User[]
+    users:User[];
     
     constructor(private controller:DialogController, private service:ActivitiesService,
-        private referenceService:ReferenceService, private usersService:UsersService, private element:Element) {
+        private referenceService:ReferenceService, private usersService:UsersService,
+        private ordersService:OrdersService, private dialogService:DialogService, private element:Element) {
 
         controller.settings.lock = true;
         controller.settings.position = position;
@@ -37,8 +40,19 @@ export class ActivityDetail {
                 .then(result => this.users = result),
             this.referenceService.zones()
                 .then(result => this.zones = result),
-            this.referenceService.plants()
-                .then(result => this.plants = result)
+            this.ordersService.getAll()
+                .then(orders => {
+                    const now = moment().toWeekNumberId(),
+                        ordersInHouse = orders.filter(o => {
+                            const weeks = Object.keys(o.weeksInHouse),
+                                isInHouse = weeks.indexOf(now) !== -1;  
+
+                            return isInHouse;
+                        })
+                        .map(o => o.orderNumber)
+                        .sort();
+                    this.orders = ordersInHouse;
+                })
         ]);
     }
 
@@ -52,11 +66,9 @@ export class ActivityDetail {
         $('.dropdown.workType', this.element)
             .dropdown({ onChange: this.onWorkTypeChange.bind(this) })
             .dropdown('set selected', this.activity.workType);
-        const $plant = $('.dropdown.plant', this.element)
-            .dropdown({ onChange: this.onPlantChange.bind(this) });
-        if(this.activity.plant) {
-            $plant.dropdown('set selected', this.activity.plant.id);
-        }
+        $('.dropdown.crop', this.element)
+            .dropdown({ onChange: this.onCropChange.bind(this) })
+            .dropdown('set selected', this.activity.crop);
         const $zone = $('.dropdown.zone', this.element)
             .dropdown({ onChange: this.onZoneChange.bind(this) });
         if(this.activity.zone) {
@@ -90,7 +102,23 @@ export class ActivityDetail {
     }
 
     delete() {
+        this.dialogService.open({ viewModel: Prompt, model: 'Are you sure you want to delete this activity?'})
+            .whenClosed(result => {
+                if(result.wasCancelled) return;
 
+                this.service.delete(this.activity)
+                    .then(result => {
+                        if(result.ok) {
+                            return this.controller.ok();
+                        } else {
+                            this.errors = result.errors;
+                        }
+                    })
+                    .catch(err => log.error(err))
+            })
+            .catch(err => {
+                log.error(err);
+            })
     }
 
     onDateChange(value:string) {
@@ -106,10 +134,8 @@ export class ActivityDetail {
     onWorkTypeChange(value:WorkType) {
         this.activity.workType = value;
     }
-    onPlantChange(value:string) {
-        const id = numeral(value).value(),
-            plant = _.find(this.plants, p => p.id === id) || null;
-        this.activity.plant = plant;
+    onCropChange(value:string) {
+        this.activity.crop = value;
     }
     onZoneChange(value:string) {
         const zone = _.find(this.zones, z => z.name === value) || null;

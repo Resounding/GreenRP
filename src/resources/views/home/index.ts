@@ -3,6 +3,7 @@ import {EventAggregator, Subscription} from "aurelia-event-aggregator";
 import {CapacityService} from "../../services/domain/capacity-service";
 import {CapacityWeek} from "../../models/capacity-week";
 import {Database} from '../../services/database';
+import {log} from '../../services/log';
 import {ReferenceService} from "../../services/data/reference-service";
 import {OrdersService} from '../../services/data/orders-service';
 import {Zone} from "../../models/zone";
@@ -55,7 +56,7 @@ export class Index {
                 });
             })
             .catch(error => {
-                console.error(error);
+                log.error(error);
             });
     }
 
@@ -69,7 +70,7 @@ export class Index {
                 }
             })
             .catch(error => {
-                console.error(error);
+                log.error(error);
                 if(error.status === 404) {
                     this.zonesSyncChangedSubscription = this.events.subscribe(Database.ZonesSyncChangeEvent, this.loadZones.bind(this));
                 }
