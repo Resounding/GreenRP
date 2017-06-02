@@ -113,7 +113,7 @@ export class WeekDetail {
         this.dialogService.open({
             viewModel: OrderDetail,
             model: order
-        }).then((result:DialogResult) => {
+        }).whenClosed((result:DialogResult) => {
             if(result.wasCancelled) return;
 
             this.loadOrders().then(this.refresh.bind(this));

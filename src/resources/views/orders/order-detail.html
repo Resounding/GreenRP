@@ -3,11 +3,11 @@
     <require from="../calculator/event-view"></require>
     <require from="../calculator/zone-cell"></require>
 
-    <ai-dialog id="order-detail">
-        <ai-dialog-header>
+    <ux-dialog id="order-detail">
+        <ux-dialog-header>
             <h2>Order ${calculator.order.orderNumber}</h2>
-        </ai-dialog-header>
-        <ai-dialog-body>
+        </ux-dialog-header>
+        <ux-dialog-body>
             <form class="ui form segment">                
                 <div class="two fields">
                     <div class="field">
@@ -74,8 +74,8 @@
                     </tbody>
                 </table>
             </form>
-        </ai-dialog-body>
-        <ai-dialog-footer>
+        </ux-dialog-body>
+        <ux-dialog-footer>
             <button type="button" class="ui basic red button left floated" click.delegate="delete()" data-tooltip="Click to Delete this Order" show.bind="canSaveChanges">
                 <i class="trash button icon"></i>
                 Delete
@@ -86,6 +86,6 @@
                 <i class="save button icon"></i>
                 Save
             </button>
-        </ai-dialog-footer>
-    </ai-dialog>
+        </ux-dialog-footer>
+    </ux-dialog>
 </template>

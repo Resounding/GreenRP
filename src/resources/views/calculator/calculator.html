@@ -3,8 +3,8 @@
     <require from="../controls/escape-quotes-value-converter"></require>    
     <require from="./order-table"></require>
 
-    <ai-dialog id="calculator">
-        <ai-dialog-body>
+    <ux-dialog id="calculator">
+        <ux-dialog-body>
             <form class="ui form segment">
                 <h4 class="ui dividing header">Requested Order</h4>
                 <div class="three fields">
@@ -67,10 +67,10 @@
                 <order-table repeat.for="c of repeatCalculators" calculator.bind="c"></order-table>
 
             </form>
-        </ai-dialog-body>
-        <ai-dialog-footer>
+        </ux-dialog-body>
+        <ux-dialog-footer>
             <button type="button" class="basic ui button" click.delegate="controller.cancel()">Cancel</button>
             <button type="button" class="basic ui primary button" click.delegate="createOrder()">Save</button>
-        </ai-dialog-footer>
-    </ai-dialog>
+        </ux-dialog-footer>
+    </ux-dialog>
 </template>

@@ -79,7 +79,7 @@ export class Search {
         this.dialogService.open({
             viewModel: OrderDetail,
             model: order
-        }).then((result:DialogResult) => {
+        }).whenClosed((result:DialogResult) => {
             if(result.wasCancelled) return;
 
             this.loadOrders().then(this.refresh.bind(this));
@@ -100,9 +100,9 @@ export class Search {
 
 function position(modalContainer:Element) {
     const $container = $(modalContainer),
-        $aiHeader = $container.find('ai-dialog-header'),
-        $aiFooter = $container.find('ai-dialog-footer'),
-        $aiBody = $container.find('ai-dialog-body'),
+        $aiHeader = $container.find('ux-dialog-header'),
+        $aiFooter = $container.find('ux-dialog-footer'),
+        $aiBody = $container.find('ux-dialog-body'),
         headerHeight = $aiHeader.outerHeight(),
         footerHeight = $aiFooter.outerHeight(),
         bodyHeight = `calc(100% - ${headerHeight + footerHeight}px)`;

@@ -30,7 +30,7 @@ export class PlantDetail {
     constructor(private referenceService:ReferenceService, private dialogService:DialogService,
         private controller:DialogController, private element:Element) {
         controller.settings.lock = true;
-        controller.settings.position = position;        
+        controller.settings.position = position;
     }
 
     activate(plant:Plant) {
@@ -212,7 +212,7 @@ export class PlantDetail {
 
     delete() {
         this.dialogService.open({ viewModel: Prompt, model: 'Are you sure you want to delete this plant?'})
-            .then((result:DialogResult) => {
+            .whenClosed((result:DialogResult) => {
                 if(result.wasCancelled) return;
         
                 this.referenceService.deletePlant(this.plant)
@@ -245,9 +245,9 @@ export class PlantDetail {
 
 function position(modalContainer:Element, modalOverlay:Element) {
     const $container = $(modalContainer),
-        $aiHeader = $container.find('ai-dialog-header'),
-        $aiFooter = $container.find('ai-dialog-footer'),
-        $aiBody = $container.find('ai-dialog-body'),
+        $aiHeader = $container.find('ux-dialog-header'),
+        $aiFooter = $container.find('ux-dialog-footer'),
+        $aiBody = $container.find('ux-dialog-body'),
         headerHeight = $aiHeader.outerHeight(),
         footerHeight = $aiFooter.outerHeight(),
         bodyHeight = `calc(100% - ${footerHeight + headerHeight}px)`;

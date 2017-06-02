@@ -16,7 +16,8 @@ export function configure(aurelia: Aurelia) {
         .globalResources([
             './resources/views/controls/date-format-value-converter',
             './resources/views/controls/numeric-format-value-converter',
-            './resources/views/controls/keys-value-converter'
+            './resources/views/controls/keys-value-converter',
+            './resources/views/controls/sort-value-converter'
         ]);
 
     if (Configuration.isDebug()) {

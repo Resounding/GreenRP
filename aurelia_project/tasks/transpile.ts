@@ -1,6 +1,7 @@
 import * as gulp from 'gulp';
 import * as changedInPlace from 'gulp-changed-in-place';
 import * as sourcemaps from 'gulp-sourcemaps';
+import * as notify from 'gulp-notify';
 import * as rename from 'gulp-rename';
 import * as ts from 'gulp-typescript';
 import * as project from '../aurelia.json';
@@ -19,11 +20,9 @@ function configureEnvironment() {
 var typescriptCompiler = typescriptCompiler || null;
 
 function buildTypeScript() {
-  if(!typescriptCompiler) {
-    typescriptCompiler = ts.createProject('tsconfig.json', {
-      "typescript": require('typescript')
-    });
-  }
+  typescriptCompiler = ts.createProject('tsconfig.json', {
+    "typescript": require('typescript')
+  });
 
   let dts = gulp.src(project.transpiler.dtsSource);
 
@@ -31,9 +30,8 @@ function buildTypeScript() {
     .pipe(changedInPlace({firstPass: true}));
 
   return eventStream.merge(dts, src)
-    //.pipe(plumber({ errorHandler: notify.onError('Error: <%= error.message %>') }))
     .pipe(sourcemaps.init())
-    .pipe(ts(typescriptCompiler))
+    .pipe(typescriptCompiler())
     .pipe(build.bundle());
 }
 

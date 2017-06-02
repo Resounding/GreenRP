@@ -70,8 +70,8 @@ export class FlowerThisWeekDataModel {
 
 function position(modalContainer:Element, modalOverlay:Element) {
     const $container = $(modalContainer),
-        $aiFooter = $container.find('ai-dialog-footer'),
-        $aiBody = $container.find('ai-dialog-body'),
+        $aiFooter = $container.find('ux-dialog-footer'),
+        $aiBody = $container.find('ux-dialog-body'),
         footerHeight = $aiFooter.outerHeight(),
         bodyHeight = `calc(100% - ${footerHeight}px)`;
 

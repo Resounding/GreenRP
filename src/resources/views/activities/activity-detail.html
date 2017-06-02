@@ -1,0 +1,111 @@
+<template>
+    <ux-dialog id="activity-detail-dialog">
+        <ux-dialog-header>
+            <h2 show.bind="activity.isNew">New Activity</h2>
+            <h2 hide.bind="activity.isNew">${activity.name}</h2>
+        </ux-dialog-header>
+        <ux-dialog-body>
+            <form class="ui form segment ${errors.length ? 'error' : ''}">                
+                <div class="fields row">
+                    <div class="field eight wide">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" value.bind="activity.name" attach-focus="true">
+                    </div>
+                    <div class="field four wide">
+                        <label>Date</label>
+                        <div class="calendar">
+                            <span class="date-display">${activity.dateDisplay}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="fields row">
+                    <div class="field eight wide">
+                        <label for="assignedTo">Assigned To</label>
+                        <div class="ui search selection dropdown assignedTo">
+                            <input type="hidden" id="assignedTo">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">Choose User</div>
+                            <div class="menu">
+                                <div repeat.for="u of users" class="item">${u.name}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field eight wide">
+                        <label for="workType">Work Type</label>
+                        <div class="ui search selection dropdown workType">
+                            <input type="hidden" id="workType">
+                            <i class="dropdown icon"></i>
+                            <div class="text"></div>
+                            <div class="menu">
+                                <div repeat.for="wt of workTypes" class="item">${wt}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="field row" hide.bind="activity.isNew">
+                    <div class="field eight wide">
+                        <label for="status">Status</label>
+                        <div class="text"></div>
+                        <div class="ui search selection dropdown status">
+                            <input type="hidden" id="status">
+                            <i class="dropdown icon"></i>
+                            <div class="text"></div>
+                            <div class="menu">
+                                <div repeat.for="s of statuses" class="item">${s}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fields row">
+                    <div class="field eight wide">
+                        <label for="plant">Plant</label>
+                        <div class="ui search selection dropdown plant">
+                            <input type="hidden" id="plant">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">Choose Plant</div>
+                            <div class="menu">
+                                <div repeat.for="p of plants" class="item" data-value="${p.id}">${p.name}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field eight wide">
+                        <label for="zone">Zone</label>
+                        <div class="ui search selection dropdown zone">
+                            <input type="hidden" id="zone">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">Choose Zone</div>
+                            <div class="menu">
+                                <div repeat.for="z of zones" class="item" data-value="${z.name}">${z.name}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fields row">
+                    <div class="field sixteen wide">
+                        <label for="description">Description</label>
+                        <textarea id="description" value.bind="activity.description"></textarea>
+                    </div>                    
+                </div>
+                <div class="ui divider">&nbsp;</div>
+                </div>
+                <div class="ui error message" show.bind="errors.length">
+                    <ul class="list" repeat.for="e of errors">
+                        <li>${e}</li>
+                    </ul>
+                </div>
+            </form>
+        </ux-dialog-body>
+        <ux-dialog-footer>
+            <button type="button" class="ui basic red button left floated" click.delegate="delete()" data-tooltip="Click to Delete this Activity" hide.bind="activity.isNew">
+                <i class="trash button icon"></i>
+                Delete
+            </button>
+
+            <button type="button" class="ui basic button" click.delegate="controller.close()">Cancel</button>
+            <button type="button" class="ui basic primary button" click.delegate="save()">
+                <i class="save button icon"></i>
+                Save
+            </button>
+        </ux-dialog-footer>
+    </ux-dialog>
+</template>

@@ -1,6 +1,6 @@
-@import '../../node_modules/toastr/toastr';
-@import (less) '../../node_modules/semantic-ui-css/semantic.css';
-@import (less) '../../node_modules/semantic-ui-calendar/dist/calendar.css';
+@import (inline) '../../node_modules/toastr/toastr.less';
+@import (css, inline) '../../node_modules/semantic-ui-css/semantic.css';
+@import (css, inline) '../../node_modules/semantic-ui-calendar/dist/calendar.css';
 
 /* General */
 a {
@@ -12,6 +12,13 @@ a {
 }
 .text-right {
     text-align: right;
+}
+
+.ui[class*="right floated"] {
+    float: right;
+}
+.ui[class*="left floated"] {
+    float: left;
 }
 
 .ui.secondary.pointing.menu .item.logo-item {

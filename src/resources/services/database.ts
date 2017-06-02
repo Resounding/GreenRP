@@ -1,3 +1,4 @@
+import { ActivityDocument } from '../models/activity';
 import {autoinject} from 'aurelia-framework';
 import {EventAggregator} from 'aurelia-event-aggregator';
 import {Configuration} from './configuration';
@@ -62,7 +63,8 @@ export class Database {
 
                         let ordersSynced:boolean = _.any(change.change.docs, doc => doc.type === OrderDocument.OrderDocumentType),
                             zonesSynced:boolean = _.any(change.change.docs, doc => doc._id === 'zones'),
-                            plantsSynced:boolean = _.any(change.change.docs, doc => doc._id === 'plants');
+                            plantsSynced:boolean = _.any(change.change.docs, doc => doc._id === 'plants'),
+                            activitiesSynced:boolean = _.any(change.change.docs, doc => doc.type === ActivityDocument.ActivityDocumentType);
 
                         if(ordersSynced) {
                             this.events.publish(Database.OrdersSyncChangeEvent);
@@ -74,6 +76,10 @@ export class Database {
 
                         if(plantsSynced) {
                             this.events.publish(Database.PlantsSyncChangeEvent);
+                        }
+
+                        if(activitiesSynced) {
+                            this.events.publish(Database.ActivitiesSyncChangedEvent);
                         }
                     }
                 })
@@ -104,4 +110,5 @@ export class Database {
     static OrdersSyncChangeEvent:string = 'OrdersSyncChangeEvent';
     static ZonesSyncChangeEvent:string = 'ZonesSyncChangeEvent';
     static PlantsSyncChangeEvent:string = 'PlantsSyncChangeEvent';
+    static ActivitiesSyncChangedEvent:string = 'ActivitiesSyncChangedEvent';
 }

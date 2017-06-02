@@ -192,7 +192,7 @@ export class Calculator {
                             const customer = this.calculator.order.customer.name,
                                 date = moment(this.calculator.order.arrivalDate).format('MMM D, YYYY');
                             this.dialogService.open({ viewModel: Prompt, model: `There is already an order for ${customer} on ${date}. Would you like to continue creating this order?` })
-                                .then((result:DialogResult) => {
+                                .whenClosed((result:DialogResult) => {
                                     if(result.wasCancelled) return;
 
                                     //noinspection TypeScriptUnresolvedFunction
@@ -313,8 +313,8 @@ export class Calculator {
 
 function position(modalContainer:Element) {
     const $container = $(modalContainer),
-        $aiFooter = $container.find('ai-dialog-footer'),
-        $aiBody = $container.find('ai-dialog-body'),
+        $aiFooter = $container.find('ux-dialog-footer'),
+        $aiBody = $container.find('ux-dialog-body'),
         footerHeight = $aiFooter.outerHeight(),
         bodyHeight = `calc(100% - ${footerHeight}px)`;
 

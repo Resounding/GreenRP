@@ -87,7 +87,7 @@ export class OrderDetail {
 
     delete() {
         this.dialogService.open({ viewModel: Prompt, model: `Are you sure you want to delete order ${this.calculator.order._id}`})
-            .then((result:DialogResult) => {
+            .whenClosed((result:DialogResult) => {
                 if(result.wasCancelled) return;
 
                 this.orderService.cancel(this.calculator.order._id)
@@ -129,9 +129,9 @@ export class OrderDetail {
 
 function position(modalContainer:Element, modalOverlay:Element) {
     const $container = $(modalContainer),
-        $aiHeader = $container.find('ai-dialog-header'),
-        $aiFooter = $container.find('ai-dialog-footer'),
-        $aiBody = $container.find('ai-dialog-body'),
+        $aiHeader = $container.find('ux-dialog-header'),
+        $aiFooter = $container.find('ux-dialog-footer'),
+        $aiBody = $container.find('ux-dialog-body'),
         headerHeight = $aiHeader.outerHeight(),
         footerHeight = $aiFooter.outerHeight(),
         bodyHeight = `calc(100% - ${footerHeight + headerHeight}px)`;

@@ -1,12 +1,12 @@
 <template>
     <require from="styles/plant-detail.css"></require>
 
-    <ai-dialog id="plant-detail">
-        <ai-dialog-header>
+    <ux-dialog id="plant-detail">
+        <ux-dialog-header>
             <h2 show.bind="isNew">New Plant</h2>
             <h2 hide.bind="isNew">${plant.name}</h2>
-        </ai-dialog-header>
-        <ai-dialog-body>
+        </ux-dialog-header>
+        <ux-dialog-body>
             <form class="ui form segment">                
                 <div class="fields row">
                     <div class="field two wide">
@@ -175,8 +175,8 @@
                     </div>
                 </div>
             </form>
-        </ai-dialog-body>
-        <ai-dialog-footer>
+        </ux-dialog-body>
+        <ux-dialog-footer>
             <button type="button" class="ui basic red button left floated" click.delegate="delete()" data-tooltip="Click to Delete this Plant" hide.bind="isNew">
                 <i class="trash button icon"></i>
                 Delete
@@ -187,6 +187,6 @@
                 <i class="save button icon"></i>
                 Save
             </button>
-        </ai-dialog-footer>
-    </ai-dialog>
+        </ux-dialog-footer>
+    </ux-dialog>
 </template>

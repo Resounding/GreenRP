@@ -1,6 +1,6 @@
 import {autoinject} from 'aurelia-framework';
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
-import {DialogController, DialogService, DialogResult} from 'aurelia-dialog';
+import {DialogController, DialogService} from 'aurelia-dialog';
 import {Database} from '../../services/database';
 import {ReferenceService} from '../../services/data/reference-service'
 import {Plant, PlantDocument,Spacings} from '../../models/plant';
@@ -21,7 +21,7 @@ export class CropIndex {
     }
 
     deactivate() {
-
+        this.plantSyncChangeSubscription.dispose();
     }
 
     loadPlants() {
@@ -45,7 +45,7 @@ export class CropIndex {
         this.dialogService.open({
             viewModel: PlantDetail,
             model: new PlantDocument()
-        }).then((result:DialogResult) => {
+        }).whenClosed(result => {
             if(result.wasCancelled) return;
 
             this.loadPlants();
@@ -56,7 +56,7 @@ export class CropIndex {
         this.dialogService.open({
             viewModel: PlantDetail,
             model: plant
-        }).then((result:DialogResult) => {
+        }).whenClosed(result => {
             if(result.wasCancelled) return;
 
             this.loadPlants();

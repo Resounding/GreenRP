@@ -43,7 +43,7 @@ export class NavBar {
     showCalculator() {
         this.dialogService.open({
             viewModel: Calculator
-        }).then(response => {
+        }).whenClosed(response => {
             if(response.wasCancelled) return;
 
             log.debug(response.output);
