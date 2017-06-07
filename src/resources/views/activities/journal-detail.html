@@ -1,0 +1,83 @@
+<template>
+    <require from="styles/activities.css"></require>
+
+    <div class="ui">
+        <div class="button-container">
+            <button type="button" class="ui basic button" click.delegate="editActivity()" data-tooltip="Click to edit the Activity information" data-position="bottom right">
+                <i class="edit icon"></i>
+                Edit Activity
+            </button>
+            <a class="ui basic button" route-href="route: activities">Cancel</a>
+            <button type="button" class="ui basic primary button" click.delegate="save()">
+                <i class="save button icon"></i>
+                Save
+            </button>
+        </div>
+
+        <h2>${title}</h2>
+
+        <form class="ui form segment ${errors.length ? 'error' : ''}">
+            <div class="fields row">
+                <div class="field">
+                    <label for="completion-status">Activity was not completed&nbsp;&nbsp;</label>
+                </div>
+                <div class="field">
+                    <div class="ui fitted toggle checkbox">
+                        <input type="checkbox" id="completion-status" checked.bind="completed">
+                        <label></label>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="completion-status">&nbsp;&nbsp;Activity was completed</label>
+                </div>
+            </div>
+            <div class="fields row" show.bind="completed && isMeasurement">
+                <div class="field four wide">
+                    <label for="measurement">Measurement</label>
+                    <div class="ui labeled input">
+                        <input type="text" id="measurement" value.bind="activity.journal.measurement">
+                        <div class="ui label">${activity.unitOfMeasure}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="fields row" show.bind="completed && !isMeasurement">
+                <div class="field sixteen wide">
+                    <label for="measurement">Checklist</label>
+                    <div class="ui ordered list">
+                        <template repeat.for="item of activity.journal.checklist">
+                            <div class="item">
+                                <div class="ui left action input">                                
+                                    <button type="button" class="mini ui icon button" tabindex="-1" click.delegate="removeFromChecklist($index)" data-tooltip="Remove this item">
+                                        <i class="icon button trash"></i>
+                                    </button>
+                                    <input type="text" value.bind="item.value" keypress.delegate="onChecklistItemKeyPress($event, $index)">
+                                </div>
+                            </div>
+                        </template>                        
+                    </div>
+                    <div class="ui list">
+                        <div class="item">
+                            <button type="button" class="ui basic button" click.delegate="addToChecklist()">
+                                <i class="icon plus"></i>
+                                Add an item
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="fields row">
+                <div class="field sixteen wide">
+                    <label for="notes">Notes</label>
+                    <textarea id="notes" value.bind="activity.journal.notes"></textarea>
+                </div>                    
+            </div>
+            <div class="ui divider">&nbsp;</div>
+            </div>
+            <div class="ui error message" show.bind="errors.length">
+                <ul class="ui list" repeat.for="e of errors">
+                    <li>${e}</li>
+                </ul>
+            </div>
+        </form>
+    </div>
+</template>

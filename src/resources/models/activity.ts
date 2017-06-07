@@ -10,8 +10,8 @@ export interface Activity {
     status:ActivityStatus;
     workType:WorkType;
     description:string;
-    crop?:string;
-    zone?:Zone;
+    crops?:string[];
+    zones?:Zone[];
     assignedTo?:string;
     recordingType:JournalRecordingType;
     unitOfMeasure?:string;
@@ -20,7 +20,7 @@ export interface Activity {
 
 export interface Journal {
     notes:string;
-    checklist?:string[];
+    checklist?:ChecklistItem[];
     measurement?:string|number;
 }
 
@@ -33,8 +33,8 @@ export class ActivityDocument implements Activity {
     status:ActivityStatus = ActivityStatuses.NotStarted;
     workType:WorkType = WorkTypes.Other;
     description:string;
-    crop?:string = null;
-    zone?:Zone = null;
+    crops?:string[] = [];
+    zones?:Zone[] = [];
     assignedTo?:string = null;
     recordingType:JournalRecordingType = JournalRecordingTypes.CheckList;
     unitOfMeasure?:string = null;
@@ -76,12 +76,18 @@ export class ActivityDocument implements Activity {
             workType: this.workType,
             status: this.status,
             description: this.description,
-            crop:this.crop,
-            zone: this.zone,
+            crops: null,
+            zones: null,
             assignedTo: this.assignedTo,
             recordingType: this.recordingType,
             unitOfMeasure: this.unitOfMeasure,
         };
+        if(Array.isArray(this.crops) && this.crops.length) {
+            json.crops = this.crops;
+        }
+        if(Array.isArray(this.zones) && this.zones.length) {
+            json.zones = this.zones;
+        }
         if(this.journal) {
             json.journal = this.journal.toJSON();
         }
@@ -97,21 +103,40 @@ export class ActivityDocument implements Activity {
 
 export class JournalDocument implements Journal {
     notes:string;    
-    checklist?:string[];
+    checklist?:ChecklistItem[];
     measurement?:string|number;
 
     constructor(args?:Journal) {
         if(args) {
             _.extend(this, args);
+
+            if(Array.isArray(args.checklist)) {
+                this.checklist = args.checklist.reduce((memo, item) => {
+                    if(typeof item === 'string') {
+                        memo.push(new ChecklistItem(item));
+                    } else if(item.value) {
+                        memo.push(item);
+                    }
+
+                    return memo;
+                }, []);
+            }
         }
     }
 
     toJSON():Journal {
-        return {
-            notes: this.notes,
-            checklist: this.checklist,
-            measurement: this.measurement
+        const json:Journal = {
+            notes: this.notes
         };
+
+        if(this.measurement != null) {
+            json.measurement = this.measurement;
+        }
+        if(Array.isArray(this.checklist) && this.checklist.length) {
+            json.checklist = this.checklist.filter(i => i.value);
+        }
+
+        return json;
     }
 }
 
@@ -162,5 +187,13 @@ export class JournalRecordingTypes {
             JournalRecordingTypes.CheckList,
             JournalRecordingTypes.Measurement
         ]
+    }
+}
+
+export class ChecklistItem {
+    constructor(public value:string = '') { }
+
+    toJSON() {
+        return this.value;
     }
 }

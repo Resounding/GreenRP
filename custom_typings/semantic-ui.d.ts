@@ -3,6 +3,8 @@ interface visibilityOptions {
     continuous?: boolean;
     onBottomPassed?(e?: JQueryEventObject);
     onBottomPassedReverse?(e?: JQueryEventObject);
+    type?: 'fixed' | 'image';
+    offset?: number;
 }
 
 interface dropdownOptions {

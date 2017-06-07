@@ -19,7 +19,7 @@ export class NavBar {
         this.router.routes.forEach(r => {
             // prevent duplicates
             if(this.authorizedRoutes.some(ar => r.moduleId === ar.moduleId)) return false;
-            if(!Array.isArray(r.settings.roles) || r.settings.roles.some(this.auth.isInRole)){
+            if(r.nav && (!Array.isArray(r.settings.roles) || r.settings.roles.some(this.auth.isInRole))) {
                 this.authorizedRoutes.push(r);
             }
         });

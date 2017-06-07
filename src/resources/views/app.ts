@@ -32,7 +32,11 @@ export class App {
             if(!config.instructions.length) {
                 route.route.push('');
             }
-            config.map([route]);
+            config.map([
+                route,
+                {route: 'activities/:id', name: 'activity-detail', moduleId: 'resources/views/activities/activity-detail', nav: false, settings: { auth: true }},
+                {route: 'activities/:id/journal', name: 'journal-detail', moduleId: 'resources/views/activities/journal-detail', nav: false, settings: { auth: true }}
+            ]);
         }
 
         this.router = router;

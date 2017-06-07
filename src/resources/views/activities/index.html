@@ -2,7 +2,7 @@
     <require from="styles/activities.css"></require>
 
     <div class="ui segments">
-        <div class="ui segment grid">
+        <div class="ui segment stackable grid">
             <h2 class="ui header four wide column">Activities</h2>
             <div class="eight wide column">
                 <div class="ui toggle checkbox left floated" show.bind="canShowAll">
@@ -11,10 +11,10 @@
                 </div>
             </div>
             <div class="four wide column text-right">
-                <button type="button" class="basic ui positive button" click.delegate="add()">
+                <a class="basic ui positive button" route-href="route: activity-detail; params.bind: { id: 'new' }">
                     <i class="plus icon"></i>
                     Add Activity
-                </button>
+                </a>
             </div>
         </div>
         <div class="ui secondary segment">
@@ -34,7 +34,7 @@
                 <tbody>
                     <tr repeat.for="a of activities | sort:'date'">
                         <td>
-                            <a click.delegate="detail(a)">${a.name}</a>
+                            <a route-href="route: activity-detail; params.bind: { id: a._id }">${a.name}</a>
                         </td>
                         <td>${a.dateDisplay}</td>
                         <td>${a.assignedToDisplay}</td>
@@ -43,7 +43,7 @@
                         <td>${a.crop}</td>
                         <td>${a.status}</td>
                         <td>
-                            <a href="#">Journal</a>
+                            <a route-href="route: journal-detail; params.bind: { id: a._id }">Journal</a>
                         </td>
                     </tr>
                 </tbody>

@@ -1,190 +1,109 @@
 <template>
-    <ux-dialog id="activity-detail-dialog">
-        <ux-dialog-header>
-            <h2 show.bind="activity.isNew">New Activity</h2>
-            <h2 hide.bind="activity.isNew">${activity.name}</h2>
-        </ux-dialog-header>
-        <ux-dialog-body class="activity">
-            <form class="ui form segment ${errors.length ? 'error' : ''}">                
-                <div class="fields row">
-                    <div class="field eight wide">
-                        <label for="name">Name</label>
-                        <input type="text" id="name" value.bind="activity.name" attach-focus="true">
-                    </div>
-                    <div class="field four wide">
-                        <label>Due Date</label>
-                        <div class="calendar">
-                            <span class="date-display">${activity.dateDisplay}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="fields row">
-                    <div class="field eight wide">
-                        <label for="assignedTo">Assigned To</label>
-                        <div class="ui search selection dropdown assignedTo">
-                            <input type="hidden" id="assignedTo">
-                            <i class="dropdown icon"></i>
-                            <div class="default text">Choose User</div>
-                            <div class="menu">
-                                <div repeat.for="u of users" class="item">${u.name}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="field eight wide">
-                        <label for="workType">Work Type</label>
-                        <div class="ui search selection dropdown workType">
-                            <input type="hidden" id="workType">
-                            <i class="dropdown icon"></i>
-                            <div class="text"></div>
-                            <div class="menu">
-                                <div repeat.for="wt of workTypes" class="item">${wt}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="fields row">
-                    <div class="field eight wide">
-                        <label for="crop">Crop</label>
-                        <div class="ui search selection dropdown crop">
-                            <input type="hidden" id="crop">
-                            <i class="dropdown icon"></i>
-                            <div class="default text">Choose Crop</div>
-                            <div class="menu">
-                                <div repeat.for="o of orders" class="item">${o}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="field eight wide">
-                        <label for="zone">Zone</label>
-                        <div class="ui search selection dropdown zone">
-                            <input type="hidden" id="zone">
-                            <i class="dropdown icon"></i>
-                            <div class="default text">Choose Zone</div>
-                            <div class="menu">
-                                <div repeat.for="z of zones" class="item" data-value="${z.name}">${z.name}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="fields row">
-                    <div class="field eight wide">
-                        <label for="recordingType">Recording Type</label>
-                        <div class="ui search selection dropdown recording-type">
-                            <input type="hidden" id="recordingType">
-                            <i class="dropdown icon"></i>
-                            <div class="text"></div>
-                            <div class="menu">
-                                <div repeat.for="t of journalRecordingTypes" class="item">${t}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="field four wide" show.bind="isMeasurement">
-                        <label for="unitOfMeasure">Units:</label>
-                        <input type="text" id="unitOfMeasure" value.bind="activity.unitOfMeasure">
-                    </div>
-                </div>
-                <div class="fields row">
-                    <div class="field sixteen wide">
-                        <label for="description">Description</label>
-                        <textarea id="description" value.bind="activity.description"></textarea>
-                    </div>                    
-                </div>
-                <div class="ui divider">&nbsp;</div>
-                </div>
-                <div class="ui error message" show.bind="errors.length">
-                    <ul class="ui list" repeat.for="e of errors">
-                        <li>${e}</li>
-                    </ul>
-                </div>
-            </form>
-        </ux-dialog-body>
-        <ux-dialog-body class="journal">
-            <form class="ui form segment ${errors.length ? 'error' : ''}">
-                <div class="fields row">
-                    <div class="field">
-                        <label for="completion-status">Activity was not completed&nbsp;&nbsp;</label>
-                    </div>
-                    <div class="field">
-                        <div class="ui fitted toggle checkbox">
-                            <input type="checkbox" id="completion-status" checked.bind="completed">
-                            <label></label>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label for="completion-status">&nbsp;&nbsp;Activity was completed</label>
-                    </div>
-                </div>
-                <div class="fields row" show.bind="completed && isMeasurement">
-                    <div class="field four wide">
-                        <label for="measurement">Measurement</label>
-                        <div class="ui labeled input">
-                            <input type="text" id="measurement" value.bind="activity.journal.measurement">
-                            <div class="ui label">${activity.unitOfMeasure}</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="fields row" show.bind="completed && !isMeasurement">
-                    <div class="field sixteen wide">
-                        <label for="measurement">Checklist</label>
-                        <div class="ui grid">
-                            <template repeat.for="item of activity.journal.checklist">
-                                <div class="row">
-                                    <div class="two wide column">
-                                        <button type="button" class="mini ui basic red icon button" click.delegate="removeFromChecklist($index)">
-                                            <i class="icon minus"></i>
-                                        </button>
-                                    </div>
-                                    <div class="eight wide column">
-                                        <input type="text" value.bind="item">
-                                    </div>
-                                </div>
-                            </template>
+    <require from="styles/activities.css"></require>
 
-                            <div class="row">
-                                <div class="ten wide column">&nbsp;</div>
-                                <div class="two wide column">
-                                    <button type="button" class="mini ui basic green icon button" click.delegate="addToChecklist()">
-                                        <i class="icon plus"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="fields row">
-                    <div class="field sixteen wide">
-                        <label for="notes">Notes</label>
-                        <textarea id="notes" value.bind="activity.journal.notes"></textarea>
-                    </div>                    
-                </div>
-                <div class="ui divider">&nbsp;</div>
-                </div>
-                <div class="ui error message" show.bind="errors.length">
-                    <ul class="ui list" repeat.for="e of errors">
-                        <li>${e}</li>
-                    </ul>
-                </div>
-            </form>
-        </ux-dialog-body>
-        <ux-dialog-footer>
-            <button type="button" class="ui basic red button left floated" click.delegate="delete()" data-tooltip="Click to Delete this Activity" hide.bind="activity.isNew">
+    <div class="ui">
+        <div class="button-container">
+            <button type="button" class="ui basic red button text-nowrap" click.delegate="delete()" data-tooltip="Click to Delete this Activity" data-position="bottom right" hide.bind="activity.isNew">
                 <i class="trash button icon"></i>
                 Delete
             </button>
-            <button type="button" class="ui basic button left floated" click.delegate="addJournal()" data-tooltip="Click to record a Journal entry for this Activity" hide.bind="journalShowing">
+            <button type="button" class="ui basic button" click.delegate="addJournal()" data-tooltip="Click to record a Journal entry for this Activity" data-position="bottom right">
                 <i class="browser icon"></i>
                 Add Journal
             </button>
-            <button type="button" class="ui basic button left floated" click.delegate="editActivity()" data-tooltip="Click to edit the Activity information" show.bind="journalShowing">
-                <i class="edit icon"></i>
-                Edit Activity
-            </button>
-
-            <button type="button" class="ui basic button" click.delegate="controller.close()">Cancel</button>
+            <a class="ui basic button" route-href="route: activities">Cancel</a>
             <button type="button" class="ui basic primary button" click.delegate="save()">
                 <i class="save button icon"></i>
                 Save
             </button>
-        </ux-dialog-footer>
-    </ux-dialog>
+        </div>
+
+        <h2>${title}</h2>
+
+        <form class="ui form segment ${errors.length ? 'error' : ''}">                
+            <div class="fields row">
+                <div class="required field eight wide">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" value.bind="activity.name" attach-focus="true">
+                </div>
+                <div class="field four wide">
+                    <label>Due Date</label>
+                    <div class="calendar">
+                        <span class="date-display">${activity.dateDisplay}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="fields row">
+                <div class="field eight wide">
+                    <label for="assignedTo">Assigned To</label>
+                    <div class="ui search selection dropdown assignedTo">
+                        <input type="hidden" id="assignedTo">
+                        <i class="dropdown icon"></i>
+                        <div class="text"></div>
+                        <div class="menu">
+                            <div class="item" data-value="">Unassigned</div>
+                            <div repeat.for="u of users" class="item">${u.name}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="field eight wide">
+                    <label for="workType">Work Type</label>
+                    <div class="ui search selection dropdown workType">
+                        <input type="hidden" id="workType">
+                        <i class="dropdown icon"></i>
+                        <div class="text"></div>
+                        <div class="menu">
+                            <div repeat.for="wt of workTypes" class="item">${wt}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="fields row">
+                <div class="field eight wide">
+                    <label for="crop">Crop</label>
+                    <select id="crop" class="ui fluid search dropdown crop" multiple>
+                        <option value="">Select Crop(s)</option>
+                        <option repeat.for="o of orders" value="${o}">${o}</option>
+                    </select>
+                </div>
+                <div class="field eight wide">
+                    <label for="zone">Zone</label>
+                    <select id="zone" class="ui fluid search dropdown zone" multiple>
+                        <option value="">Select Zone(s)</option>
+                        <option repeat.for="z of zones" value="${z.name}">${z.name}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="fields row">
+                <div class="field eight wide">
+                    <label for="recordingType">Recording Type</label>
+                    <div class="ui search selection dropdown recording-type">
+                        <input type="hidden" id="recordingType">
+                        <i class="dropdown icon"></i>
+                        <div class="text"></div>
+                        <div class="menu">
+                            <div repeat.for="t of journalRecordingTypes" class="item">${t}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="field four wide" show.bind="isMeasurement">
+                    <label for="unitOfMeasure">Units:</label>
+                    <input type="text" id="unitOfMeasure" value.bind="activity.unitOfMeasure">
+                </div>
+            </div>
+            <div class="fields row">
+                <div class="required field sixteen wide">
+                    <label for="description">Description</label>
+                    <textarea id="description" value.bind="activity.description"></textarea>
+                </div>                    
+            </div>
+            <div class="ui divider">&nbsp;</div>
+            </div>
+            <div class="ui error message" show.bind="errors.length">
+                <ul class="ui list" repeat.for="e of errors">
+                    <li>${e}</li>
+                </ul>
+            </div>
+        </form>        
+    </div>
 </template>

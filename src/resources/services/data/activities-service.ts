@@ -15,6 +15,17 @@ export class ActivitiesService {
 
     constructor(private database:Database, private events:EventAggregator) { }
 
+    getOne(id:string):Promise<ActivityDocument> {
+        return new Promise((resolve, reject) => {
+            this.database.db.get(id)
+                .then(result => {
+                    const doc = new ActivityDocument(result);
+                    resolve(doc);
+                })
+                .catch(reject);
+        });
+    }
+
     getAll():Promise<ActivityDocument[]> {
         return new Promise((resolve, reject) => {
             this.database.db.find({ selector: { type: ActivityDocument.ActivityDocumentType }})
