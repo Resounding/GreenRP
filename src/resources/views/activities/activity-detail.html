@@ -4,7 +4,7 @@
             <h2 show.bind="activity.isNew">New Activity</h2>
             <h2 hide.bind="activity.isNew">${activity.name}</h2>
         </ux-dialog-header>
-        <ux-dialog-body>
+        <ux-dialog-body class="activity">
             <form class="ui form segment ${errors.length ? 'error' : ''}">                
                 <div class="fields row">
                     <div class="field eight wide">
@@ -12,7 +12,7 @@
                         <input type="text" id="name" value.bind="activity.name" attach-focus="true">
                     </div>
                     <div class="field four wide">
-                        <label>Date</label>
+                        <label>Due Date</label>
                         <div class="calendar">
                             <span class="date-display">${activity.dateDisplay}</span>
                         </div>
@@ -42,20 +42,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="field row" hide.bind="activity.isNew">
-                    <div class="field eight wide">
-                        <label for="status">Status</label>
-                        <div class="text"></div>
-                        <div class="ui search selection dropdown status">
-                            <input type="hidden" id="status">
-                            <i class="dropdown icon"></i>
-                            <div class="text"></div>
-                            <div class="menu">
-                                <div repeat.for="s of statuses" class="item">${s}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <div class="fields row">
                     <div class="field eight wide">
                         <label for="crop">Crop</label>
@@ -81,6 +67,23 @@
                     </div>
                 </div>
                 <div class="fields row">
+                    <div class="field eight wide">
+                        <label for="recordingType">Recording Type</label>
+                        <div class="ui search selection dropdown recording-type">
+                            <input type="hidden" id="recordingType">
+                            <i class="dropdown icon"></i>
+                            <div class="text"></div>
+                            <div class="menu">
+                                <div repeat.for="t of journalRecordingTypes" class="item">${t}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field four wide" show.bind="isMeasurement">
+                        <label for="unitOfMeasure">Units:</label>
+                        <input type="text" id="unitOfMeasure" value.bind="activity.unitOfMeasure">
+                    </div>
+                </div>
+                <div class="fields row">
                     <div class="field sixteen wide">
                         <label for="description">Description</label>
                         <textarea id="description" value.bind="activity.description"></textarea>
@@ -89,7 +92,75 @@
                 <div class="ui divider">&nbsp;</div>
                 </div>
                 <div class="ui error message" show.bind="errors.length">
-                    <ul class="list" repeat.for="e of errors">
+                    <ul class="ui list" repeat.for="e of errors">
+                        <li>${e}</li>
+                    </ul>
+                </div>
+            </form>
+        </ux-dialog-body>
+        <ux-dialog-body class="journal">
+            <form class="ui form segment ${errors.length ? 'error' : ''}">
+                <div class="fields row">
+                    <div class="field">
+                        <label for="completion-status">Activity was not completed&nbsp;&nbsp;</label>
+                    </div>
+                    <div class="field">
+                        <div class="ui fitted toggle checkbox">
+                            <input type="checkbox" id="completion-status" checked.bind="completed">
+                            <label></label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="completion-status">&nbsp;&nbsp;Activity was completed</label>
+                    </div>
+                </div>
+                <div class="fields row" show.bind="completed && isMeasurement">
+                    <div class="field four wide">
+                        <label for="measurement">Measurement</label>
+                        <div class="ui labeled input">
+                            <input type="text" id="measurement" value.bind="activity.journal.measurement">
+                            <div class="ui label">${activity.unitOfMeasure}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fields row" show.bind="completed && !isMeasurement">
+                    <div class="field sixteen wide">
+                        <label for="measurement">Checklist</label>
+                        <div class="ui grid">
+                            <template repeat.for="item of activity.journal.checklist">
+                                <div class="row">
+                                    <div class="two wide column">
+                                        <button type="button" class="mini ui basic red icon button" click.delegate="removeFromChecklist($index)">
+                                            <i class="icon minus"></i>
+                                        </button>
+                                    </div>
+                                    <div class="eight wide column">
+                                        <input type="text" value.bind="item">
+                                    </div>
+                                </div>
+                            </template>
+
+                            <div class="row">
+                                <div class="ten wide column">&nbsp;</div>
+                                <div class="two wide column">
+                                    <button type="button" class="mini ui basic green icon button" click.delegate="addToChecklist()">
+                                        <i class="icon plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fields row">
+                    <div class="field sixteen wide">
+                        <label for="notes">Notes</label>
+                        <textarea id="notes" value.bind="activity.journal.notes"></textarea>
+                    </div>                    
+                </div>
+                <div class="ui divider">&nbsp;</div>
+                </div>
+                <div class="ui error message" show.bind="errors.length">
+                    <ul class="ui list" repeat.for="e of errors">
                         <li>${e}</li>
                     </ul>
                 </div>
@@ -99,6 +170,14 @@
             <button type="button" class="ui basic red button left floated" click.delegate="delete()" data-tooltip="Click to Delete this Activity" hide.bind="activity.isNew">
                 <i class="trash button icon"></i>
                 Delete
+            </button>
+            <button type="button" class="ui basic button left floated" click.delegate="addJournal()" data-tooltip="Click to record a Journal entry for this Activity" hide.bind="journalShowing">
+                <i class="browser icon"></i>
+                Add Journal
+            </button>
+            <button type="button" class="ui basic button left floated" click.delegate="editActivity()" data-tooltip="Click to edit the Activity information" show.bind="journalShowing">
+                <i class="edit icon"></i>
+                Edit Activity
             </button>
 
             <button type="button" class="ui basic button" click.delegate="controller.close()">Cancel</button>

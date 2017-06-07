@@ -70,6 +70,7 @@ export class ActivitiesService {
                 return this.database.db.put(json)
                     .then((response:PouchDB.Core.Response) => {
                         if(response.ok) {
+                            doc._rev = response.rev;
                             result.activity = doc;
                             this.events.publish(ActivitiesService.ActivitiesChangedEvent);
                             resolve(result);

@@ -24,6 +24,11 @@ interface modalOptions {
     onApprove(e?:any);
 }
 
+interface transitionOptions {
+    animation: string;
+    onHide?(e?:any);
+}
+
 type sidebarCallback = () => void;
 
 interface sidebarOptions {
@@ -44,7 +49,7 @@ interface sidebarOptions {
 
 interface JQuery {
   visibility(options?: visibilityOptions) : JQuery;
-  transition(transition:string) : JQuery;
+  transition(transition:string|transitionOptions) : JQuery;
   dropdown(options?: dropdownOptions | string, values?:any) : JQuery;
   calendar(options?: calendarOptions | string, values?:any) : JQuery;
   modal(options?: modalOptions | string) : JQuery;

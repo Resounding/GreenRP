@@ -1,9 +1,9 @@
-import { Authentication, Roles } from '../../services/authentication';
 import {autoinject} from 'aurelia-framework';
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {DialogService} from 'aurelia-dialog';
 import {ActivityDetail} from './activity-detail';
 import {ActivityDocument} from '../../models/activity';
+import {Authentication, Roles} from '../../services/authentication';
 import {Database} from '../../services/database';
 import {log} from "../../services/log";
 import {ActivitiesService} from '../../services/data/activities-service';
@@ -18,10 +18,6 @@ export class ActivityIndex {
 
     constructor(private dialogService:DialogService, private service:ActivitiesService,
         private auth:Authentication, private events:EventAggregator, private element:Element) { }
-
-    attach() {
-        $('.')
-    }
 
     activate() {
         this.activitySyncChangeSubscription = this.events.subscribe(Database.ActivitiesSyncChangedEvent, this.load.bind(this));        

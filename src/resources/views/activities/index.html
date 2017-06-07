@@ -2,19 +2,20 @@
     <require from="styles/activities.css"></require>
 
     <div class="ui segments">
-        <div class="ui clearing segment">
-            <h2 class="ui left floated">Activities</h2>
-            <div class="ui container">
+        <div class="ui segment grid">
+            <h2 class="ui header four wide column">Activities</h2>
+            <div class="eight wide column">
                 <div class="ui toggle checkbox left floated" show.bind="canShowAll">
                     <input type="checkbox" id="showall" checked.bind="showAll">
                     <label for="repeating-order">Show All Users</label>
                 </div>
             </div>
-
-            <button type="button" class="basic ui positive right floated button" click.delegate="add()">
-                <i class="plus icon"></i>
-                Add Activity
-            </button>
+            <div class="four wide column text-right">
+                <button type="button" class="basic ui positive button" click.delegate="add()">
+                    <i class="plus icon"></i>
+                    Add Activity
+                </button>
+            </div>
         </div>
         <div class="ui secondary segment">
             <table class="ui single line table">
