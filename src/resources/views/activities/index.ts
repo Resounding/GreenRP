@@ -51,10 +51,6 @@ export class ActivityIndex {
             });
     }
 
-    get canShowAll():boolean {
-        return this.auth.isInRole(Roles.ProductionManager);
-    }
-
     get showAll():boolean {
         return this._showAll;
     }
