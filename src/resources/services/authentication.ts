@@ -1,7 +1,8 @@
 import {autoinject, Aurelia} from 'aurelia-framework';
 import {Router, NavigationInstruction, Next, Redirect} from 'aurelia-router';
-import {HttpClient} from 'aurelia-fetch-client';
+import {HttpClient, json} from 'aurelia-fetch-client';
 import {EventAggregator} from 'aurelia-event-aggregator';
+import * as cryptoJS from 'crypto-js';
 import {Configuration} from './configuration';
 import {log} from './log';
 
@@ -13,7 +14,22 @@ interface UserInfo {
     name:string;
     password:string;
     roles:string[];
-    basicAuth:string;
+}
+
+interface CouchUserDoc {
+    _id:string;
+    _rev:string;
+    name:string;
+    orgs:string[];
+    roles:string[];
+    type:string;
+    password_sha:string;
+    salt:string;
+}
+
+export interface ChangePasswordResult {
+    success:boolean;
+    errors:string[];
 }
 
 @autoinject()
@@ -28,16 +44,13 @@ export class Authentication {
 
         return new Promise((resolve, reject) => {
             const url = `${this.config.remote_server}/_session`,
+                method = 'post',
                 body = `name=${encodeURI(user)}&password=${encodeURI(password)}`,
-                authHeader = `Basic ${window.btoa(user + password)}`;
+                authorization = getBasicAuth(user, password),
+                headers = { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': authorization };
 
             this.httpClient.fetch(
-                url, {
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', Authorization: authHeader },
-                    method: 'post',
-                    body: body
-                }
-            )
+                url, { method, headers, body })
                 .then(result => {
                     if(result.ok) {
                         log.debug('Login succeeded');
@@ -45,11 +58,11 @@ export class Authentication {
                             user_info = {
                                 name: info.name,
                                 password: password,
-                                roles: info.roles,
-                                basicAuth: authHeader
+                                roles: info.roles
                             };
 
-                            localStorage[storage_key] = JSON.stringify(user_info);
+                            saveUserInfo();
+
                             this.app.setRoot(this.config.app_root);
                             this.events.publish(Authentication.AuthenticatedEvent);
                             return resolve(user_info);
@@ -74,9 +87,9 @@ export class Authentication {
         return Promise.resolve();
     }
 
-    refreshProfile():Promise<UserInfo> {
+    refreshProfile():Promise<UserInfo|Error> {
         if(!this.isAuthenticated()) {
-            return Promise.reject(new Error('Not logged in'));
+            return Promise.reject<Error>(new Error('Not logged in'));
         }
 
         return this.login(this.userInfo.name, this.userInfo.password);
@@ -88,6 +101,55 @@ export class Authentication {
 
     isInRole(role:string):boolean {
         return Authentication.isInRole(role);
+    }
+
+    changePassword(password:string):Promise<ChangePasswordResult> {
+        return new Promise((resolve, reject) => {
+            const url = `${this.config.remote_server}/_users/org.couchdb.user:${this.userInfo.name}`,
+                authorization = getBasicAuth(this.userInfo.name, this.userInfo.password),
+                headers = { 'Authorization': authorization };
+
+            this.httpClient.fetch(url, { headers })
+                .then(result => {
+                    if(result.ok) {
+                        log.debug('Retrieved user profile');
+                        return result.json().then((user:CouchUserDoc) => {
+
+                            const salt = cryptoJS.lib.WordArray.random(16).toString(),
+                                 hash = new cryptoJS.SHA1(`${password}${salt}`).toString();
+
+                            user.salt = salt;
+                            user.password_sha = hash;
+
+                            const method = 'PUT',
+                                body = json(user);
+
+                            this.httpClient.fetch(url, { headers, method, body })
+                                .then(updateResult => {
+                                    if(updateResult.ok) {
+                                        log.debug('Successfully changed password');
+
+                                        user_info.password = password;
+                                        saveUserInfo();
+
+                                        return updateResult.json()
+                                            .then(resolve)
+                                            .catch(reject);
+                                    }
+
+                                    return updateResult.json()
+                                        .then(reject)
+                                        .catch(reject);
+                                })
+                        });
+                    }
+
+                    return result.json()
+                        .then(reject)
+                        .catch(reject);
+                })
+                .catch(reject);
+        });
     }
 
     get userInfo():UserInfo {
@@ -138,4 +200,15 @@ export class Roles {
     static ProductionManager:string = 'production manager';
     static Administrator:string = 'administrator';
     static LabourSupervisor:string = 'labour supervisor';
+}
+
+function getBasicAuth(username:string, password:string) {
+    const data = `${username}:${password}`,
+        header = `Basic ${window.btoa(data)}`;
+
+    return header;
+}
+
+function saveUserInfo() {
+    localStorage[storage_key] = JSON.stringify(user_info);
 }

@@ -27,10 +27,9 @@ export class Database {
 
         if (this.auth.isAuthenticated()) {
             const userInfo = this.auth.userInfo,
-                headers = {Authorization: userInfo.basicAuth},
                 opts = {
-                skip_setup: true,
-                auth: {username: userInfo.name, password: userInfo.password}
+                    skip_setup: true,
+                    auth: {username: userInfo.name, password: userInfo.password}
                 };
             if(remoteOps) {
                 _.extend(opts, remoteOps);

@@ -1,4 +1,6 @@
-import {autoinject, bindable} from 'aurelia-framework';
+import { Notifications } from '../../services/notifications';
+import { ChangePassword } from './change-password';
+import {autoinject, bindable, computedFrom} from 'aurelia-framework';
 import {Router, RouteConfig} from 'aurelia-router';
 import {DialogService} from 'aurelia-dialog';
 import {Authentication, Roles} from '../../services/authentication';
@@ -36,6 +38,17 @@ export class NavBar {
         $('.dropdown', this.element).dropdown();
     }
 
+    changePassword() {
+        this.dialogService.open({ viewModel: ChangePassword })
+            .whenClosed(response => {
+                if(response.wasCancelled) return;
+
+                Notifications.success('Password changed successfully');
+            })
+            .catch(Notifications.error);
+
+    }
+
     logout() {
         this.auth.logout();
     }
@@ -68,6 +81,7 @@ export class NavBar {
         });
     }
 
+    @computedFrom('auth.userInfo')
     get userName():string {
         if(!this.auth || !this.auth.userInfo) return '';
         return this.auth.userInfo.name;

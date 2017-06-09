@@ -9,11 +9,11 @@
                 <a repeat.for="item of authorizedRoutes" href.bind="item.navModel.href" class="item ${item.navModel.isActive? 'active' : ''}">
                     ${item.title}
                 </a>
-                <button type="button" class="item" click.trigger="showSearch()" show.bind="canSearch">
+                <button type="button" class="item" click.delegate="showSearch()" show.bind="canSearch">
                     <i class="icon search"></i>
                     Search
                 </button>
-                <button type="button" class="item" click.trigger="showCalculator()" show.bind="canCreateOrders">
+                <button type="button" class="item" click.delegate="showCalculator()" show.bind="canCreateOrders">
                     <i class="icon plus"></i>
                     New Order
                 </button>
@@ -21,7 +21,14 @@
                     ${userName}
                     <i class="dropdown icon"></i>
                     <div class="menu">
-                        <button type="button" class="item" click.trigger="logout()">Logout</button>
+                        <button type="button" class="item" click.delegate="changePassword()">
+                            <i class="talk outline icon"></i>
+                            Change Password
+                        </button>
+                        <button type="button" class="item" click.delegate="logout()">
+                            <i class="sign out icon"></i>
+                            Logout
+                        </button>
                     </div>
                 </div>
             </div>
@@ -37,11 +44,11 @@
             <a repeat.for="item of authorizedRoutes" href.bind="item.navModel.href" class="item ${item.navModel.isActive? 'active' : ''}">
                 ${item.title}
             </a>
-            <a class="item" click.trigger="showSearch()" show.bind="canSearch">
+            <a class="item" click.delegate="showSearch()" show.bind="canSearch">
                 <i class="icon search"></i>
                 Search
             </a>
-            <a class="item" click.trigger="showCalculator()" show.bind="canCreateOrders">
+            <a class="item" click.delegate="showCalculator()" show.bind="canCreateOrders">
                 <i class="icon plus"></i>
                 New Order
             </a>
