@@ -1,0 +1,29 @@
+<template>
+    <div class="content">
+        <div class="header">
+            <a route-href="route: activity-detail; params.bind: { id: activity._id }">
+                ${activity.name}
+            </a>
+        </div>
+        <div class="meta">
+            <span class="category">${activity.status}</span>
+            <span class="right floated ui time">
+                ${activity.assignedToDisplay}
+            </span>
+        </div>
+        <div class="description">${activity.description}</div>
+    </div>
+    <div class="extra content">
+        <a route-href="route: journal-detail; params.bind: { id: activity._id }" class="ui left floated" data-tooltip="Add Journal entry">
+            <i class="browser icon"></i>
+            Journal
+        </a>
+        <div class="ui right floated">
+            <span>${activity.dateDisplay}</span>
+            &nbsp;
+            <a class="ui calendar snooze" data-tooltip="Change due date">
+                <i class="calendar button icon"></i>
+            </a>
+        </div>
+    </div>
+</template>

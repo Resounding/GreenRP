@@ -1,7 +1,7 @@
-import { Prompt } from '../controls/prompt';
 import {autoinject, computedFrom} from 'aurelia-framework';
 import {DialogService} from 'aurelia-dialog';
 import {Router} from 'aurelia-router';
+import {Prompt} from '../controls/prompt';
 import {log} from '../../services/log';
 import {ActivitiesService, ActivitySaveResult} from '../../services/data/activities-service';
 import {OrdersService} from '../../services/data/orders-service';
@@ -191,6 +191,8 @@ export class ActivityDetail {
                             this.activity._id = result.activity._id;
                         }
                         this.activity._rev = result.activity._rev;
+                    } else {
+                        this.errors = result.errors;
                     }
 
                     resolve(result);

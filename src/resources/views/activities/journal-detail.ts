@@ -25,20 +25,23 @@ export class JournalDetail {
         this.service.getOne(params.id)
             .then(result => {
                 this.activity = result;
-                if(this.activity.status !== ActivityStatuses.Incomplete) {
-                        this.completed = true;
+                if(!ActivityStatuses.equals(this.activity.status, ActivityStatuses.Incomplete)) {
+                    this.completed = true;
+                }
+                if(!this.activity.journal) {
+                    this.activity.journal = new JournalDocument;                    
+                }
+                if(JournalRecordingTypes.equals(this.activity.recordingType, JournalRecordingTypes.CheckList)) {
+                    if(!this.activity.journal.checklist) {
+                        this.activity.journal.checklist = [];
                     }
-                    if(!this.activity.journal) {
-                        this.activity.journal = new JournalDocument;
+                    if(!this.activity.journal.checklist.length) {
+                        this.addToChecklist();
                     }
-                    if(this.activity.recordingType.toLowerCase() === JournalRecordingTypes.CheckList.toLowerCase()) {
-                        if(!this.activity.journal.checklist) {
-                            this.activity.journal.checklist = [];
-                        }
-                        if(!this.activity.journal.checklist.length) {
-                            this.addToChecklist();
-                        }
-                    }
+                }
+                if(!this.activity.journal.completedDate) {
+                    this.activity.journal.completedDate = new Date;
+                }
             });
 
         $('.button-container', this.element).visibility({ type: 'fixed', offset: 57});

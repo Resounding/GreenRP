@@ -1,26 +1,34 @@
 <template>
     <require from="styles/activities.css"></require>
 
-    <div class="ui">
+    <div class="ui" id="activity-detail-container">
         <div class="button-container">
-            <button type="button" class="ui basic red button text-nowrap" click.delegate="delete()" data-tooltip="Click to Delete this Activity" data-position="bottom right" hide.bind="activity.isNew">
+            <button type="button" class="ui basic red icon button" click.delegate="delete()" data-tooltip="Click to Delete this Activity" data-position="bottom right" hide.bind="activity.isNew">
                 <i class="trash button icon"></i>
-                Delete
+                <span class="hide-mobile">Delete</span>
             </button>
-            <button type="button" class="ui basic button" click.delegate="addJournal()" data-tooltip="Click to record a Journal entry for this Activity" data-position="bottom right">
-                <i class="browser icon"></i>
-                Add Journal
+            <button type="button" class="ui basic icon button" click.delegate="addJournal()" data-tooltip="Click to record a Journal entry for this Activity" data-position="bottom right">
+                <i class="browser button icon"></i>
+                <span class="hide-mobile">Add Journal</span>
             </button>
-            <a class="ui basic button" route-href="route: activities">Cancel</a>
-            <button type="button" class="ui basic primary button" click.delegate="save()">
+            <a class="ui basic icon button" route-href="route: activities">
+                <i class="undo button icon"></i>
+                <span class="hide-mobile">Cancel</span>
+            </a>
+            <button type="button" class="ui basic primary icon button" click.delegate="save()">
                 <i class="save button icon"></i>
-                Save
+                <span class="hide-mobile">Save</span>
             </button>
         </div>
 
         <h2>${title}</h2>
 
-        <form class="ui form segment ${errors.length ? 'error' : ''}">                
+        <form class="ui form segment ${errors.length ? 'error' : ''}">
+            <div class="ui error message" show.bind="errors.length">
+                <div class="ui list" repeat.for="e of errors">
+                    <div>${e}</div>
+                </div>
+            </div>
             <div class="fields row">
                 <div class="required field eight wide">
                     <label for="name">Name</label>
@@ -100,9 +108,9 @@
             <div class="ui divider">&nbsp;</div>
             </div>
             <div class="ui error message" show.bind="errors.length">
-                <ul class="ui list" repeat.for="e of errors">
-                    <li>${e}</li>
-                </ul>
+                <div class="ui list" repeat.for="e of errors">
+                    <div>${e}</div>
+                </div>
             </div>
         </form>        
     </div>

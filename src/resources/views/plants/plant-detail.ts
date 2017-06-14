@@ -1,5 +1,5 @@
 import {autoinject} from 'aurelia-framework';
-import {DialogController, DialogService, DialogResult} from 'aurelia-dialog';
+import {DialogController, DialogService} from 'aurelia-dialog';
 import {ErrorNotification} from '../controls/error-notification';
 import {Prompt} from '../controls/prompt';
 import {log} from '../../services/log';

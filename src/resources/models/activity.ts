@@ -19,6 +19,7 @@ export interface Activity {
 }
 
 export interface Journal {
+    completedDate?:Date;
     notes:string;
     checklist?:ChecklistItem[];
     measurement?:string|number;
@@ -68,6 +69,13 @@ export class ActivityDocument implements Activity {
         return this.assignedTo || 'Unassigned';
     }
 
+    @computedFrom('workType')
+    get colour():string {
+        if(WorkTypes.equals(this.workType, WorkTypes.Growing)) return 'green';
+        if(WorkTypes.equals(this.workType, WorkTypes.Labour)) return 'blue';
+        return 'grey';
+    }
+
     toJSON() {
         const json:Activity = {
             type: this.type,
@@ -102,6 +110,7 @@ export class ActivityDocument implements Activity {
 }
 
 export class JournalDocument implements Journal {
+    completedDate?:Date;
     notes:string;    
     checklist?:ChecklistItem[];
     measurement?:string|number;
@@ -156,6 +165,10 @@ export class ActivityStatuses {
             ActivityStatuses.Reviewed
         ];
     }
+
+    public static equals(a:ActivityStatus, b:ActivityStatus):boolean {
+        return equals(a, b);
+    }
 }
 
 export type ActivityStatus = 'Not Started' | 'Incomplete' | 'Snoozed' | 'Complete' | 'Reviewed';
@@ -171,6 +184,10 @@ export class WorkTypes {
             WorkTypes.Growing,
             WorkTypes.Other
         ];
+    }
+
+    public static equals(a:WorkType, b:WorkType):boolean {
+        return equals(a, b);
     }
 }
 
@@ -188,6 +205,10 @@ export class JournalRecordingTypes {
             JournalRecordingTypes.Measurement
         ]
     }
+
+    public static equals(a:JournalRecordingType, b:JournalRecordingType):boolean {
+        return equals(a, b);
+    }
 }
 
 export class ChecklistItem {
@@ -196,4 +217,9 @@ export class ChecklistItem {
     toJSON() {
         return this.value;
     }
+}
+
+function equals(a:string, b:string) {
+    if(a == null || b == null) return false;
+    return a.toLowerCase() === b.toLowerCase();
 }

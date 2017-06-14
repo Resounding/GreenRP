@@ -3,20 +3,23 @@
 
     <div class="ui">
         <div class="button-container">
-            <button type="button" class="ui basic button" click.delegate="editActivity()" data-tooltip="Click to edit the Activity information" data-position="bottom right">
-                <i class="edit icon"></i>
-                Edit Activity
+            <button type="button" class="ui basic icon button" click.delegate="editActivity()" data-tooltip="Click to edit the Activity information" data-position="bottom right">
+                <i class="edit button icon"></i>
+                <span class="hide-mobile">Edit Activity</span>
             </button>
-            <a class="ui basic button" route-href="route: activities">Cancel</a>
-            <button type="button" class="ui basic primary button" click.delegate="save()">
+            <a class="ui basic icon button" route-href="route: activities">
+                <i class="undo button icon"></i>
+                <span class="hide-mobile">Cancel</span>
+            </a>
+            <button type="button" class="ui basic primary icon button" click.delegate="save()">
                 <i class="save button icon"></i>
-                Save
+                <span class="hide-mobile">Save</span>
             </button>
         </div>
 
         <h2>${title}</h2>
 
-        <form class="ui form segment ${errors.length ? 'error' : ''}">
+        <form class="ui form ${errors.length ? 'error' : ''}">
             <div class="fields row">
                 <div class="field">
                     <label for="completion-status">Activity was not completed&nbsp;&nbsp;</label>
@@ -29,6 +32,10 @@
                 </div>
                 <div class="field">
                     <label for="completion-status">&nbsp;&nbsp;Activity was completed</label>
+                </div>
+                <div class="field" show.bind="completed">
+                    <label for="completedDate">Completed:</label>
+                    <input type="date" value.bind="activity.journal.completedDate">
                 </div>
             </div>
             <div class="fields row" show.bind="completed && isMeasurement">

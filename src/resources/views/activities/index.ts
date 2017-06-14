@@ -1,8 +1,8 @@
-import {autoinject} from 'aurelia-framework';
+import {autoinject, computedFrom} from 'aurelia-framework';
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {DialogService} from 'aurelia-dialog';
 import {ActivityDetail} from './activity-detail';
-import {ActivityDocument} from '../../models/activity';
+import { ActivityDocument, ActivityStatus, ActivityStatuses } from '../../models/activity';
 import {Authentication, Roles} from '../../services/authentication';
 import {Database} from '../../services/database';
 import {log} from "../../services/log";
@@ -10,11 +10,13 @@ import {ActivitiesService} from '../../services/data/activities-service';
 
 @autoinject
 export class ActivityIndex {
-    allActivities:ActivityDocument[];
-    activities:ActivityDocument[];
+    allActivities:ActivityDocument[] = [];
+    activities:ActivityDocument[] = [];
     activitySyncChangeSubscription:Subscription;
     activitiesChangedSubscription:Subscription;
+    filtersExpanded:boolean = false;
     private _showAll:boolean = false;
+    private _showCompleted:boolean = false;
 
     constructor(private dialogService:DialogService, private service:ActivitiesService,
         private auth:Authentication, private events:EventAggregator, private element:Element) { }
@@ -41,6 +43,10 @@ export class ActivityIndex {
             });;
     }
 
+    toggleFiltersExpanded() {
+        this.filtersExpanded = !this.filtersExpanded;
+    }
+
     detail(activity:ActivityDocument) {
         this.dialogService.open({ viewModel: ActivityDetail, model: activity })
             .whenClosed(result => {
@@ -51,12 +57,23 @@ export class ActivityIndex {
             });
     }
 
+    @computedFrom('_showAll')
     get showAll():boolean {
         return this._showAll;
     }
 
     set showAll(value:boolean) {
         this._showAll = value;
+        this.filter();
+    }
+
+    @computedFrom('_showCompleted')
+    get showCompleted():boolean {
+        return this._showCompleted;
+    }
+
+    set showCompleted(value:boolean) {
+        this._showCompleted = value;
         this.filter();
     }
 
@@ -69,8 +86,12 @@ export class ActivityIndex {
     }
 
     private filter() {
-        this.activities = this._showAll ?
-            this.allActivities :
-            this.allActivities.filter(a => a.assignedTo === this.auth.userInfo.name);
+        this.activities = this.allActivities;
+        if(!this._showAll) {
+            this.activities = this.activities.filter(a => a.assignedTo === this.auth.userInfo.name);
+        }
+        if(!this._showCompleted) {
+            this.activities = this.activities.filter(a => !ActivityStatuses.equals(a.status, ActivityStatuses.Complete))
+        }
     }
 }

@@ -1,53 +1,41 @@
 <template>
     <require from="styles/activities.css"></require>
+    <require from="./activity-card"></require>
 
-    <div class="ui segments">
-        <div class="ui segment stackable grid">
-            <h2 class="ui header four wide column">Activities</h2>
-            <div class="eight wide column">
-                <div class="ui toggle checkbox left floated">
-                    <input type="checkbox" id="showall" checked.bind="showAll">
-                    <label for="repeating-order">Show All Users</label>
+    <div class="ui" id="activities-list">
+        <div class="filters ui clearing segment ${filtersExpanded ? 'expanded' : 'collapsed'}">
+            <a class="basic ui positive icon button left floated" route-href="route: activity-detail; params.bind: { id: 'new' }">
+                <i class="plus icon"></i>
+                Add Activity
+            </a>
+            <button class="ui icon button basic right floated hide-desktop mini" click.trigger="toggleFiltersExpanded()">
+                <i class="dropdown icon ${filtersExpanded ? 'vertically flipped' : ''}"></i>
+            </button>
+            <div class="ui clearing divider"></div>
+            <div class="filter-grid ui two column grid stackable container">
+                <div class="column">
+                    <div class="ui toggle checkbox">
+                        <input type="checkbox" id="showall" checked.bind="showAll">
+                        <label for="showall">Show All Users</label>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="ui toggle checkbox">
+                        <input type="checkbox" id="showcomplete" checked.bind="showCompleted">
+                        <label for="showcomplete">Show Completed Items</label>
+                    </div>
                 </div>
             </div>
-            <div class="four wide column text-right">
-                <a class="basic ui positive button" route-href="route: activity-detail; params.bind: { id: 'new' }">
-                    <i class="plus icon"></i>
-                    Add Activity
-                </a>
-            </div>
         </div>
-        <div class="ui secondary segment">
-            <table class="ui single line table">
-                <thead>
-                    <tr>
-                        <th>Activity</th>
-                        <th>Due Date</th>
-                        <th>Assigned To</th>
-                        <th>Work Type</th>
-                        <th>Recipe</th>
-                        <th>Crop</th>
-                        <th>Status</th>
-                        <th>&nbsp;</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr repeat.for="a of activities | sort:'date'">
-                        <td>
-                            <a route-href="route: activity-detail; params.bind: { id: a._id }">${a.name}</a>
-                        </td>
-                        <td>${a.dateDisplay}</td>
-                        <td>${a.assignedToDisplay}</td>
-                        <td></td>
-                        <td></td>
-                        <td>${a.crop}</td>
-                        <td>${a.status}</td>
-                        <td>
-                            <a route-href="route: journal-detail; params.bind: { id: a._id }">Journal</a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="ui cards" show.bind="activities.length">
+            <div as-element="activity-card" class="ui card ${a.colour}" activity.bind="a" repeat.for="a of activities | sort:'date'"></div>
+        </div>
+        <div class="ui message" hide.bind="activities.length">
+            <div class="header">No Activities</div>
+            <p>
+                There aren't any Activities. You can change the filters above, or
+                <a route-href="route: activity-detail; params.bind: { id: 'new' }">add an activity</a> now.
+            </p>
         </div>
     </div>
 </template>

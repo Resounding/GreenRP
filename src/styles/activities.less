@@ -1,15 +1,34 @@
-.button-container {
-    padding: 0;
-    display: inline-block;
+#activity-detail-container {
+    .button-container {
+        padding: 0;
+        display: inline-block;
 
-    &.fixed {
-        transition: all 0.5s ease;
-        position: fixed;
-        padding: 1em;
-        background-color: #fff;
+        &.fixed {
+            transition: all 0.5s ease;
+            position: fixed;
+            padding: 1em;
+            background-color: #fff;
 
-        @media only screen and (max-width: 1199px) and (min-width: 992px) {
-            width: 933px;   
+            @media only screen and (max-width: 1199px) and (min-width: 992px) {
+                width: 933px;   
+            }
+        }
+    }
+}
+
+#activities-list {
+    & > .filters.expanded {
+        .button.positive {
+            margin-bottom: 10px;
+        }
+    }
+
+    & > .filters.collapsed {
+        @media only screen and (max-width: 767px) {
+            .ui.clearing.divider,
+            .filter-grid {
+                display: none;
+            }
         }
     }
 }
