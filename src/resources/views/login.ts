@@ -1,5 +1,6 @@
-import {autoinject} from 'aurelia-framework';
+import {autoinject, Aurelia} from 'aurelia-framework';
 import {Authentication} from '../services/authentication';
+import {Configuration} from "../services/configuration";
 
 @autoinject()
 export class Login {
@@ -7,7 +8,7 @@ export class Login {
     password:string;
     errorMessage:string;
 
-    constructor(private auth:Authentication) { }
+    constructor(private auth:Authentication, private app:Aurelia, private config:Configuration) { }
 
     login() {
         this.errorMessage = '';
@@ -17,6 +18,9 @@ export class Login {
 
         if(!this.errorMessage) {
             this.auth.login(this.username, this.password)
+                .then(() => {
+                    this.app.setRoot(this.config.app_root);
+                })
                 .catch(err => {
                     this.errorMessage = err.message;
                 });

@@ -12,7 +12,7 @@ export class App {
 
     activate() {
         this.addFooter();
-        //this.auth.refreshProfile();
+        return this.auth.refreshProfile();
     }
 
     configureRouter(config:RouterConfiguration, router:Router) {

@@ -63,7 +63,6 @@ export class Authentication {
 
                             saveUserInfo();
 
-                            this.app.setRoot(this.config.app_root);
                             this.events.publish(Authentication.AuthenticatedEvent);
                             return resolve(user_info);
                         });
