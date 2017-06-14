@@ -17,6 +17,7 @@ export class ActivityIndex {
     filtersExpanded:boolean = false;
     private _showAll:boolean = false;
     private _showCompleted:boolean = false;
+    private _showIncomplete:boolean = false;
 
     constructor(private dialogService:DialogService, private service:ActivitiesService,
         private auth:Authentication, private events:EventAggregator, private element:Element) { }
@@ -77,6 +78,16 @@ export class ActivityIndex {
         this.filter();
     }
 
+    @computedFrom('_showIncomplete')
+    get showIncomplete():boolean {
+        return this._showIncomplete;
+    }
+
+    set showIncomplete(value:boolean) {
+        this._showIncomplete = value;
+        this.filter();
+    }
+
     private load() {
         this.service.getAll()
             .then(result => {
@@ -92,6 +103,9 @@ export class ActivityIndex {
         }
         if(!this._showCompleted) {
             this.activities = this.activities.filter(a => !ActivityStatuses.equals(a.status, ActivityStatuses.Complete))
+        }
+        if(!this._showIncomplete) {
+            this.activities = this.activities.filter(a => !ActivityStatuses.equals(a.status, ActivityStatuses.Incomplete))
         }
     }
 }

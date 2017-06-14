@@ -1,11 +1,11 @@
-import {Notifications} from '../../services/notifications';
 import {autoinject, computedFrom, bindable} from 'aurelia-framework';
+import {Notifications} from '../../services/notifications';
 import {ActivitiesService} from '../../services/data/activities-service';
-import {Activity} from '../../models/activity';
+import {ActivityDocument, ActivityStatuses} from '../../models/activity';
 
 @autoinject
 export class ActivityCard {
-    @bindable activity:Activity;
+    @bindable activity:ActivityDocument;
 
     constructor(private service:ActivitiesService, private element:Element) { }
 
@@ -18,6 +18,11 @@ export class ActivityCard {
 
     detached() {
         $('.calendar.snooze', this.element).calendar('destroy');
+    }
+
+    @computedFrom('activity.status')
+    get done():boolean {
+        return ActivityStatuses.equals(this.activity.status, ActivityStatuses.Complete) || ActivityStatuses.equals(this.activity.status, ActivityStatuses.Incomplete);
     }
 
     onSnoozeChange(value:string) {

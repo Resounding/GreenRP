@@ -25,6 +25,12 @@
                         <label for="showcomplete">Show Completed Items</label>
                     </div>
                 </div>
+                <div class="column">
+                    <div class="ui toggle checkbox">
+                        <input type="checkbox" id="showincomplete" checked.bind="showIncomplete">
+                        <label for="showincomplete">Show Incomplete Items</label>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="ui cards" show.bind="activities.length">

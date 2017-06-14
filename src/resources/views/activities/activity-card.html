@@ -1,6 +1,6 @@
 <template>
     <div class="content">
-        <div class="header">
+        <div class="ui header ${done ? 'disabled' : ''}">
             <a route-href="route: activity-detail; params.bind: { id: activity._id }">
                 ${activity.name}
             </a>
