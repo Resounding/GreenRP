@@ -1,0 +1,35 @@
+<template>
+    <ux-dialog>
+        <ux-dialog-body>
+            <form class="ui form segment ${errors.length ? 'error' : ''}">
+                <div class="fields row">
+                    <div class="field sixteen wide">
+                        <label for="notes">Notes:</label>
+                        <textarea id="notes" value.bind="notes" rows="2" attach-focus="true"></textarea>
+                    </div>
+                </div>
+                <div class="fields row">
+                    <div class="field sixteen wide" show.bind="isMeasurement">
+                        <label for="measurement">Measurement:</label>
+                        <div class="ui labeled input">
+                            <input type="text" id="measurement" value.bind="measurement">
+                            <div class="ui label">${activity.unitOfMeasure}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ui divider" show.bind="errors.length">&nbsp;</div>
+                </div>
+                <div class="ui error message" show.bind="errors.length">
+                    <div class="ui list" repeat.for="e of errors">
+                        <div>${e}</div>
+                    </div>
+                </div>
+            </form>
+        </ux-dialog-body>
+
+        <ux-dialog-footer>
+            <button type="button" click.trigger="controller.cancel()" class="ui button basic">Cancel</button>
+            <button type="button" click.trigger="save()" class="ui button primary">OK</button>
+        </ux-dialog-footer>
+    </ux-dialog>
+</template>

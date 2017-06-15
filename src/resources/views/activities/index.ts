@@ -2,7 +2,7 @@ import {autoinject, computedFrom} from 'aurelia-framework';
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {DialogService} from 'aurelia-dialog';
 import {ActivityDetail} from './activity-detail';
-import { ActivityDocument, ActivityStatus, ActivityStatuses } from '../../models/activity';
+import {ActivityDocument, ActivityStatus, ActivityStatuses, WorkType, WorkTypes} from '../../models/activity';
 import {Authentication, Roles} from '../../services/authentication';
 import {Database} from '../../services/database';
 import {log} from "../../services/log";
@@ -12,9 +12,11 @@ import {ActivitiesService} from '../../services/data/activities-service';
 export class ActivityIndex {
     allActivities:ActivityDocument[] = [];
     activities:ActivityDocument[] = [];
+    workTypes:WorkType[];
     activitySyncChangeSubscription:Subscription;
     activitiesChangedSubscription:Subscription;
     filtersExpanded:boolean = false;
+    private _workType:WorkType = null;
     private _showAll:boolean = false;
     private _showCompleted:boolean = false;
     private _showIncomplete:boolean = false;
@@ -26,12 +28,25 @@ export class ActivityIndex {
         this.activitySyncChangeSubscription = this.events.subscribe(Database.ActivitiesSyncChangedEvent, this.load.bind(this));        
         this.activitiesChangedSubscription = this.events.subscribe(ActivitiesService.ActivitiesChangedEvent, this.load.bind(this));
 
+        this.workTypes = [WorkTypes.ALL_WORK_TYPES].concat(WorkTypes.getAll());
+
         this.load();
     }
 
     deactivate() {
         this.activitySyncChangeSubscription.dispose();
         this.activitiesChangedSubscription.dispose();
+    }
+
+    attached() {
+        $('.dropdown.work-type', this.element).dropdown({
+            forceSelection: true,
+            onChange: this.onWorkTypeChange.bind(this)
+        });
+    }
+
+    detached() {
+        $('.dropdown', this.element).dropdown('destroy');
     }
 
     add() {
@@ -107,5 +122,13 @@ export class ActivityIndex {
         if(!this._showIncomplete) {
             this.activities = this.activities.filter(a => !ActivityStatuses.equals(a.status, ActivityStatuses.Incomplete))
         }
+        if(this._workType && !WorkTypes.equals(this._workType, WorkTypes.ALL_WORK_TYPES)) {
+            this.activities = this.activities.filter(a => WorkTypes.equals(a.workType, this._workType));
+        }
+    }
+
+    private onWorkTypeChange(value:WorkType) {
+        this._workType = value;
+        this.filter();
     }
 }

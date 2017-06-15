@@ -1,29 +1,43 @@
 <template>
-    <div class="content">
-        <div class="ui header ${done ? 'disabled' : ''}">
-            <a route-href="route: activity-detail; params.bind: { id: activity._id }">
-                ${activity.name}
-            </a>
+    <div class="ui card ${colour} ${done ? 'done' : ''}">
+        <div class="content">
+            <div class="header">
+                <a route-href="route: activity-detail; params.bind: { id: activity._id }">
+                    ${activity.name}
+                </a>
+            </div>
+            <div class="meta">                
+                <div class="ui inline dropdown assigned-to">
+                    <div class="text">${assignedToDisplay}</div>
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                        <div class="item" repeat.for="user of users">${user}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="description">
+                <p show.bind="activity.description">Description: ${activity.description}</p>
+                <p show.bind="activity.crops.length">Crop${activity.crops.length > 1 ? 's' : ''}: ${activity.crops.join(', ')}</p>
+                <p show.bind="activity.zones.length">Zone${activity.zones.length > 1 ? 's' : ''}: ${activity.zones.join(', ')}</p>
+            </div>
         </div>
-        <div class="meta">
-            <span class="category">${activity.status}</span>
-            <span class="right floated ui time">
-                ${activity.assignedToDisplay}
-            </span>
-        </div>
-        <div class="description">${activity.description}</div>
-    </div>
-    <div class="extra content">
-        <a route-href="route: journal-detail; params.bind: { id: activity._id }" class="ui left floated" data-tooltip="Add Journal entry">
-            <i class="browser icon"></i>
-            Journal
-        </a>
-        <div class="ui right floated">
-            <span>${activity.dateDisplay}</span>
-            &nbsp;
-            <a class="ui calendar snooze" data-tooltip="Change due date">
-                <i class="calendar button icon"></i>
-            </a>
+        <div class="extra content">
+            <div class="ui inline dropdown status">
+                <div class="text">${activity.status}</div>
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                    <div class="item" repeat.for="status of statuses" data-value.one-time="status.status">
+                        ${status.text}
+                    </div>
+                </div>
+            </div>
+            <div class="ui right floated">
+                <span>${dateDisplay}</span>
+                &nbsp;
+                <a class="ui calendar snooze" data-tooltip="Change due date">
+                    <i class="calendar button icon"></i>
+                </a>
+            </div>
         </div>
     </div>
 </template>

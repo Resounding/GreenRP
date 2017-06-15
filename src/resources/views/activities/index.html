@@ -6,7 +6,7 @@
         <div class="filters ui clearing segment ${filtersExpanded ? 'expanded' : 'collapsed'}">
             <a class="basic ui positive icon button left floated" route-href="route: activity-detail; params.bind: { id: 'new' }">
                 <i class="plus icon"></i>
-                Add Activity
+                New Activity
             </a>
             <button class="ui icon button basic right floated hide-desktop mini" click.trigger="toggleFiltersExpanded()">
                 <i class="dropdown icon ${filtersExpanded ? 'vertically flipped' : ''}"></i>
@@ -31,10 +31,22 @@
                         <label for="showincomplete">Show Incomplete Items</label>
                     </div>
                 </div>
+                <div class="column">
+                    <span>
+                        Work Types:
+                        <div class="ui inline dropdown work-type">
+                            <div class="text">All</div>
+                            <i class="dropdown icon"></i>
+                            <div class="menu">
+                                <div class="item" repeat.for="workType of workTypes">${workType}</div>
+                            </div>
+                        </div>                        
+                    </span>
+                </div>
             </div>
         </div>
         <div class="ui cards" show.bind="activities.length">
-            <div as-element="activity-card" class="ui card ${a.colour}" activity.bind="a" repeat.for="a of activities | sort:'date'"></div>
+            <activity-card activity.bind="a" repeat.for="a of activities | sort:'date'"></activity-card>
         </div>
         <div class="ui message" hide.bind="activities.length">
             <div class="header">No Activities</div>

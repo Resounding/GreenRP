@@ -1,15 +1,11 @@
 <template>
     <require from="styles/activities.css"></require>
 
-    <div class="ui" id="activity-detail-container">
+    <div class="ui ${activity.isNew ? 'new' : ''}" id="activity-detail-container">
         <div class="button-container">
             <button type="button" class="ui basic red icon button" click.delegate="delete()" data-tooltip="Click to Delete this Activity" data-position="bottom right" hide.bind="activity.isNew">
                 <i class="trash button icon"></i>
                 <span class="hide-mobile">Delete</span>
-            </button>
-            <button type="button" class="ui basic icon button" click.delegate="addJournal()" data-tooltip="Click to record a Journal entry for this Activity" data-position="bottom right">
-                <i class="browser button icon"></i>
-                <span class="hide-mobile">Add Journal</span>
             </button>
             <a class="ui basic icon button" route-href="route: activities">
                 <i class="undo button icon"></i>
@@ -21,9 +17,9 @@
             </button>
         </div>
 
-        <h2>${title}</h2>
-
         <form class="ui form segment ${errors.length ? 'error' : ''}">
+            <!-- Activity -->
+            <h4 class="ui dividing header">${title}</h4>
             <div class="ui error message" show.bind="errors.length">
                 <div class="ui list" repeat.for="e of errors">
                     <div>${e}</div>
@@ -32,12 +28,12 @@
             <div class="fields row">
                 <div class="required field eight wide">
                     <label for="name">Name</label>
-                    <input type="text" id="name" value.bind="activity.name" attach-focus="true">
+                    <input type="text" id="name" value.bind="activity.name" autofocus>
                 </div>
                 <div class="field four wide">
                     <label>Due Date</label>
                     <div class="calendar">
-                        <span class="date-display">${activity.dateDisplay}</span>
+                        <span class="date-display">${dateDisplay}</span>
                     </div>
                 </div>
             </div>
@@ -100,11 +96,48 @@
                 </div>
             </div>
             <div class="fields row">
-                <div class="required field sixteen wide">
+                <div class="field sixteen wide">
                     <label for="description">Description</label>
                     <textarea id="description" value.bind="activity.description"></textarea>
                 </div>                    
             </div>
+            <!-- End Activity -->
+            <!-- Journal -->
+            <h4 class="ui dividing header journal">Outcome</h4>
+            <div class="fields row journal">
+                <div class="field">
+                    <label for="completion-status">Activity was not completed&nbsp;&nbsp;</label>
+                </div>
+                <div class="field">
+                    <div class="ui fitted toggle checkbox">
+                        <input type="checkbox" id="completion-status" checked.bind="completed">
+                        <label></label>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="completion-status">&nbsp;&nbsp;Activity was completed</label>
+                </div>
+                <div class="field" show.bind="completed">
+                    <label for="completedDate">Completed:</label>
+                    <input type="date" value.bind="activity.journal.completedDate">
+                </div>
+            </div>
+            <div class="fields row journal" show.bind="isMeasurement">
+                <div class="field four wide">
+                    <label for="measurement">Measurement</label>
+                    <div class="ui labeled input">
+                        <input type="text" id="measurement" value.bind="activity.journal.measurement">
+                        <div class="ui label">${activity.unitOfMeasure}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="fields row journal">
+                <div class="field sixteen wide">
+                    <label for="notes">Notes</label>
+                    <textarea id="notes" value.bind="activity.journal.notes"></textarea>
+                </div>                    
+            </div>
+            <!-- End Journal -->
             <div class="ui divider">&nbsp;</div>
             </div>
             <div class="ui error message" show.bind="errors.length">
@@ -112,6 +145,6 @@
                     <div>${e}</div>
                 </div>
             </div>
-        </form>        
+        </form>
     </div>
 </template>

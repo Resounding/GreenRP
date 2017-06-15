@@ -32,7 +32,7 @@ export class ActivityDocument implements Activity {
     name:string;
     date:Date = new Date;
     status:ActivityStatus = ActivityStatuses.NotStarted;
-    workType:WorkType = WorkTypes.Other;
+    workType:WorkType = null;
     description:string;
     crops?:string[] = [];
     zones?:Zone[] = [];
@@ -55,25 +55,6 @@ export class ActivityDocument implements Activity {
     @computedFrom('_id')
     get isNew():boolean {
         return !this._id;
-    }
-
-    @computedFrom('date')
-    get dateDisplay():string {
-        if(!this.date) return 'Not Set';
-
-        return moment(this.date).format('ddd, MMM D, YYYY');
-    }
-
-    @computedFrom('assignedTo')
-    get assignedToDisplay():string {
-        return this.assignedTo || 'Unassigned';
-    }
-
-    @computedFrom('workType')
-    get colour():string {
-        if(WorkTypes.equals(this.workType, WorkTypes.Growing)) return 'green';
-        if(WorkTypes.equals(this.workType, WorkTypes.Labour)) return 'blue';
-        return 'grey';
     }
 
     toJSON() {
@@ -152,7 +133,6 @@ export class JournalDocument implements Journal {
 export class ActivityStatuses {
     public static NotStarted:ActivityStatus = 'Not Started';
     public static Incomplete:ActivityStatus = 'Incomplete';
-    public static Snoozed:ActivityStatus = 'Snoozed';
     public static Complete:ActivityStatus = 'Complete';
     public static Reviewed:ActivityStatus = 'Reviewed';
 
@@ -160,7 +140,6 @@ export class ActivityStatuses {
         return [
             ActivityStatuses.NotStarted,
             ActivityStatuses.Incomplete,
-            ActivityStatuses.Snoozed,
             ActivityStatuses.Complete,
             ActivityStatuses.Reviewed
         ];
@@ -171,27 +150,27 @@ export class ActivityStatuses {
     }
 }
 
-export type ActivityStatus = 'Not Started' | 'Incomplete' | 'Snoozed' | 'Complete' | 'Reviewed';
+export type ActivityStatus = 'Not Started' | 'Incomplete' | 'Complete' | 'Reviewed';
 
 export class WorkTypes {
     public static Labour:WorkType = 'Labour';
     public static Growing:WorkType = 'Growing';
-    public static Other:WorkType = 'Other';
 
     public static getAll():WorkType[] {
         return [
-            WorkTypes.Labour,
             WorkTypes.Growing,
-            WorkTypes.Other
+            WorkTypes.Labour
         ];
     }
+
+    public static ALL_WORK_TYPES:WorkType = <WorkType>'All';
 
     public static equals(a:WorkType, b:WorkType):boolean {
         return equals(a, b);
     }
 }
 
-export type WorkType = 'Labour' | 'Growing' | 'Other';
+export type WorkType = 'Labour' | 'Growing';
 
 export type JournalRecordingType = 'Measurement' | 'Checklist';
 
@@ -209,6 +188,10 @@ export class JournalRecordingTypes {
     public static equals(a:JournalRecordingType, b:JournalRecordingType):boolean {
         return equals(a, b);
     }
+}
+
+export class AssignedTo {
+    public static UNASSIGNED:string = 'Unassigned';
 }
 
 export class ChecklistItem {

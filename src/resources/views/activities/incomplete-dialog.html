@@ -1,0 +1,26 @@
+<template>
+    <ux-dialog>
+        <ux-dialog-body>
+            <form class="ui form segment ${errors.length ? 'error' : ''}">
+                <div class="fields row">
+                    <div class="required field sixteen wide">
+                        <label for="reason">Reason activity was not completed:</label>
+                        <textarea id="reason" value.bind="reason" rows="3" attach-focus="true"></textarea>
+                    </div>                    
+                </div>
+                <div class="ui divider" show.bind="errors.length">&nbsp;</div>
+                </div>
+                <div class="ui error message" show.bind="errors.length">
+                    <div class="ui list" repeat.for="e of errors">
+                        <div>${e}</div>
+                    </div>
+                </div>
+            </form>
+        </ux-dialog-body>
+
+        <ux-dialog-footer>
+            <button type="button" click.trigger="controller.cancel()" class="ui button basic">Cancel</button>
+            <button type="button" click.trigger="save()" class="ui button primary">OK</button>
+        </ux-dialog-footer>
+    </ux-dialog>
+</template>

@@ -2,6 +2,7 @@ import {autoinject, computedFrom} from 'aurelia-framework';
 import {DialogService} from 'aurelia-dialog';
 import {Router} from 'aurelia-router';
 import {Prompt} from '../controls/prompt';
+import {Authentication, Roles} from '../../services/authentication';
 import {log} from '../../services/log';
 import {ActivitiesService, ActivitySaveResult} from '../../services/data/activities-service';
 import {OrdersService} from '../../services/data/orders-service';
@@ -11,6 +12,7 @@ import {
     ActivityDocument,
     ActivityStatus,
     ActivityStatuses,
+    JournalDocument,
     JournalRecordingType,
     JournalRecordingTypes,
     WorkType,
@@ -30,7 +32,7 @@ export class ActivityDetail {
     journalShowing:boolean = false;
     journalRecordingTypes:JournalRecordingType[];
     
-    constructor(private service:ActivitiesService, private router:Router,
+    constructor(private service:ActivitiesService, private router:Router, private auth:Authentication,
         private referenceService:ReferenceService, private usersService:UsersService,
         private ordersService:OrdersService, private dialogService:DialogService, private element:Element) { }
 
@@ -57,9 +59,22 @@ export class ActivityDetail {
 
         if(params.id === 'new') {
             this.activity = new ActivityDocument;
+            this.activity.date = new Date;
+            if(this.auth.isInRole(Roles.Grower)) {
+                this.activity.assignedTo = this.auth.userInfo.name;
+                this.activity.workType = WorkTypes.Growing;
+            } else if(this.auth.isInRole(Roles.LabourSupervisor)) {
+                this.activity.assignedTo = this.auth.userInfo.name;
+                this.activity.workType = WorkTypes.Labour;
+            }
         } else {
             actions.push(this.service.getOne(params.id)
-                .then(result => this.activity = result));
+                .then(result => {
+                    this.activity = result;
+                    if(!this.activity.journal) {
+                        this.activity.journal = new JournalDocument;
+                    }
+                }));
         }
 
         this.workTypes = WorkTypes.getAll();
@@ -174,6 +189,13 @@ export class ActivityDetail {
     @computedFrom('activity.isNew')
     get title():string {
         return this.activity && this.activity.isNew ? 'New Activity' : this.activity.name;
+    }
+
+    @computedFrom('activity.date')
+    get dateDisplay():string {
+        if(!this.activity.date) return 'Not Set';
+
+        return moment(this.activity.date).format('ddd, MMM D, YYYY');
     }
 
     @computedFrom('activity.recordingType')

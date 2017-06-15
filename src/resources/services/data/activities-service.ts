@@ -55,10 +55,6 @@ export class ActivitiesService {
                 result.ok = false;
                 result.errors.push('Please choose a valid due date.');
             }
-            if(!doc.description) {
-                result.ok = false;
-                result.errors.push('The Description is required.');
-            }
 
             if(!result.ok) {
                 return resolve(result);
