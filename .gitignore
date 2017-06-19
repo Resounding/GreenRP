@@ -1,6 +1,7 @@
 node_modules
 .idea
 .DS_STORE
-scripts/app-bundle.*
-scripts/vendor-bundle.*
+scripts/app-bundle*
+scripts/vendor-bundle*
 themes/
+src/environment.ts
