@@ -159,7 +159,11 @@ export class ActivityCard {
                 .whenClosed(result => {
                     if(result.wasCancelled) return;
 
-                    this.activity.description = result.output;
+                    if(!this.activity.journal) {
+                        this.activity.journal = new JournalDocument;
+                    }
+
+                    this.activity.journal.notes = result.output;
                     save();
                 });
         } else if(ActivityStatuses.equals(value, WITH_COMMENT) ||
