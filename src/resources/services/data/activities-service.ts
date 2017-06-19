@@ -49,7 +49,7 @@ export class ActivitiesService {
             
             if(!doc.name) {
                 result.ok = false;
-                result.errors.push('The Activity is required.')
+                result.errors.push('The Activity Name is required.')
             }
             if(!doc.date || !moment(doc.date).isValid()) {
                 result.ok = false;

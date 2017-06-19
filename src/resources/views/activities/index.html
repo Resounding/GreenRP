@@ -46,7 +46,7 @@
             </div>
         </div>
         <div class="ui cards" show.bind="activities.length">
-            <activity-card activity.bind="a" repeat.for="a of activities | sort:'date'"></activity-card>
+            <activity-card users.bind="users" activity.bind="a" repeat.for="a of activities | sort:'date'"></activity-card>
         </div>
         <div class="ui message" hide.bind="activities.length">
             <div class="header">No Activities</div>

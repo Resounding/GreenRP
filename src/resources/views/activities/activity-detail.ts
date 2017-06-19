@@ -101,13 +101,40 @@ export class ActivityDetail {
         if(this.activity.zones && this.activity.zones.length) {
             $zone.dropdown('set selected', this.activity.zones.map(z => z.name));
         }
-        $('.dropdown.recording-type', this.element)
-            .dropdown({ onChange: this.onRecordingTypeChange.bind(this) })
-            .dropdown('set selected', this.activity.recordingType);
-        $('.calendar', this.element).calendar({
+        $('.calendar.due-date', this.element).calendar({
             type: 'date',
-            onChange: this.onDateChange.bind(this)
+            firstDayOfWeek: 1,
+            onChange: this.onDateChange.bind(this),
+            formatter: {
+                cell: (cell:jQuery, date:Date, cellOptions:any) => {
+                    if(cellOptions.mode === 'day' && date.getDay() === 1) {
+                        const week = moment(date).isoWeek(),
+                            text = cell.text(),
+                            html =  `<span class="ui blue basic ribbon label">${week}</span>&nbsp;${text}`;
+                        cell.html(html);
+                    }
+                }
+            }
+        }).calendar('set date', this.activity.date);
+
+        const $completedDate = $('.calendar.completed-date', this.element).calendar({
+            type: 'date',
+            firstDayOfWeek: 1,
+            onChange: this.onCompletedDateChange.bind(this),
+            formatter: {
+                cell: (cell:jQuery, date:Date, cellOptions:any) => {
+                    if(cellOptions.mode === 'day' && date.getDay() === 1) {
+                        const week = moment(date).isoWeek(),
+                            text = cell.text(),
+                            html =  `<span class="ui blue basic ribbon label">${week}</span>&nbsp;${text}`;
+                        cell.html(html);
+                    }
+                }
+            }
         });
+        if(this.activity.journal && this.activity.journal.completedDate) {
+            $completedDate.calendar('set date', this.activity.journal.completedDate);
+        }
         $('.button-container', this.element).visibility({ type: 'fixed', offset: 57});
     }
 
@@ -122,6 +149,19 @@ export class ActivityDetail {
             .then(result => {
                 if(result.ok) {
                     this.goHome();
+                }
+            });
+    }
+
+    saveAndComplete() {
+        this.activity.status = ActivityStatuses.Complete;
+        this.activity.journal = new JournalDocument;
+        this.activity.journal.completedDate = new Date;
+
+        this.saveActivity()
+            .then(result => {
+                if(result.ok) {
+                    this.router.navigateToRoute('activity-detail', { id: result.activity._id });
                 }
             });
     }
@@ -163,6 +203,10 @@ export class ActivityDetail {
         const date = moment(value).toDate();
         this.activity.date = date;
     }
+    onCompletedDateChange(value:string) {
+        const date = moment(value).toDate();
+        this.activity.journal.completedDate = date;
+    }
     onStatusChange(value:ActivityStatus) {
         this.activity.status = value;
     }
@@ -171,12 +215,6 @@ export class ActivityDetail {
     }
     onWorkTypeChange(value:WorkType) {
         this.activity.workType = value;
-    }
-    onRecordingTypeChange(value:JournalRecordingType) {
-        this.activity.recordingType = value;
-        if(value.toLowerCase() === JournalRecordingTypes.CheckList.toLowerCase()) {
-            this.activity.unitOfMeasure = null;
-        }
     }
     onCropChange(values:string[]) {
         this.activity.crops = values;
@@ -201,6 +239,28 @@ export class ActivityDetail {
     @computedFrom('activity.recordingType')
     get isMeasurement():boolean {
         return this.activity && this.activity.recordingType.toLowerCase() === JournalRecordingTypes.Measurement.toLowerCase();
+    }
+
+    set isMeasurement(value:boolean) {
+        this.activity.recordingType = value ? JournalRecordingTypes.Measurement : JournalRecordingTypes.CheckList;
+    }
+
+    @computedFrom('activity.status')
+    get completed():boolean {
+        return this.activity && this.activity.status === ActivityStatuses.Complete;
+    }
+    set completed(value:boolean) {
+        this.activity.status = value ? ActivityStatuses.Complete : ActivityStatuses.Incomplete;
+        if(this.activity.journal && !this.activity.journal.completedDate) {
+            this.activity.journal.completedDate = new Date;
+        }
+    }
+
+    @computedFrom('activity.journal.completedDate')
+    get completedDateDisplay():string {
+        if(!this.activity.journal || !this.activity.journal.completedDate) return 'Not Set';
+
+        return moment(this.activity.journal.completedDate).format('ddd, MMM D, YYYY');
     }
 
     private saveActivity():Promise<ActivitySaveResult> {

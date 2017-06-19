@@ -1,4 +1,5 @@
 import {computedFrom} from 'aurelia-framework';
+import * as moment from 'moment';
 import { Zone } from './zone';
 
 export interface Activity {
@@ -21,7 +22,6 @@ export interface Activity {
 export interface Journal {
     completedDate?:Date;
     notes:string;
-    checklist?:ChecklistItem[];
     measurement?:string|number;
 }
 
@@ -93,37 +93,25 @@ export class ActivityDocument implements Activity {
 export class JournalDocument implements Journal {
     completedDate?:Date;
     notes:string;    
-    checklist?:ChecklistItem[];
     measurement?:string|number;
 
     constructor(args?:Journal) {
         if(args) {
             _.extend(this, args);
-
-            if(Array.isArray(args.checklist)) {
-                this.checklist = args.checklist.reduce((memo, item) => {
-                    if(typeof item === 'string') {
-                        memo.push(new ChecklistItem(item));
-                    } else if(item.value) {
-                        memo.push(item);
-                    }
-
-                    return memo;
-                }, []);
-            }
         }
     }
 
     toJSON():Journal {
-        const json:Journal = {
+        const json:Journal = {            
             notes: this.notes
         };
 
+        if(this.completedDate && Object.prototype.toString.call(this.completedDate) === '[object Date]') {
+            json.completedDate = this.completedDate;
+        }
+
         if(this.measurement != null) {
             json.measurement = this.measurement;
-        }
-        if(Array.isArray(this.checklist) && this.checklist.length) {
-            json.checklist = this.checklist.filter(i => i.value);
         }
 
         return json;
@@ -192,14 +180,6 @@ export class JournalRecordingTypes {
 
 export class AssignedTo {
     public static UNASSIGNED:string = 'Unassigned';
-}
-
-export class ChecklistItem {
-    constructor(public value:string = '') { }
-
-    toJSON() {
-        return this.value;
-    }
 }
 
 function equals(a:string, b:string) {

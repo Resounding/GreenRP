@@ -11,6 +11,10 @@
                 <i class="undo button icon"></i>
                 <span class="hide-mobile">Cancel</span>
             </a>
+            <button type="button" class="ui basic secondary right icon button" click.delegate="saveAndComplete()" hide.bind="activity.journal">
+                <span class="hide-mobile">Save &amp; Complete</span>
+                <i class="right arrow icon"></i>
+            </button>
             <button type="button" class="ui basic primary icon button" click.delegate="save()">
                 <i class="save button icon"></i>
                 <span class="hide-mobile">Save</span>
@@ -32,7 +36,7 @@
                 </div>
                 <div class="field four wide">
                     <label>Due Date</label>
-                    <div class="calendar">
+                    <div class="calendar due-date">
                         <span class="date-display">${dateDisplay}</span>
                     </div>
                 </div>
@@ -79,15 +83,11 @@
                 </div>
             </div>
             <div class="fields row">
-                <div class="field eight wide">
-                    <label for="recordingType">Recording Type</label>
-                    <div class="ui search selection dropdown recording-type">
-                        <input type="hidden" id="recordingType">
-                        <i class="dropdown icon"></i>
-                        <div class="text"></div>
-                        <div class="menu">
-                            <div repeat.for="t of journalRecordingTypes" class="item">${t}</div>
-                        </div>
+                <div class="field four wide">
+                    <label>&nbsp;</label>
+                    <div class="ui toggle checkbox">
+                        <input type="checkbox" id="recordingType" checked.bind="isMeasurement">
+                        <label for="recordingType">Record Measurement</label>
                     </div>
                 </div>
                 <div class="field four wide" show.bind="isMeasurement">
@@ -105,21 +105,25 @@
             <!-- Journal -->
             <h4 class="ui dividing header journal">Outcome</h4>
             <div class="fields row journal">
-                <div class="field">
-                    <label for="completion-status">Activity was not completed&nbsp;&nbsp;</label>
-                </div>
-                <div class="field">
-                    <div class="ui fitted toggle checkbox">
-                        <input type="checkbox" id="completion-status" checked.bind="completed">
-                        <label></label>
+                <div class="field eight wide ui grid equal width">
+                    <div class="field">
+                        <label for="completion-status">Activity was not completed&nbsp;&nbsp;</label>
                     </div>
-                </div>
-                <div class="field">
-                    <label for="completion-status">&nbsp;&nbsp;Activity was completed</label>
+                    <div class="field">
+                        <div class="ui fitted toggle checkbox">
+                            <input type="checkbox" id="completion-status" checked.bind="completed">
+                            <label></label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="completion-status">&nbsp;&nbsp;Activity was completed</label>
+                    </div>
                 </div>
                 <div class="field" show.bind="completed">
                     <label for="completedDate">Completed:</label>
-                    <input type="date" value.bind="activity.journal.completedDate">
+                    <div class="calendar completed-date">
+                        <span class="date-display">${completedDateDisplay}</span>
+                    </div>
                 </div>
             </div>
             <div class="fields row journal" show.bind="isMeasurement">

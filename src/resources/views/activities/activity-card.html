@@ -17,8 +17,8 @@
             </div>
             <div class="description">
                 <p show.bind="activity.description">Description: ${activity.description}</p>
-                <p show.bind="activity.crops.length">Crop${activity.crops.length > 1 ? 's' : ''}: ${activity.crops.join(', ')}</p>
-                <p show.bind="activity.zones.length">Zone${activity.zones.length > 1 ? 's' : ''}: ${activity.zones.join(', ')}</p>
+                <p show.bind="activity.crops.length">Crop${activity.crops.length > 1 ? 's' : ''}: ${cropNames}</p>
+                <p show.bind="zoneNames">Zone${activity.zones.length > 1 ? 's' : ''}: ${zoneNames}</p>
             </div>
         </div>
         <div class="extra content">

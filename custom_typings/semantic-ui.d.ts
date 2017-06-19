@@ -18,8 +18,10 @@ interface dropdownOptions {
 
 interface calendarOptions {
     type?: string;
+    firstDayOfWeek?: number;
     onChange?(e:string):void;
     initialDate?:Date;
+    formatter?:any;
 }
 
 interface modalOptions {

@@ -5,7 +5,6 @@ import {IncompleteDialog} from './incomplete-dialog';
 import {Authentication, Roles} from '../../services/authentication';
 import {Notifications} from '../../services/notifications';
 import {ActivitiesService} from '../../services/data/activities-service';
-import {User, UsersService} from '../../services/data/users-service';
 import {
     ActivityDocument,
     ActivityStatus,
@@ -22,12 +21,12 @@ const WITH_COMMENT:ActivityStatus = <ActivityStatus>'With Comment';
 @autoinject
 export class ActivityCard {    
     @bindable activity:ActivityDocument;
+    @bindable users:string[];
     statuses:StatusItem[];
-    users:string[];
     element:Element;
 
     constructor(private service:ActivitiesService, private auth:Authentication,
-        private usersService:UsersService, private dialogService:DialogService, element:Element) {
+        private dialogService:DialogService, element:Element) {
         this.element = element;
     }
 
@@ -36,16 +35,6 @@ export class ActivityCard {
         this.element = $(this.element).prev().get(0);
 
         if(!this.done || this.auth.isInRole(Roles.ProductionManager)) {
-            this.usersService.getAll()
-                .then(result => {
-                    this.users = ['Unassigned'].concat(result.map(u => u.name).sort());
-
-                    $('.dropdown.assigned-to', this.element).dropdown({
-                        forceSelection: true,
-                        onChange: this.onAssignedToChange.bind(this)
-                    })
-                })
-                .catch(Notifications.error);
 
             this.statuses = [
                 { status: ActivityStatuses.NotStarted, text: 'Not Started' },
@@ -57,9 +46,25 @@ export class ActivityCard {
                 this.statuses.push({ status: ActivityStatuses.Reviewed, text: 'Reviewed' });
             }
 
+            $('.dropdown.assigned-to', this.element).dropdown({
+                forceSelection: true,
+                onChange: this.onAssignedToChange.bind(this)
+            });
+
             $('.calendar.snooze', this.element).calendar({
                 type: 'date',
-                onChange: this.onDueDateChange.bind(this)
+                firstDayOfWeek: 1,
+                onChange: this.onDueDateChange.bind(this),
+                formatter: {
+                    cell: (cell:jQuery, date:Date, cellOptions:any) => {
+                        if(cellOptions.mode === 'day' && date.getDay() === 1) {
+                            const week = moment(date).isoWeek(),
+                                text = cell.text(),
+                                html =  `<span class="ui blue basic ribbon label">${week}</span>&nbsp;${text}`;
+                            cell.html(html);
+                        }
+                    }
+                }
             });
         
             $('.dropdown.status', this.element).dropdown({
@@ -95,6 +100,20 @@ export class ActivityCard {
         if(WorkTypes.equals(this.activity.workType, WorkTypes.Growing)) return 'green';
         if(WorkTypes.equals(this.activity.workType, WorkTypes.Labour)) return 'blue';
         return 'grey';
+    }
+
+    @computedFrom('activity.crops')
+    get cropNames():string {
+        if(!this.activity || !Array.isArray(this.activity.crops) || !this.activity.crops.length) return '';
+
+        return this.activity.crops.sort().join(', ');
+    }
+
+    @computedFrom('activity.zones')
+    get zoneNames():string {
+        if(!this.activity || !Array.isArray(this.activity.zones) || !this.activity.zones.length) return '';
+
+        return this.activity.zones.map(z => z.name).sort().join(', ');
     }
 
     onDueDateChange(value:string) {

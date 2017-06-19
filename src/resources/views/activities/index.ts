@@ -7,12 +7,15 @@ import {Authentication, Roles} from '../../services/authentication';
 import {Database} from '../../services/database';
 import {log} from "../../services/log";
 import {ActivitiesService} from '../../services/data/activities-service';
+import {User, UsersService} from '../../services/data/users-service';
+import {Notifications} from "../../services/notifications";
 
 @autoinject
 export class ActivityIndex {
     allActivities:ActivityDocument[] = [];
     activities:ActivityDocument[] = [];
     workTypes:WorkType[];
+    users:string[];
     activitySyncChangeSubscription:Subscription;
     activitiesChangedSubscription:Subscription;
     filtersExpanded:boolean = false;
@@ -21,7 +24,7 @@ export class ActivityIndex {
     private _showCompleted:boolean = false;
     private _showIncomplete:boolean = false;
 
-    constructor(private dialogService:DialogService, private service:ActivitiesService,
+    constructor(private dialogService:DialogService, private service:ActivitiesService, private usersService:UsersService,
         private auth:Authentication, private events:EventAggregator, private element:Element) { }
 
     activate() {
@@ -29,6 +32,12 @@ export class ActivityIndex {
         this.activitiesChangedSubscription = this.events.subscribe(ActivitiesService.ActivitiesChangedEvent, this.load.bind(this));
 
         this.workTypes = [WorkTypes.ALL_WORK_TYPES].concat(WorkTypes.getAll());
+
+        this.usersService.getAll()
+            .then(result => {
+                this.users = ['Unassigned'].concat(result.map(u => u.name).sort());                    
+            })
+            .catch(Notifications.error);
 
         this.load();
     }
