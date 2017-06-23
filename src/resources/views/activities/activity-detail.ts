@@ -2,12 +2,6 @@ import {autoinject, computedFrom} from 'aurelia-framework';
 import {DialogService} from 'aurelia-dialog';
 import {Router} from 'aurelia-router';
 import {Prompt} from '../controls/prompt';
-import {Authentication, Roles} from '../../services/authentication';
-import {log} from '../../services/log';
-import {ActivitiesService, ActivitySaveResult} from '../../services/data/activities-service';
-import {OrdersService} from '../../services/data/orders-service';
-import {ReferenceService} from '../../services/data/reference-service';
-import {UsersService, User} from '../../services/data/users-service';
 import {
     ActivityDocument,
     ActivityStatus,
@@ -16,10 +10,17 @@ import {
     JournalRecordingType,
     JournalRecordingTypes,
     WorkType,
-    WorkTypes
+    WorkTypes,
 } from '../../models/activity';
 import {OrderDocument} from '../../models/order';
 import {Zone} from '../../models/zone';
+import {Authentication, Roles} from '../../services/authentication';
+import {log} from '../../services/log';
+import {ActivitiesService, ActivitySaveResult} from '../../services/data/activities-service';
+import {OrdersService} from '../../services/data/orders-service';
+import {ReferenceService} from '../../services/data/reference-service';
+import {User, UsersService} from '../../services/data/users-service';
+import {Notifications} from '../../services/notifications';
 
 @autoinject
 export class ActivityDetail {
@@ -28,6 +29,7 @@ export class ActivityDetail {
     orders:string[];
     zones:Zone[];
     workTypes:WorkType[];
+    statuses:ActivityStatus[];
     users:User[];
     journalShowing:boolean = false;
     journalRecordingTypes:JournalRecordingType[];
@@ -51,7 +53,20 @@ export class ActivityDetail {
 
                             return isInHouse;
                         })
-                        .map(o => o.orderNumber)
+                        .map(o => {
+                            const plant = o.plant ? o.plant.abbreviation : '',
+                                customer = o.customer ? o.customer.abbreviation : '',
+                                arrival = moment(o.arrivalDate),
+                                stick = moment(o.stickDate),
+                                arrivalWeek = arrival.isoWeek(),
+                                arrivalDay = arrival.isoWeekday(),
+                                stickYear = stick.isoWeekYear(),
+                                stickWeek = stick.isoWeek(),
+                                stickDay = stick.isoWeekday(),
+                                orderNumber = `${plant}${customer}${stickYear}-${stickWeek}-${stickDay} (${arrivalWeek}-${arrivalDay})`;
+                            
+                            return orderNumber;
+                        })
                         .sort();
                     this.orders = ordersInHouse;
                 })
@@ -78,63 +93,77 @@ export class ActivityDetail {
         }
 
         this.workTypes = WorkTypes.getAll();
-        this.journalRecordingTypes = JournalRecordingTypes.getAll();
+        this.journalRecordingTypes = JournalRecordingTypes.getAll();        
 
-        return Promise.all(actions);
+        return Promise.all(actions)
+            .then(() => {
+                if(!this.activity.done || this.auth.isInRole(Roles.ProductionManager)) {
+                    this.statuses = [
+                        ActivityStatuses.NotStarted,
+                        ActivityStatuses.InProgress,
+                        ActivityStatuses.Incomplete,
+                        ActivityStatuses.Complete,
+                    ];
+                }
+            })
+            .catch(Notifications.error);
     }
 
     attached() {
-        $('.dropdown.status', this.element)
-            .dropdown({ onChange: this.onStatusChange.bind(this) })
-            .dropdown('set selected', this.activity.status);
-        $('.dropdown.assignedTo', this.element)
-            .dropdown({ onChange: this.onAssignedToChange.bind(this) })
-            .dropdown('set selected', this.activity.assignedTo);
-        $('.dropdown.workType', this.element)
-            .dropdown({ onChange: this.onWorkTypeChange.bind(this) })
-            .dropdown('set selected', this.activity.workType);
-        $('.dropdown.crop', this.element)
-            .dropdown({ onChange: this.onCropChange.bind(this) })
-            .dropdown('set selected', this.activity.crops);
-        const $zone = $('.dropdown.zone', this.element)
-            .dropdown({ onChange: this.onZoneChange.bind(this) });
-        if(this.activity.zones && this.activity.zones.length) {
-            $zone.dropdown('set selected', this.activity.zones.map(z => z.name));
-        }
-        $('.calendar.due-date', this.element).calendar({
-            type: 'date',
-            firstDayOfWeek: 1,
-            onChange: this.onDateChange.bind(this),
-            formatter: {
-                cell: (cell:jQuery, date:Date, cellOptions:any) => {
-                    if(cellOptions.mode === 'day' && date.getDay() === 1) {
-                        const week = moment(date).isoWeek(),
-                            text = cell.text(),
-                            html =  `<span class="ui blue basic ribbon label">${week}</span>&nbsp;${text}`;
-                        cell.html(html);
+        if(!this.activity.done || this.auth.isInRole(Roles.ProductionManager)) {
+            $('.dropdown.status', this.element)
+                .dropdown({ onChange: this.onStatusChange.bind(this) })
+                .dropdown('set selected', this.activity.status);
+            $('.dropdown.assignedTo', this.element)
+                .dropdown({ onChange: this.onAssignedToChange.bind(this) })
+                .dropdown('set selected', this.activity.assignedTo);
+            $('.dropdown.workType', this.element)
+                .dropdown({ onChange: this.onWorkTypeChange.bind(this) })
+                .dropdown('set selected', this.activity.workType);
+            $('.dropdown.crop', this.element)
+                .dropdown({ onChange: this.onCropChange.bind(this) })
+                .dropdown('set selected', this.activity.crops);
+            const $zone = $('.dropdown.zone', this.element)
+                .dropdown({ onChange: this.onZoneChange.bind(this) });
+            if(this.activity.zones && this.activity.zones.length) {
+                $zone.dropdown('set selected', this.activity.zones.map(z => z.name));
+            }
+            $('.calendar.due-date', this.element).calendar({
+                type: 'date',
+                firstDayOfWeek: 1,
+                onChange: this.onDateChange.bind(this),
+                formatter: {
+                    cell: (cell:jQuery, date:Date, cellOptions:any) => {
+                        if(cellOptions.mode === 'day' && date.getDay() === 1) {
+                            const week = moment(date).isoWeek(),
+                                text = cell.text(),
+                                html =  `<span class="ui blue basic ribbon label">${week}</span>&nbsp;${text}`;
+                            cell.html(html);
+                        }
                     }
                 }
-            }
-        }).calendar('set date', this.activity.date);
+            }).calendar('set date', this.activity.date);
 
-        const $completedDate = $('.calendar.completed-date', this.element).calendar({
-            type: 'date',
-            firstDayOfWeek: 1,
-            onChange: this.onCompletedDateChange.bind(this),
-            formatter: {
-                cell: (cell:jQuery, date:Date, cellOptions:any) => {
-                    if(cellOptions.mode === 'day' && date.getDay() === 1) {
-                        const week = moment(date).isoWeek(),
-                            text = cell.text(),
-                            html =  `<span class="ui blue basic ribbon label">${week}</span>&nbsp;${text}`;
-                        cell.html(html);
+            const $completedDate = $('.calendar.completed-date', this.element).calendar({
+                type: 'date',
+                firstDayOfWeek: 1,
+                onChange: this.onCompletedDateChange.bind(this),
+                formatter: {
+                    cell: (cell:jQuery, date:Date, cellOptions:any) => {
+                        if(cellOptions.mode === 'day' && date.getDay() === 1) {
+                            const week = moment(date).isoWeek(),
+                                text = cell.text(),
+                                html =  `<span class="ui blue basic ribbon label">${week}</span>&nbsp;${text}`;
+                            cell.html(html);
+                        }
                     }
                 }
+            });
+            if(this.activity.journal && this.activity.journal.completedDate) {
+                $completedDate.calendar('set date', this.activity.journal.completedDate);
             }
-        });
-        if(this.activity.journal && this.activity.journal.completedDate) {
-            $completedDate.calendar('set date', this.activity.journal.completedDate);
         }
+
         $('.button-container', this.element).visibility({ type: 'fixed', offset: 57});
     }
 
@@ -243,17 +272,6 @@ export class ActivityDetail {
 
     set isMeasurement(value:boolean) {
         this.activity.recordingType = value ? JournalRecordingTypes.Measurement : JournalRecordingTypes.CheckList;
-    }
-
-    @computedFrom('activity.status')
-    get completed():boolean {
-        return this.activity && this.activity.status === ActivityStatuses.Complete;
-    }
-    set completed(value:boolean) {
-        this.activity.status = value ? ActivityStatuses.Complete : ActivityStatuses.Incomplete;
-        if(this.activity.journal && !this.activity.journal.completedDate) {
-            this.activity.journal.completedDate = new Date;
-        }
     }
 
     @computedFrom('activity.journal.completedDate')

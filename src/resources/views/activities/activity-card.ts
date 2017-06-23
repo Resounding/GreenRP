@@ -34,17 +34,15 @@ export class ActivityCard {
         // we have to do this because of the @containerless
         this.element = $(this.element).prev().get(0);
 
-        if(!this.done || this.auth.isInRole(Roles.ProductionManager)) {
+        if(!this.activity.done || this.auth.isInRole(Roles.ProductionManager)) {
 
             this.statuses = [
                 { status: ActivityStatuses.NotStarted, text: 'Not Started' },
+                { status: ActivityStatuses.InProgress, text: 'In Progress' },
                 { status: ActivityStatuses.Incomplete, text: 'Incomplete' },
                 { status: ActivityStatuses.Complete, text: 'Complete' },
                 { status: WITH_COMMENT, text: 'Complete (with comment)' }
             ];
-            if(this.auth.isInRole(Roles.ProductionManager)) {
-                this.statuses.push({ status: ActivityStatuses.Reviewed, text: 'Reviewed' });
-            }
 
             $('.dropdown.assigned-to', this.element).dropdown({
                 forceSelection: true,
@@ -70,17 +68,12 @@ export class ActivityCard {
             $('.dropdown.status', this.element).dropdown({
                 forceSelection: true,
                 onChange: this.onStatusChange.bind(this)
-            })
+            });
         }
     }
 
     detached() {
         $('.calendar.snooze', this.element).calendar('destroy');
-    }
-
-    @computedFrom('activity.status')
-    get done():boolean {
-        return ActivityStatuses.equals(this.activity.status, ActivityStatuses.Complete) || ActivityStatuses.equals(this.activity.status, ActivityStatuses.Incomplete);
     }
 
     @computedFrom('activity.date')
@@ -100,6 +93,16 @@ export class ActivityCard {
         if(WorkTypes.equals(this.activity.workType, WorkTypes.Growing)) return 'green';
         if(WorkTypes.equals(this.activity.workType, WorkTypes.Labour)) return 'blue';
         return 'grey';
+    }
+
+    @computedFrom('activity.status')
+    get statusClass():string {
+        if(!this.activity || !this.activity.status) return '';
+
+        if(ActivityStatuses.equals(this.activity.status, ActivityStatuses.NotStarted) && moment(this.activity.date).isBefore(moment(), 'day')) return 'overdue';
+
+        return this.activity.status.replace(' ', '').replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+
     }
 
     @computedFrom('activity.crops')

@@ -1,5 +1,5 @@
 <template>
-    <div class="ui card ${colour} ${done ? 'done' : ''}">
+    <div class="ui card ${colour} ${statusClass}">
         <div class="content">
             <div class="header">
                 <a route-href="route: activity-detail; params.bind: { id: activity._id }">

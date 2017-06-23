@@ -105,19 +105,13 @@
             <!-- Journal -->
             <h4 class="ui dividing header journal">Outcome</h4>
             <div class="fields row journal">
-                <div class="field eight wide ui grid equal width">
+                <div class="field four wide">
                     <div class="field">
-                        <label for="completion-status">Activity was not completed&nbsp;&nbsp;</label>
-                    </div>
-                    <div class="field">
-                        <div class="ui fitted toggle checkbox">
-                            <input type="checkbox" id="completion-status" checked.bind="completed">
-                            <label></label>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label for="completion-status">&nbsp;&nbsp;Activity was completed</label>
-                    </div>
+                        <label for="status">Status:</label>
+                        <select id="status" class="dropdown status">
+                            <option repeat.for="s of statuses" value="${s}">${s}</option>
+                        </select>
+                    </div>                    
                 </div>
                 <div class="field" show.bind="completed">
                     <label for="completedDate">Completed:</label>

@@ -57,6 +57,11 @@ export class ActivityDocument implements Activity {
         return !this._id;
     }
 
+    @computedFrom('status')
+    get done():boolean {
+        return ActivityStatuses.equals(this.status, ActivityStatuses.Complete) || ActivityStatuses.equals(this.status, ActivityStatuses.Incomplete);
+    }
+
     toJSON() {
         const json:Activity = {
             type: this.type,
@@ -120,16 +125,16 @@ export class JournalDocument implements Journal {
 
 export class ActivityStatuses {
     public static NotStarted:ActivityStatus = 'Not Started';
+    public static InProgress:ActivityStatus = 'In Progress';
     public static Incomplete:ActivityStatus = 'Incomplete';
     public static Complete:ActivityStatus = 'Complete';
-    public static Reviewed:ActivityStatus = 'Reviewed';
 
     public static getAll():ActivityStatus[] {
         return [
             ActivityStatuses.NotStarted,
+            ActivityStatuses.InProgress,
             ActivityStatuses.Incomplete,
-            ActivityStatuses.Complete,
-            ActivityStatuses.Reviewed
+            ActivityStatuses.Complete            
         ];
     }
 
@@ -138,7 +143,7 @@ export class ActivityStatuses {
     }
 }
 
-export type ActivityStatus = 'Not Started' | 'Incomplete' | 'Complete' | 'Reviewed';
+export type ActivityStatus = 'Not Started' | 'In Progress' | 'Incomplete' | 'Complete';
 
 export class WorkTypes {
     public static Labour:WorkType = 'Labour';

@@ -43,6 +43,16 @@
                         </div>                        
                     </span>
                 </div>
+                <div class="column">
+                    <label for="week">Week:</label>
+                    <div class="ui inline dropdown week">
+                        <div class="text"></div>
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            <div class="item" repeat.for="week of weeks" data-value="${week.id}">${week.text}</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="ui cards" show.bind="activities.length">

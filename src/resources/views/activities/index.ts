@@ -16,9 +16,11 @@ export class ActivityIndex {
     activities:ActivityDocument[] = [];
     workTypes:WorkType[];
     users:string[];
+    weeks:WeekItem[] = [];
     activitySyncChangeSubscription:Subscription;
     activitiesChangedSubscription:Subscription;
     filtersExpanded:boolean = false;
+    private _week:string = moment().toWeekNumberId();
     private _workType:WorkType = null;
     private _showAll:boolean = false;
     private _showCompleted:boolean = false;
@@ -32,6 +34,19 @@ export class ActivityIndex {
         this.activitiesChangedSubscription = this.events.subscribe(ActivitiesService.ActivitiesChangedEvent, this.load.bind(this));
 
         this.workTypes = [WorkTypes.ALL_WORK_TYPES].concat(WorkTypes.getAll());
+
+        const thisWeek = moment().toWeekNumberId(),
+            lastweek = moment().subtract(1, 'week').toWeekNumberId(),
+            nextweek = moment().add(1, 'week').toWeekNumberId(),
+            week = moment().subtract(2, 'weeks');
+        for(let i = 0; i < 6; i++) {
+            const id = week.toWeekNumberId(),
+                text = id === thisWeek ? 'This week' :
+                (id === lastweek ? 'Last Week' :
+                (id === nextweek ? 'Next Week' : week.format('[Week] W')));
+            this.weeks.push({ id, text });
+            week.add(1, 'week');
+        }
 
         this.usersService.getAll()
             .then(result => {
@@ -52,6 +67,10 @@ export class ActivityIndex {
             forceSelection: true,
             onChange: this.onWorkTypeChange.bind(this)
         });
+        $('.dropdown.week', this.element).dropdown({
+            forceSelection: true,
+            onChange: this.onWeekChange.bind(this)
+        }).dropdown('set selected', this._week);
     }
 
     detached() {
@@ -134,10 +153,23 @@ export class ActivityIndex {
         if(this._workType && !WorkTypes.equals(this._workType, WorkTypes.ALL_WORK_TYPES)) {
             this.activities = this.activities.filter(a => WorkTypes.equals(a.workType, this._workType));
         }
+        if(this._week) {
+            this.activities = this.activities.filter(a => moment(a.date).toWeekNumberId() === this._week);
+        }
     }
 
     private onWorkTypeChange(value:WorkType) {
         this._workType = value;
         this.filter();
     }
+
+    private onWeekChange(value:string) {
+        this._week = value;
+        this.filter();
+    }
+}
+
+interface WeekItem {
+    id:string;
+    text:string;
 }
