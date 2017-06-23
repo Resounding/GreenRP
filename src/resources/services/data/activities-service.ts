@@ -1,6 +1,6 @@
 import {autoinject} from 'aurelia-framework';
 import {EventAggregator} from 'aurelia-event-aggregator';
-import {Activity, ActivityDocument} from '../../models/activity';
+import {Activity, ActivityDocument, ActivityStatuses} from '../../models/activity';
 import {Database} from '../database';
 
 export interface ActivitySaveResult {
@@ -54,6 +54,10 @@ export class ActivitiesService {
             if(!doc.date || !moment(doc.date).isValid()) {
                 result.ok = false;
                 result.errors.push('Please choose a valid due date.');
+            }
+            if(ActivityStatuses.equals(doc.status, ActivityStatuses.Incomplete) && doc.journal && !doc.journal.notes) {
+                result.ok = false;
+                result.errors.push('Please enter the reason the activity was Incomplete.');
             }
 
             if(!result.ok) {
