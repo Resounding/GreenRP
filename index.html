@@ -21,12 +21,94 @@
         <title>Boekestyn Greenhouses Resource Planning app</title>
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0 minimum-scale=1.0, user-scalable=no">
+
+        <style>
+            @font-face {
+                font-family: 'Icons';
+                src: url("./style./styles/themes/default/assets/fonts/icons.eot");
+                src: url("./styles/themes/default/assets/fonts/icons.eot?#iefix") format('embedded-opentype'), url("./styles/themes/default/assets/fonts/icons.woff2") format('woff2'), url("./styles/themes/default/assets/fonts/icons.woff") format('woff'), url("./styles/themes/default/assets/fonts/icons.ttf") format('truetype'), url("./styles/themes/default/assets/fonts/icons.svg#icons") format('svg');
+                font-style: normal;
+                font-weight: normal;
+                font-variant: normal;
+                text-decoration: inherit;
+                text-transform: none;
+            }
+        body[aurelia-app] {
+            margin: 0;
+        }
+        [aurelia-app] > .splash {
+            margin-top: 50px;
+        }
+        [aurelia-app] > .splash h1 {
+            color: #800F69;
+            font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+            font-size: 28px;
+            line-height: 36px;
+            margin: 24px 0 14px 0;
+            font-weight: bold;
+            padding: 0em;
+            text-align: center;
+            min-height: 14px;
+        }
+        [aurelia-app] > .splash i {
+            animation-delay: 0s;
+            animation-direction:normal;
+            animation-duration:2s;
+            animation-fill-mode:none;
+            animation-iteration-count:infinite;
+            animation-name:icon-loading;
+            animation-play-state:running;
+            animation-timing-function:linear;
+            backface-visibility:hidden;
+            box-sizing:border-box;
+            color:rgb(128, 15, 105);
+            display:inline-block;
+            font-family:Icons;
+            font-size:28px;
+            font-style:normal;
+            font-weight:normal;
+            height:28px;
+            line-height:28px;
+            margin-bottom:0px;
+            margin-left:0px;
+            margin-right:3.5px;
+            margin-top:0px;
+            opacity:1;
+            speak:none;
+            text-align:center;
+            text-decoration-color:rgb(128, 15, 105);
+            text-decoration-line:none;
+            text-decoration-style:solid;
+            text-size-adjust:100%;
+            width:33.0313px;
+            -webkit-font-smoothing:antialiased;
+        }
+        [aurelia-app] > .splash i::before {
+            background-attachment:scroll;
+            background-clip:border-box;
+            background-color:rgba(0, 0, 0, 0);
+            background-image:none;
+            background-origin:padding-box;
+            background-position-x:0%;
+            background-position-y:0%;
+            background-size:auto;
+            box-sizing:border-box;
+            content:"\f110";
+        }
+        [aurelia-app] > .splash img {
+            margin: 50px auto;
+            display: block;
+        }
+        </style>
     </head>
 
     <body aurelia-app="main">
         <div class="splash">
-            <div class="message">Boekestyn Greenhouses Resource Planning app</div>
-            <i class="fa fa-spinner fa-spin"></i>
+            <img src="images/logo.png" alt="Flora Pack logo">
+            <h1 class="text-center">
+                Boekestyn Greenhouses Resource Planning app
+                <i class="spinner loading icon"></i>    
+            </h1>
         </div>
 
         <script src="scripts/vendor-bundle.js" data-main="aurelia-bootstrapper"></script>
