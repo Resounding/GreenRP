@@ -1,0 +1,108 @@
+<template>
+    <require from="styles/recipes.css"></require>
+
+    <div class="ui" id="recipe-detail">
+        <div class="button-container">
+            <button type="button" class="ui basic red icon button" click.delegate="delete()" data-tooltip="Click to Delete this Recipe" data-position="bottom right" hide.bind="recipe.isNew">
+                <i class="trash button icon"></i>
+                <span class="hide-mobile">Delete</span>
+            </button>
+            <a class="ui basic icon button" route-href="route: recipes">
+                <i class="undo button icon"></i>
+                <span class="hide-mobile">Cancel</span>
+            </a>
+            <button type="button" class="ui basic primary icon button" click.delegate="save()">
+                <i class="save button icon"></i>
+                <span class="hide-mobile">Save</span>
+            </button>
+        </div>
+
+        <form class="ui form segment ${errors.length ? 'error' : ''}">
+            <h4 class="ui dividing header">${title}</h4>
+
+            <div class="ui error message" show.bind="errors.length">
+                <div class="ui list" repeat.for="e of errors">
+                    <div>${e}</div>
+                </div>
+            </div>
+
+            <div class="fields">
+                <div class="field eight wide" show.bind="!recipe.isNew && recipe.plant">
+                    <h4>${recipe.plant.name}</h4>
+                </div>
+                <div class="field eight wide" show.bind="!recipe.isNew && recipe.zone">
+                    <h4>${recipe.zone.name}</h4>
+                </div>
+                <div class="field eight wide" show.bind="recipe.isNew">
+                    <div class="inline fields ${recipe.plant ? 'has-plant' : ''} ${recipe.zone ? 'has-zone' : ''}">
+                        <div class="field">
+                            <div class="ui radio checkbox">
+                                <input type="radio" id="plant" name="plant-or-zone" model.bind="true" checked.bind="hasPlant">
+                                <label for="plant">Plant:</label>
+                            </div>
+                        </div>
+                        <div class="field plant">
+                            <select value.bind="recipe.plant" matcher.bind="plantMatcher">
+                                <option model.bind="null">Choose Plant</option>
+                                <option repeat.for="plant of plants | sort:'name'" model.bind="plant">${plant.name}</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <div class="ui radio checkbox">
+                                <input type="radio" id="zone" name="plant-or-zone" model.bind="true" checked.bind="hasZone">
+                                <label for="zone">Zone:</label>
+                            </div>
+                        </div>
+                        <div class="field zone">
+                            <select value.bind="recipe.zone" matcher.bind="zoneMatcher">
+                                <option model.bind="null">Choose Zone</option>
+                                <option repeat.for="zone of zones | sort:'name'" model.bind="zone">${zone.name}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="field eight wide">
+                    <label for="instructions">Instructions:</label>
+                    <textarea id="instructions" value.bind="recipe.instructions"></textarea>
+                </div>
+            </div>            
+
+            <h4 class="ui dividing header">Tasks</h4>
+            <div class="ui secondary segment">
+                <table class="ui table" show.bind="recipe.tasks.length">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr repeat.for="task of recipe.tasks">
+                            <td>
+                                <a route-href="route: task-detail; params.bind: {id: recipeId, taskid: $index}" click.delegate="goToTask($index)">
+                                    ${task.name || 'Unknown'}
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>
+                                <a route-href="route: task-detail; params.bind: {id: recipeId, taskid:'new'}" class="basic ui positive icon button" click.delegate="goToTask()">
+                                    <i class="plus icon"></i>
+                                    Add Task
+                                </a>
+                            </th>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div class="ui message" hide.bind="recipe.tasks.length">
+                    <div class="header">No Tasks</div>
+                    <p>
+                        There aren't any Tasks for this Recipe. 
+                        <a route-href="route: task-detail; params.bind: {id: recipeId, taskid:'new'}" click.delegate="goToTask()">Click to add one</a> now.
+                    </p>
+                </div>
+            </div>
+        </form>
+    </div>    
+</template>

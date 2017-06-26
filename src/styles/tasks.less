@@ -1,0 +1,50 @@
+#task-detail-container {
+
+    .button-container {
+        padding: 0;
+        display: inline-block;
+
+        &.fixed {
+            transition: all 0.5s ease;
+            position: fixed;
+            padding: 1em;
+            background-color: #fff;
+
+            @media only screen and (max-width: 1199px) and (min-width: 992px) {
+                width: 933px;   
+            }
+        }
+    }
+
+    .ui.form .fields .fields.inline {
+        margin-bottom: 0;
+    }
+
+    &.not-recurring .recurrence {
+        display: none;
+    }
+
+    input[type=number] {
+        width: 75px;
+    }
+
+    .Day .weekly, .On .weekly,
+    .Week .daily, .On .daily, {
+        display: none;
+    }
+
+    .On .not-on {
+        display: none;
+    }
+
+    .any-day .weekday {
+        display: none;
+    }
+
+    .NoEnd .end-date,
+    .EndAfter .end-date,
+    .NoEnd .end-after-occurrences,
+    .EndDate .end-after-occurrences {
+        display: none;
+    }        
+}

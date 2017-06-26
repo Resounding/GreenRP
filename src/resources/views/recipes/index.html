@@ -1,0 +1,30 @@
+<template>
+    <div class="ui">
+        <div class="ui clearing segment">
+            <a class="basic ui positive icon button left floated" route-href="route: recipe-detail; params.bind: { id: 'new'}">
+                <i class="plus icon"></i>
+                New Recipe
+            </a>
+        </div>
+        <div class="ui secondary segment">
+            <table class="ui single line table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Crop</th>
+                        <th>Zone</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr repeat.for="r of recipes | sort:'name'">
+                        <td>
+                            <a route-href="route: recipe-detail; params.bind: { id: r._id }">${r.name}</a>
+                        </td>
+                        <td>${r.plant ? r.plant.name : '&nbsp;'}</td>
+                        <td>${r.zone ? r.zone.name : '&nbsp;'}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</template>

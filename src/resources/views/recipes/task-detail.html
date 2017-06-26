@@ -1,0 +1,185 @@
+<template>
+    <require from="styles/tasks.css"></require>
+
+    <div class="ui ${task.recurring ? 'recurring' : 'not-recurring'}" id="task-detail-container">
+        <div class="button-container">
+            <button type="button" class="ui basic red icon button" click.delegate="delete()" data-tooltip="Click to Delete this Activity" data-position="bottom right" hide.bind="isNew">
+                <i class="trash button icon"></i>
+                <span class="hide-mobile">Delete</span>
+            </button>
+            <a class="ui basic icon button" route-href="route: recipe-detail; params.bind: {id: recipe._id}">
+                <i class="undo button icon"></i>
+                <span class="hide-mobile">Cancel</span>
+            </a>
+            <button type="button" class="ui basic primary icon button" click.delegate="save()">
+                <i class="save button icon"></i>
+                <span class="hide-mobile">Save</span>
+            </button>
+        </div>
+
+        <form class="ui form segment ${errors.length ? 'error' : ''}">
+            <h4 class="ui dividing header">${title}</h4>
+            <div class="ui error message" show.bind="errors.length">
+                <div class="ui list" repeat.for="e of errors">
+                    <div>${e}</div>
+                </div>
+            </div>
+            <div class="fields row">
+                <div class="field four wide">
+                    <div class="field required">
+                        <label for="name">Task Name:</label>
+                        <input type="text" id="name" value.bind="task.name">
+                    </div>
+                </div>
+            </div>
+            <div class="fields row">
+                <div with.bind="task.startTime" class="fields inline ${relativeTime} ${anyDay ? 'any-day' : ''}">
+                    <label for="relativeTime">Starting&nbsp;</label>
+                    <input type="number" value.bind="numberOfRelativePeriods" class="not-on">
+                    <field>
+                        <select value.bind="relativePeriod" class="not-on">
+                            <option value.bind="periods.Day">Day${numberOfRelativePeriods == 1 ? '' : 's'}</option>
+                            <option value.bind="periods.Week">Week${numberOfRelativePeriods == 1 ? '' : 's'}</option>
+                        </select>
+                    </field>
+                    <field>
+                        <select id="relativeTime" value.bind="relativeTime">
+                            <option repeat.for="time of relativeTimes" value.bind="time.id">${time.text}</option>
+                        </select>
+                    </field>
+                    <field>
+                        <select value.bind="event">
+                            <option repeat.for="event of events" value.bind="event">${event}</option>
+                        </select>
+                    </field>
+                    <div class="field">
+                        <div class="ui radio checkbox">
+                            <input type="radio" id="starts-any-day" name="start-any-day" model.bind="true" checked.bind="anyDay">
+                            <label for="starts-any-day">Any day</label>
+                        </div>
+                    </div>
+                    &nbsp;
+                    <div class="field">
+                        <div class="ui radio checkbox">
+                            <input type="radio" id="starts-on-day" name="start-any-day" model.bind="false" checked.bind="anyDay">
+                            <label for="starts-on-day">On</label>
+                        </div>
+                    </div>
+                    <field class="weekday">
+                        <select value.bind="weekday">
+                            <option repeat.for="day of weekdays" value.bind="day.id">${day.text}</option>
+                        </select>
+                    </field>
+                </div>                
+            </div>
+            <div class="fields row">
+                <div class="field">
+                    <div class="ui toggle checkbox">
+                        <input type="checkbox" id="task.recurring" checked.bind="task.recurring">
+                        <label for="task.recurring">Task is recurring</label>
+                    </div>
+                </div>
+            </div>
+            <h4 class="ui dividing header recurrence">Recurrence</h4>
+            <div with.bind="task.recurrence" class="fields recurrence ${period}">
+                <div class="field inline fields">
+                    <div class="fields inline">
+                        <label>Task recurs each</label>
+                        <div class="field">
+                            <div class="ui radio checkbox">
+                                <input type="radio" id="day" name="period" model.bind="periods.Day" checked.bind="period">
+                                <label for="day">${periods.Day}</label>
+                            </div>
+                        </div>
+                        <div class="field fields inline">
+                            <div class="ui radio checkbox">
+                                <input type="radio" id="week" name="period" model.bind="periods.Week" checked.bind="period">
+                                <label for="week">${periods.Week}</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>                
+                <div class="field twelve wide daily">
+                    <div class="fields inline">
+                        <label>Every</label>
+                        <input type="number" value.bind="numberOfPeriods">
+                        <label>&nbsp;day${numberOfPeriods == 1 ? '' : 's'}.</label>
+                    </div>
+                </div>
+                <div class="field twelve wide weekly">
+                    <div class="fields inline">
+                        <label>Every</label>
+                        <input type="number" value.bind="numberOfPeriods">
+                        <label>&nbsp;week${numberOfPeriods == 1 ? '' : 's'} on</label>
+                        <div class="inline fields">
+                            <div class="field" repeat.for="day of weekdays">
+                                <div class="ui checkbox">
+                                    <input type="checkbox" id="weekday-${day.id}" model.bind="day.id" checked.bind="weekDays">
+                                    <label for="weekday-${day.id}">${day.text}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="fields inline recurrence ${endingType}" with.bind="task.recurrence">
+                <label>Ending</label>
+                <div class="field">
+                    <div class="ui radio checkbox">
+                        <input type="radio" id="no-end-date" name="ending-type" model.bind="endingTypes.NoEnd" checked.bind="endingType">
+                        <label for="no-end-date">No end</label>
+                    </div>
+                    <div class="ui radio checkbox">
+                        <input type="radio" id="end-after-occurrences" name="ending-type" model.bind="endingTypes.EndAfter" checked.bind="endingType">
+                        <label for="end-after-occurrences">End after</label>
+                    </div>
+                    <div class="ui radio checkbox">
+                        <input type="radio" id="end-after-date" name="ending-type" model.bind="endingTypes.EndDate" checked.bind="endingType">
+                        <label for="end-after-date">End date</label>
+                    </div>
+                </div>
+                <div with.bind="task.recurrence" class="fields inline recurrence end-after-occurrences">
+                    <input type="number" id="numberOfOccurrences" value.bind="numberOfOccurrences">
+                    <label for="numberOfOccurrences">occurrence${numberOfOccurrences == 1 ? '' : 's'}.</label>
+                </div>
+                <div with.bind="task.recurrence.endTime" class="fields inline recurrence end-date ${relativeTime} ${anyDay ? 'any-day' : ''}">
+                    <input type="number" value.bind="numberOfRelativePeriods" class="not-on">
+                    <field>
+                        <select value.bind="relativePeriod" class="not-on">
+                            <option value.bind="periods.Day">Day${numberOfRelativePeriods == 1 ? '' : 's'}</option>
+                            <option value.bind="periods.Week">Week${numberOfRelativePeriods == 1 ? '' : 's'}</option>
+                        </select>
+                    </field>
+                    <field>
+                        <select id="relativeTime" value.bind="relativeTime">
+                            <option repeat.for="time of relativeTimes" value.bind="time.id">${time.text}</option>
+                        </select>
+                    </field>
+                    <field>
+                        <select value.bind="event">
+                            <option repeat.for="event of events" value.bind="event">${event}</option>
+                        </select>
+                    </field>
+                    <div class="field">
+                        <div class="ui radio checkbox">
+                            <input type="radio" id="ends-any-day" name="end-any-day" model.bind="true" checked.bind="anyDay">
+                            <label for="ends-any-day">Any day</label>
+                        </div>
+                    </div>
+                    &nbsp;
+                    <div class="field">
+                        <div class="ui radio checkbox">
+                            <input type="radio" id="ends-on-day" name="end-any-day" model.bind="false" checked.bind="anyDay">
+                            <label for="ends-on-day">On</label>
+                        </div>
+                    </div>
+                    <field class="weekday">
+                        <select value.bind="weekday">
+                            <option repeat.for="day of weekdays" value.bind="day.id">${day.text}</option>
+                        </select>
+                    </field>
+                </div>
+            </div>
+        </form>
+    </div>
+</template>
