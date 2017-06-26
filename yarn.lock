@@ -353,9 +353,9 @@ aurelia-bootstrapper@^2.1.1:
     aurelia-templating-resources "^1.0.0"
     aurelia-templating-router "^1.0.0"
 
-aurelia-cli@^0.29.0:
-  version "0.29.0"
-  resolved "https://registry.yarnpkg.com/aurelia-cli/-/aurelia-cli-0.29.0.tgz#b261263d41ec4f09452873e82553fd2c816370bd"
+aurelia-cli@^0.30.0:
+  version "0.30.0"
+  resolved "https://registry.yarnpkg.com/aurelia-cli/-/aurelia-cli-0.30.0.tgz#1660e30f4b28a851d4d99178f60f2728efb8e665"
   dependencies:
     aurelia-dependency-injection "^1.0.0"
     aurelia-logging "^1.2.0"
@@ -373,7 +373,7 @@ aurelia-dependency-injection@^1.0.0:
     aurelia-metadata "^1.0.0"
     aurelia-pal "^1.0.0"
 
-aurelia-dialog@^1.0.0-rc.1:
+aurelia-dialog@^1.0.0-rc.1.0.3:
   version "1.0.0-rc.1.0.3"
   resolved "https://registry.yarnpkg.com/aurelia-dialog/-/aurelia-dialog-1.0.0-rc.1.0.3.tgz#cbc0f30ad9dad1135fe5f20d5db2357210009fae"
   dependencies:
@@ -630,15 +630,15 @@ bindings@~1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/bindings/-/bindings-1.2.1.tgz#14ad6113812d2d37d72e67b4cacb4bb726505f11"
 
-bl@^1.0.0, bl@~1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/bl/-/bl-1.1.2.tgz#fdca871a99713aa00d19e3bbba41c44787a65398"
+bl@^1.0.0, bl@~1.0.0:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/bl/-/bl-1.0.3.tgz#fc5421a28fd4226036c3b3891a66a25bc64d226e"
   dependencies:
     readable-stream "~2.0.5"
 
-bl@~1.0.0:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/bl/-/bl-1.0.3.tgz#fc5421a28fd4226036c3b3891a66a25bc64d226e"
+bl@~1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/bl/-/bl-1.1.2.tgz#fdca871a99713aa00d19e3bbba41c44787a65398"
   dependencies:
     readable-stream "~2.0.5"
 
@@ -2010,11 +2010,11 @@ got@^6.7.1:
     unzip-response "^2.0.1"
     url-parse-lax "^1.0.0"
 
-graceful-fs@4.X, graceful-fs@^4.0.0, graceful-fs@^4.1.2, graceful-fs@^4.1.4, graceful-fs@^4.1.6, graceful-fs@^4.1.9, graceful-fs@~4.1.9:
+graceful-fs@4.X, graceful-fs@^4.0.0, graceful-fs@^4.1.2, graceful-fs@^4.1.4, graceful-fs@^4.1.6, graceful-fs@^4.1.9:
   version "4.1.10"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.10.tgz#f2d720c22092f743228775c75e3612632501f131"
 
-graceful-fs@^4.1.11:
+graceful-fs@^4.1.11, graceful-fs@~4.1.9:
   version "4.1.11"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.11.tgz#0e8bdfe4d1ddb8854d64e04ea7c00e2a026e5658"
 
