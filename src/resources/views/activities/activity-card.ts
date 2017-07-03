@@ -23,17 +23,12 @@ export class ActivityCard {
     @bindable activity:ActivityDocument;
     @bindable users:string[];
     statuses:StatusItem[];
-    element:Element;
+    el:Element;
 
     constructor(private service:ActivitiesService, private auth:Authentication,
-        private dialogService:DialogService, element:Element) {
-        this.element = element;
-    }
+        private dialogService:DialogService) { }
 
     attached() {
-        // we have to do this because of the @containerless
-        this.element = $(this.element).prev().get(0);
-
         if(!this.activity.done || this.auth.isInRole(Roles.ProductionManager)) {
 
             this.statuses = [
@@ -44,12 +39,12 @@ export class ActivityCard {
                 { status: WITH_COMMENT, text: 'Complete (with comment)' }
             ];
 
-            $('.dropdown.assigned-to', this.element).dropdown({
+            $('.dropdown.assigned-to', this.el).dropdown({
                 forceSelection: true,
                 onChange: this.onAssignedToChange.bind(this)
             });
 
-            $('.calendar.snooze', this.element).calendar({
+            $('.calendar.snooze', this.el).calendar({
                 type: 'date',
                 firstDayOfWeek: 1,
                 onChange: this.onDueDateChange.bind(this),
@@ -65,7 +60,7 @@ export class ActivityCard {
                 }
             });
         
-            $('.dropdown.status', this.element).dropdown({
+            $('.dropdown.status', this.el).dropdown({
                 forceSelection: true,
                 onChange: this.onStatusChange.bind(this)
             });
@@ -73,7 +68,7 @@ export class ActivityCard {
     }
 
     detached() {
-        $('.calendar.snooze', this.element).calendar('destroy');
+        $('.calendar.snooze', this.el).calendar('destroy');
     }
 
     @computedFrom('activity.date')

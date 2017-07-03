@@ -37,9 +37,10 @@ export class Calculator {
     calculator:OrderCalculator;
     @observable repeatCalculators:OrderCalculator[] = [];
     partialSpace:boolean = false;
+    el:Element;
 
     constructor(private ordersService:OrdersService, private referenceService:ReferenceService, private capacityService:CapacityService,
-                private dialogService:DialogService, private controller:DialogController, private element:Element,
+                private dialogService:DialogService, private controller:DialogController,
                 private observerLocator:ObserverLocator, private events:EventAggregator) {
         controller.settings.lock = true;
         controller.settings.position = position;
@@ -79,25 +80,25 @@ export class Calculator {
     }
 
     attached() {
-        $('.dropdown.customer', this.element).dropdown({
+        $('.dropdown.customer', this.el).dropdown({
             allowAdditions: true,
             selectOnKeydown: true,
             forceSelection: true,
             onChange: this.onCustomerChange.bind(this)
         });
-        $('#plant', this.element).dropdown({
+        $('#plant', this.el).dropdown({
             onChange: this.onPlantChange.bind(this)
         });
-        $('.calendar', this.element).calendar({
+        $('.calendar', this.el).calendar({
             type: 'date',
             onChange: this.onDateChange.bind(this)
         });
     }
 
     detached() {
-        $('#customer', this.element).dropdown('destroy');
-        $('#plant', this.element).dropdown('destroy');
-        $('.calendar', this.element).calendar('destroy');
+        $('#customer', this.el).dropdown('destroy');
+        $('#plant', this.el).dropdown('destroy');
+        $('.calendar', this.el).calendar('destroy');
          this.observerLocator
                 .getObserver(this.calculator.order, 'zone')
                 .unsubscribe(this.onZoneChange.bind(this));

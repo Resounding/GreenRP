@@ -21,6 +21,7 @@ interface SeasonMap {
 
 @autoinject
 export class PlantDetail {
+    el:Element;
     private plant:Plant;
     private seasons:SeasonMap = {};
     private propagationTimes:SeasonMap = {};
@@ -28,7 +29,7 @@ export class PlantDetail {
     private currentYear:number = new Date().getFullYear();
 
     constructor(private referenceService:ReferenceService, private dialogService:DialogService,
-        private controller:DialogController, private element:Element) {
+        private controller:DialogController) {
         controller.settings.lock = true;
         controller.settings.position = position;
     }
@@ -86,11 +87,11 @@ export class PlantDetail {
     }
 
     attached() {
-        $('.ui.checkbox', this.element).checkbox();
+        $('.ui.checkbox', this.el).checkbox();
     }
 
     detached() {
-        $('.ui.checkbox', this.element).checkbox('destroy');
+        $('.ui.checkbox', this.el).checkbox('destroy');
     }
 
     nextSeason() {

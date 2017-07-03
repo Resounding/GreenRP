@@ -14,8 +14,9 @@ export class NavBar {
     @bindable router:Router;
     authorizedRoutes:RouteConfig[] = [];
     year:number;
+    el:Element;
 
-    constructor(private element:Element, private auth:Authentication, private database:Database, private dialogService:DialogService) { }
+    constructor(private auth:Authentication, private database:Database, private dialogService:DialogService) { }
 
     attached() {
         this.router.routes.forEach(r => {
@@ -26,8 +27,8 @@ export class NavBar {
             }
         });
 
-        let $fixedMenu = $('#fixed-menu', this.element),
-            $mainMenu = $('#main-menu', this.element);
+        let $fixedMenu = $('#fixed-menu', this.el),
+            $mainMenu = $('#main-menu', this.el);
 
         $mainMenu.visibility({
             once: false,
@@ -35,7 +36,7 @@ export class NavBar {
             onBottomPassedReverse: () => $fixedMenu.transition('fade out')
         });
 
-        $('.dropdown', this.element).dropdown();
+        $('.dropdown', this.el).dropdown();
     }
 
     changePassword() {

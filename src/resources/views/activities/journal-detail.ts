@@ -2,20 +2,15 @@ import {autoinject, computedFrom} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 import {log} from '../../services/log';
 import {ActivitiesService, ActivitySaveResult} from '../../services/data/activities-service';
-import {
-    ActivityDocument,
-    ActivityStatuses,
-    ChecklistItem,
-    JournalDocument,
-    JournalRecordingTypes
-} from '../../models/activity';
+import {ActivityDocument,ActivityStatuses,JournalDocument,JournalRecordingTypes} from '../../models/activity';
 
 @autoinject
 export class JournalDetail {
     errors:string[] = [];
     activity:ActivityDocument;
+    el:Element;
 
-    constructor(private service:ActivitiesService, private router:Router, private element:Element) { }
+    constructor(private service:ActivitiesService, private router:Router) { }
 
     activate(params) {
         if(!params || !params.id || params.id === 'new') {
@@ -31,20 +26,12 @@ export class JournalDetail {
                 if(!this.activity.journal) {
                     this.activity.journal = new JournalDocument;                    
                 }
-                if(JournalRecordingTypes.equals(this.activity.recordingType, JournalRecordingTypes.CheckList)) {
-                    if(!this.activity.journal.checklist) {
-                        this.activity.journal.checklist = [];
-                    }
-                    if(!this.activity.journal.checklist.length) {
-                        this.addToChecklist();
-                    }
-                }
                 if(!this.activity.journal.completedDate) {
                     this.activity.journal.completedDate = new Date;
                 }
             });
 
-        $('.button-container', this.element).visibility({ type: 'fixed', offset: 57});
+        $('.button-container', this.el).visibility({ type: 'fixed', offset: 57});
     }
 
     save() {

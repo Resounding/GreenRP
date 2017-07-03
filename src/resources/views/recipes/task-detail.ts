@@ -3,24 +3,19 @@ import {DialogService} from 'aurelia-dialog';
 import {Router} from 'aurelia-router';
 import {EndingTypes, Event, Events, Periods, Recurrence, RelativeTimes} from '../../models/recurrence';
 import {Prompt} from '../controls/prompt';
+import {WorkType,WorkTypes,JournalRecordingTypes} from '../../models/activity';
 import {RecipeDocument} from '../../models/recipe';
-import {EndingTypes, Event, Events, Periods, Recurrence, RelativeTimes} from '../../models/recurrence';
+import {TimeDocument} from '../../models/recurrence';
 import {TaskDocument} from '../../models/task';
 import {RecipeSaveResult, RecipesService} from '../../services/data/recipes-service';
-import {Notifications} from '../../services/notifications';
-import {Prompt} from '../controls/prompt';
-import {RecipeDocument} from '../../models/recipe';
-import {RecipesService} from '../../services/data/recipes-service';
 import {Notifications} from '../../services/notifications';
 
 @autoinject
 export class TaskDetail {
-    isNew:boolean = true;
-    taskIndex:number;
-    title:string = 'New Task';
     errors:string[] = [];
     recipe:RecipeDocument;
-    task:TaskDocument = new TaskDocument;
+    task:TaskDocument;
+    workTypes:WorkType[];
     periods:Periods = Periods;
     endingTypes:EndingTypes = EndingTypes;
     events:Event[] = [
@@ -42,33 +37,59 @@ export class TaskDetail {
         {id: RelativeTimes.Before, text: 'Before'},
         {id: RelativeTimes.After, text: 'After'}
     ];
+    el:Element;
 
     constructor(private service:RecipesService, private router:Router, private dialogService:DialogService) { }
 
     activate(params) {
+        this.workTypes = WorkTypes.getAll();
+
         const recipeId = params.id,
-            taskId = params.taskid;
+            taskId = params.taskid,
+            isNew = taskId === 'new';
 
-        this.isNew = (taskId === 'new');
-
-        this.service.getOne(params.id)
+        return this.service.getOne(params.id)
             .then(result => {
                 this.recipe = result;
-                if(!this.isNew) {
-                    this.taskIndex = parseInt(taskId) || 0;
-                    this.task = new TaskDocument(this.recipe.tasks[this.taskIndex].toJSON());
-                    this.title = this.task.name;
+                if(isNew) {
+                    this.task = new TaskDocument({ startTime: new TimeDocument }, -1);
+                } else {
+                    const taskIndex = parseInt(taskId) || 0;
+                    this.task = new TaskDocument(this.recipe.tasks[taskIndex].toJSON(), taskIndex);
                 }
             })
             .catch(Notifications.error);
     }
 
-    save() {
-        if(this.isNew) {
-            this.recipe.tasks.push(this.task);
-        } else {
-            this.recipe.tasks[this.taskIndex] = this.task;
+    attached() {
+        const $workType = $('.dropdown.workType', this.el)
+            .dropdown({ onChange: this.onWorkTypeChange.bind(this) });
+
+        if(!this.task.isNew) {
+            $workType.dropdown('set selected', this.task.workType);
         }
+    }
+
+    @computedFrom('task.isNew')
+    get title():string {
+        return this.task && this.task.isNew ? 'New Task' : this.task.name;
+    }
+
+    @computedFrom('task.recordingType')
+    get isMeasurement():boolean {
+        return this.task && this.task.recordingType && this.task.recordingType.toLowerCase() === JournalRecordingTypes.Measurement.toLowerCase();
+    }
+
+    set isMeasurement(value:boolean) {
+        this.task.recordingType = value ? JournalRecordingTypes.Measurement : JournalRecordingTypes.CheckList;
+    }
+
+    save() {
+        if(this.task.isNew) {
+            this.task.index = this.recipe.tasks.length;
+        }
+        
+        this.recipe.tasks[this.task.index] = this.task;
         
         this.saveRecipe()
             .then(result => {
@@ -87,10 +108,10 @@ export class TaskDetail {
             .whenClosed(result => {
                 if(result.wasCancelled) return;
 
-                if(this.isNew) {
+                if(this.task.isNew) {
                     this.goToRecipe();
                 } else {
-                    this.recipe.tasks.splice(this.taskIndex, 1);
+                    this.recipe.tasks.splice(this.task.index, 1);
                     this.saveRecipe()
                         .then(result => {
                             if(!result.ok) return;
@@ -114,6 +135,10 @@ export class TaskDetail {
                 })
                 .catch(reject);
         });
+    }
+
+    private onWorkTypeChange(value:WorkType) {
+        this.task.workType = value;
     }
 
     private goToRecipe() {

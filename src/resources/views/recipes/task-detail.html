@@ -1,9 +1,9 @@
 <template>
     <require from="styles/tasks.css"></require>
 
-    <div class="ui ${task.recurring ? 'recurring' : 'not-recurring'}" id="task-detail-container">
+    <div class="ui ${task.recurring ? 'recurring' : 'not-recurring'}" id="task-detail-container" ref="el">
         <div class="button-container">
-            <button type="button" class="ui basic red icon button" click.delegate="delete()" data-tooltip="Click to Delete this Activity" data-position="bottom right" hide.bind="isNew">
+            <button type="button" class="ui basic red icon button" click.delegate="delete()" data-tooltip="Click to Delete this Task" data-position="bottom right" hide.bind="task.isNew">
                 <i class="trash button icon"></i>
                 <span class="hide-mobile">Delete</span>
             </button>
@@ -31,6 +31,34 @@
                         <input type="text" id="name" value.bind="task.name">
                     </div>
                 </div>
+                <div class="field four wide">
+                    <label for="workType">Work Type:</label>
+                    <div class="ui search selection dropdown workType">
+                        <input type="hidden" id="workType">
+                        <i class="dropdown icon"></i>
+                        <div class="text default">Choose work type</div>
+                        <div class="menu">
+                            <div repeat.for="wt of workTypes" class="item">${wt}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="field four wide">
+                    <label>&nbsp;</label>
+                    <div class="ui toggle checkbox">
+                        <input type="checkbox" id="recordingType" checked.bind="isMeasurement">
+                        <label for="recordingType">Record Measurement</label>
+                    </div>
+                </div>
+                <div class="field two wide" show.bind="isMeasurement">
+                    <label for="unitOfMeasure">Units:</label>
+                    <input type="text" id="unitOfMeasure" value.bind="task.unitOfMeasure">
+                </div>
+            </div>
+            <div class="fields row">
+                <div class="field sixteen wide">
+                    <label for="description">Description</label>
+                    <textarea id="description" value.bind="task.description"></textarea>
+                </div>                    
             </div>
             <div class="fields row">
                 <div with.bind="task.startTime" class="fields inline ${relativeTime} ${anyDay ? 'any-day' : ''}">

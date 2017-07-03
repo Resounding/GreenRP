@@ -6,10 +6,10 @@ import {Week} from '../../models/week';
 @useView('./report.html')
 @autoinject()
 export class FlowerThisWeek {
-
     model:FlowerThisWeekDataModel;
+    el:Element;
 
-    constructor(private controller:DialogController, private element:Element) {
+    constructor(private controller:DialogController) {
         controller.settings.position = position;
     }
 
@@ -18,7 +18,7 @@ export class FlowerThisWeek {
     }
 
     attached() {
-        const iframe = $('iframe', this.element),
+        const iframe = $('iframe', this.el),
             weekNumber = this.model.week.week,
             year = this.model.week.year,
             tableBody = this.model.orders

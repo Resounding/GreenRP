@@ -1,5 +1,5 @@
 <template>
-    <div class="calendar">
+    <div class="calendar" ref="el">
         ${event.name} <span>(${event.date | dateFormat: 'ddd, MMM D'})</span>
         <div class="ui dropdown button mini basic" show.bind="calculator.order.stickDate">
             <div class="text">Move</div>

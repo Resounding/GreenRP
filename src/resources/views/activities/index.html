@@ -2,7 +2,7 @@
     <require from="styles/activities.css"></require>
     <require from="./activity-card"></require>
 
-    <div class="ui" id="activities-list">
+    <div class="ui" id="activities-list" ref="el">
         <div class="filters ui clearing segment ${filtersExpanded ? 'expanded' : 'collapsed'}">
             <a class="basic ui positive icon button left floated" route-href="route: activity-detail; params.bind: { id: 'new' }">
                 <i class="plus icon"></i>

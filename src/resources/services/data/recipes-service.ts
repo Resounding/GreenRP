@@ -49,6 +49,14 @@ export class RecipesService {
                 result.ok = false;
                 result.errors.push('Please choose a plant or a zone.')
             }
+            if(Array.isArray(doc.tasks) && doc.tasks.some(t => !t.name)) {
+                result.ok = false;
+                result.errors.push('Please enter a name for the task.')
+            }
+            if(Array.isArray(doc.tasks) && doc.tasks.some(t => !t.workType)) {
+                result.ok = false;
+                result.errors.push('Please choose the Type for the task.')
+            }
 
             if(!result.ok) {
                 return resolve(result);

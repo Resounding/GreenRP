@@ -73,6 +73,7 @@
                     <thead>
                         <tr>
                             <th>Name</th>
+                            <th>Type</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -82,11 +83,12 @@
                                     ${task.name || 'Unknown'}
                                 </a>
                             </td>
+                            <td>${task.workType}</td>
                         </tr>
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th>
+                            <th colspan="2">
                                 <a route-href="route: task-detail; params.bind: {id: recipeId, taskid:'new'}" class="basic ui positive icon button" click.delegate="goToTask()">
                                     <i class="plus icon"></i>
                                     Add Task

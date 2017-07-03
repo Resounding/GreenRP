@@ -7,24 +7,23 @@ import {CalculatorZone} from "../../services/domain/models/calculator-zone";
 export class EventViewCustomElement {
     @bindable calculator:OrderCalculator;
     @bindable event:Event = null;
-
-    constructor(private element:Element) { }
+    el:Element;
 
     attached() {
-        $('.calendar', this.element).calendar({
+        $('.calendar', this.el).calendar({
             type: 'date',
             initialDate: this.event.date,
             onChange: this.onDateChange.bind(this)
         }).calendar('set date', this.event.date);
 
-        $('.dropdown', this.element).dropdown({
+        $('.dropdown', this.el).dropdown({
             onChange: this.onMove.bind(this)
         });
     }
 
     detached() {
-        $('.calendar', this.element).calendar('destroy');
-        $('.dropdown', this.element).dropdown('destroy');
+        $('.calendar', this.el).calendar('destroy');
+        $('.dropdown', this.el).dropdown('destroy');
     }
 
     onDateChange(value:string) {

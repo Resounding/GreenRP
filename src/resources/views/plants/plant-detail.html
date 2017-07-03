@@ -1,7 +1,7 @@
 <template>
     <require from="styles/plant-detail.css"></require>
 
-    <ux-dialog id="plant-detail">
+    <ux-dialog id="plant-detail" ref="el">
         <ux-dialog-header>
             <h2 show.bind="isNew">New Plant</h2>
             <h2 hide.bind="isNew">${plant.name}</h2>

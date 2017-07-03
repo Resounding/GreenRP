@@ -1,7 +1,7 @@
 <template>
     <require from="styles/activities.css"></require>
 
-    <div class="ui ${activity.isNew ? 'new' : ''}" id="activity-detail-container">
+    <div class="ui ${activity.isNew ? 'new' : ''}" id="activity-detail-container" ref="el">
         <div class="button-container">
             <button type="button" class="ui basic red icon button" click.delegate="delete()" data-tooltip="Click to Delete this Activity" data-position="bottom right" hide.bind="activity.isNew">
                 <i class="trash button icon"></i>

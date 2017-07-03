@@ -19,8 +19,9 @@ export class Search {
     customers: string[];
     searchService:SearchService;
     filter:SearchFilter = new SearchFilter();
+    el:Element;
 
-    constructor(private ordersService:OrdersService, referenceService:ReferenceService, private dialogService:DialogService, private controller:DialogController, private element:Element) {
+    constructor(private ordersService:OrdersService, referenceService:ReferenceService, private dialogService:DialogService, private controller:DialogController) {
         Promise.all([
             referenceService.zones()
                 .then(result => {
@@ -55,14 +56,14 @@ export class Search {
     }
 
     attached() {
-        $('select', this.element).dropdown({
+        $('select', this.el).dropdown({
             forceSelection: false,
             onChange: this.refresh.bind(this)
         });
     }
 
     detached() {
-        $('select', this.element).dropdown('destroy');
+        $('select', this.el).dropdown('destroy');
     }
 
     sortBy(field:string) {

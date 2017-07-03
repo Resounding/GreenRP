@@ -20,6 +20,7 @@ export class ActivityIndex {
     activitySyncChangeSubscription:Subscription;
     activitiesChangedSubscription:Subscription;
     filtersExpanded:boolean = false;
+    el:Element;
     private _week:string = moment().toWeekNumberId();
     private _workType:WorkType = null;
     private _showAll:boolean = false;
@@ -27,7 +28,7 @@ export class ActivityIndex {
     private _showIncomplete:boolean = false;
 
     constructor(private dialogService:DialogService, private service:ActivitiesService, private usersService:UsersService,
-        private auth:Authentication, private events:EventAggregator, private element:Element) { }
+        private auth:Authentication, private events:EventAggregator) { }
 
     activate() {
         this.activitySyncChangeSubscription = this.events.subscribe(Database.ActivitiesSyncChangedEvent, this.load.bind(this));        
@@ -63,18 +64,18 @@ export class ActivityIndex {
     }
 
     attached() {
-        $('.dropdown.work-type', this.element).dropdown({
+        $('.dropdown.work-type', this.el).dropdown({
             forceSelection: true,
             onChange: this.onWorkTypeChange.bind(this)
         });
-        $('.dropdown.week', this.element).dropdown({
+        $('.dropdown.week', this.el).dropdown({
             forceSelection: true,
             onChange: this.onWeekChange.bind(this)
         }).dropdown('set selected', this._week);
     }
 
     detached() {
-        $('.dropdown', this.element).dropdown('destroy');
+        $('.dropdown', this.el).dropdown('destroy');
     }
 
     add() {

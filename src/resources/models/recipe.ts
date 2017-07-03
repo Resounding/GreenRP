@@ -27,7 +27,7 @@ export class RecipeDocument implements Recipe {
         Object.assign(this, data);
 
         if(Array.isArray(this.tasks)) {
-            this.tasks = this.tasks.map(t => new TaskDocument(t));
+            this.tasks = this.tasks.map((t, i) => new TaskDocument(t, i));
         }
     }
 

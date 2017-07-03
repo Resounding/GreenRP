@@ -33,10 +33,11 @@ export class ActivityDetail {
     users:User[];
     journalShowing:boolean = false;
     journalRecordingTypes:JournalRecordingType[];
+    el:Element;
     
     constructor(private service:ActivitiesService, private router:Router, private auth:Authentication,
         private referenceService:ReferenceService, private usersService:UsersService,
-        private ordersService:OrdersService, private dialogService:DialogService, private element:Element) { }
+        private ordersService:OrdersService, private dialogService:DialogService) { }
 
     activate(params) {
         const actions:Promise<any>[] = [
@@ -110,25 +111,27 @@ export class ActivityDetail {
     }
 
     attached() {
+        console.log(this.el);
+        debugger;
         if(!this.activity.done || this.auth.isInRole(Roles.ProductionManager)) {
-            $('.dropdown.status', this.element)
+            $('.dropdown.status', this.el)
                 .dropdown({ onChange: this.onStatusChange.bind(this) })
                 .dropdown('set selected', this.activity.status);
-            $('.dropdown.assignedTo', this.element)
+            $('.dropdown.assignedTo', this.el)
                 .dropdown({ onChange: this.onAssignedToChange.bind(this) })
                 .dropdown('set selected', this.activity.assignedTo);
-            $('.dropdown.workType', this.element)
+            $('.dropdown.workType', this.el)
                 .dropdown({ onChange: this.onWorkTypeChange.bind(this) })
                 .dropdown('set selected', this.activity.workType);
-            $('.dropdown.crop', this.element)
+            $('.dropdown.crop', this.el)
                 .dropdown({ onChange: this.onCropChange.bind(this) })
                 .dropdown('set selected', this.activity.crops);
-            const $zone = $('.dropdown.zone', this.element)
+            const $zone = $('.dropdown.zone', this.el)
                 .dropdown({ onChange: this.onZoneChange.bind(this) });
             if(this.activity.zones && this.activity.zones.length) {
                 $zone.dropdown('set selected', this.activity.zones.map(z => z.name));
             }
-            $('.calendar.due-date', this.element).calendar({
+            $('.calendar.due-date', this.el).calendar({
                 type: 'date',
                 firstDayOfWeek: 1,
                 onChange: this.onDateChange.bind(this),
@@ -144,7 +147,7 @@ export class ActivityDetail {
                 }
             }).calendar('set date', this.activity.date);
 
-            const $completedDate = $('.calendar.completed-date', this.element).calendar({
+            const $completedDate = $('.calendar.completed-date', this.el).calendar({
                 type: 'date',
                 firstDayOfWeek: 1,
                 onChange: this.onCompletedDateChange.bind(this),
@@ -164,13 +167,13 @@ export class ActivityDetail {
             }
         }
 
-        $('.button-container', this.element).visibility({ type: 'fixed', offset: 57});
+        $('.button-container', this.el).visibility({ type: 'fixed', offset: 57});
     }
 
     detached() {
-        $('.dropdown', this.element).dropdown('destroy');
-        $('.calendar', this.element).calendar('destroy');
-        $('.button-container', this.element).visibility('destroy');
+        $('.dropdown', this.el).dropdown('destroy');
+        $('.calendar', this.el).calendar('destroy');
+        $('.button-container', this.el).visibility('destroy');
     }
 
     save() {

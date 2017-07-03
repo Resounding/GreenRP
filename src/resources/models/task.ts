@@ -3,8 +3,6 @@ import {ActivityStatus, JournalRecordingType, WorkType} from './activity';
 import {Recurrence, RecurrenceDocument, Time, TimeDocument} from './recurrence';
 
 export interface Task {
-    _id?:string;
-    _rev?:string;
     type:string;
     name:string;
     startTime:Time;
@@ -18,8 +16,6 @@ export interface Task {
 }
 
 export class TaskDocument implements Task {
-    _id?:string;
-    _rev?:string;
     type:string;
     name:string;
     startTime:TimeDocument = new TimeDocument;
@@ -31,7 +27,7 @@ export class TaskDocument implements Task {
     _recurring:boolean = false;
     recurrence:Recurrence = null;
 
-    constructor(data:Task | {startTime?:Time} = {}) {
+    constructor(data:Task | {startTime?:Time} = {}, public index:number) {
         Object.assign(this, data);
 
         if(data.startTime) {
@@ -43,9 +39,9 @@ export class TaskDocument implements Task {
         }
     }
 
-    @computedFrom('_id')
+    @computedFrom('index')
     get isNew():boolean {
-        return !!this._id;
+        return this.index === -1;
     }
 
     @computedFrom('_recurring')
@@ -65,8 +61,6 @@ export class TaskDocument implements Task {
 
     toJSON():Task {
         const json:Task = {
-            _id: null,
-            _rev: null,
             type: this.type,
             name: this.name,
             startTime: this.startTime.toJSON(),
@@ -80,10 +74,6 @@ export class TaskDocument implements Task {
         };
         if(this.recurring) {
             json.recurrence = this.recurrence;
-        }
-        if(!this.isNew) {
-            json._id = this._id;
-            json._rev = this._rev;
         }
         return json;
     }

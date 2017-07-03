@@ -19,10 +19,11 @@ export class OrderDetail {
     calculator:OrderCalculator;
     populatePromise:Promise<any>;
     zone:CalculatorZone;
+    el:Element;
 
     constructor(private orderService:OrdersService, private referenceService:ReferenceService,
         private capacityService:CapacityService, private auth:Authentication,
-        private dialogService:DialogService, private controller:DialogController, private element:Element) {
+        private dialogService:DialogService, private controller:DialogController) {
         controller.settings.lock = true;
         controller.settings.position = position;
     }
@@ -61,7 +62,7 @@ export class OrderDetail {
 
     attached() {
         this.populatePromise.then(() => {
-            $('.calendar', this.element).calendar({
+            $('.calendar', this.el).calendar({
                 type: 'date',
                 initialDate: this.calculator.order.arrivalDate,
             }).calendar('set date', this.calculator.order.arrivalDate)
@@ -70,7 +71,7 @@ export class OrderDetail {
     }
 
     detached() {
-        $('.calendar', this.element).calendar('destroy');
+        $('.calendar', this.el).calendar('destroy');
     }
 
     onDateChange(value:string) {

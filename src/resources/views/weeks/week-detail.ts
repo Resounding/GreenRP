@@ -21,8 +21,9 @@ export class WeekDetail {
     orders: WeekDetailOrder[] = [];
     zones: string[];
     allWeeks: Week[];
+    el:Element;
 
-    constructor(private events:EventAggregator, private ordersService:OrdersService, referenceService:ReferenceService, private dialogService:DialogService, private element:Element) {
+    constructor(private events:EventAggregator, private ordersService:OrdersService, referenceService:ReferenceService, private dialogService:DialogService) {
         this.loadOrders();
 
         referenceService.zones()
@@ -42,16 +43,16 @@ export class WeekDetail {
             onShow: this.onShow.bind(this)
         });
 
-        $('[name=zones]', this.element).dropdown({
+        $('[name=zones]', this.el).dropdown({
             forceSelection: false,
             placeholder: 'Select Zone',
             onChange: this.refresh.bind(this)
         });
-        $('.calendar.start', this.element).calendar({
+        $('.calendar.start', this.el).calendar({
             type: 'date',
             onChange: this.onStartChange.bind(this)
         });
-        $('.calendar.end', this.element).calendar({
+        $('.calendar.end', this.el).calendar({
             type: 'date',
             onChange: this.onEndChange.bind(this)
         });
@@ -61,21 +62,21 @@ export class WeekDetail {
         this.orderChangedSubscription.dispose();
         this.showWeekDetailSubscription.dispose();
         $('#week-detail-sidebar').sidebar('destroy');
-        $('[name=zones]', this.element).dropdown('destroy');
-        $('.calendar.start', this.element).calendar('destroy')
-        $('.calendar.end', this.element).calendar('destroy')
+        $('[name=zones]', this.el).dropdown('destroy');
+        $('.calendar.start', this.el).calendar('destroy')
+        $('.calendar.end', this.el).calendar('destroy')
     }
 
     show(week:Week) {
         $('#week-detail-sidebar').sidebar('show');
         this.filter = new WeekDetailFilter(week);
-        $('.calendar.start', this.element).calendar('set date', this.filter.startDate);
-        $('.calendar.end', this.element).calendar('set date', this.filter.endDate);
+        $('.calendar.start', this.el).calendar('set date', this.filter.startDate);
+        $('.calendar.end', this.el).calendar('set date', this.filter.endDate);
         this.refresh();
     }
 
     close() {
-        $('i', this.element).popup('destroy');
+        $('i', this.el).popup('destroy');
         $('#week-detail-sidebar').sidebar('hide');
     }
 
@@ -87,16 +88,16 @@ export class WeekDetail {
     }
 
     refresh() {
-        $('i', this.element).popup('destroy');
+        $('i', this.el).popup('destroy');
         this.orders = this.weekDetailService.filter(this.filter);
         window.setTimeout(() => {
-            $('i', this.element).popup();
+            $('i', this.el).popup();
         });
     }
 
     onShow() {
-        $('.calendar', this.element).calendar('popup', 'show');
-        $('.calendar', this.element).calendar('popup', 'hide');
+        $('.calendar', this.el).calendar('popup', 'show');
+        $('.calendar', this.el).calendar('popup', 'hide');
     }
 
     onStartChange(value:string) {
