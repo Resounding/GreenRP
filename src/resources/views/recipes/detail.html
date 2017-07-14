@@ -56,7 +56,7 @@
                         <div class="field zone">
                             <select value.bind="recipe.zone" matcher.bind="zoneMatcher">
                                 <option model.bind="null">Choose Zone</option>
-                                <option repeat.for="zone of zones | sort:'name'" model.bind="zone">${zone.name}</option>
+                                <option repeat.for="zone of zones" model.bind="zone">${zone.name}</option>
                             </select>
                         </div>
                     </div>

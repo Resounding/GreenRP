@@ -26,7 +26,21 @@ export class ReceipeDetail {
             this.referenceService.plants()
                 .then(plants => this.plants = plants),
             this.referenceService.zones()
-                .then(zones => this.zones = zones)
+                .then(zones => {
+                    this.zones = zones.reduce((memo, zone) => {
+                        if(zone.name === 'F/G') {
+                            const f = Object.assign({}, zone),
+                                g = Object.assign({}, zone);
+                            f.name = 'F';
+                            g.name = 'G';
+                            memo.push(f);
+                            memo.push(g);
+                        } else {
+                            memo.push(zone);
+                        }
+                        return memo;
+                    }, []);
+                })
         ]);
 
         return setup

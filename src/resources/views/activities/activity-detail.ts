@@ -44,7 +44,21 @@ export class ActivityDetail {
             this.usersService.getAll()
                 .then(result => this.users = result),
             this.referenceService.zones()
-                .then(result => this.zones = result),
+                .then(result => {
+                    this.zones = result.reduce((memo, zone) => {
+                        if(zone.name === 'F/G') {
+                            const f = Object.assign({}, zone),
+                                g = Object.assign({}, zone);
+                            f.name = 'F';
+                            g.name = 'G';
+                            memo.push(f);
+                            memo.push(g);
+                        } else {
+                            memo.push(zone);
+                        }
+                        return memo;
+                    }, []);
+                }),
             this.ordersService.getAll()
                 .then(orders => {
                     const now = moment().toWeekNumberId(),
@@ -111,8 +125,6 @@ export class ActivityDetail {
     }
 
     attached() {
-        console.log(this.el);
-        debugger;
         if(!this.activity.done || this.auth.isInRole(Roles.ProductionManager)) {
             $('.dropdown.status', this.el)
                 .dropdown({ onChange: this.onStatusChange.bind(this) })

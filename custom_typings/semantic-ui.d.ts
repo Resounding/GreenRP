@@ -52,7 +52,7 @@ interface sidebarOptions {
 }
 
 interface JQuery {
-  visibility(options?: visibilityOptions) : JQuery;
+  visibility(options?: visibilityOptions | string) : JQuery;
   transition(transition:string|transitionOptions) : JQuery;
   dropdown(options?: dropdownOptions | string, values?:any) : JQuery;
   calendar(options?: calendarOptions | string, values?:any) : JQuery;

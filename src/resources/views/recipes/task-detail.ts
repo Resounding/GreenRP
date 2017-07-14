@@ -20,17 +20,15 @@ export class TaskDetail {
     endingTypes:EndingTypes = EndingTypes;
     events:Event[] = [
         Events.Stick,
-        Events.Space,
         Events.LightsOut,
         Events.Flower
     ];
     weekdays = [
-        {id: 1, text: 'Monday'},
-        {id: 2, text: 'Tuesday'},
-        {id: 3, text: 'Wednesday'},
-        {id: 4, text: 'Thursday'},
-        {id: 5, text: 'Friday'},
-        {id: 6, text: 'Saturday'},
+        {id: 1, text: 'Mon'},
+        {id: 2, text: 'Tue'},
+        {id: 3, text: 'Wed'},
+        {id: 4, text: 'Thu'},
+        {id: 5, text: 'Fri'}
     ];
     relativeTimes = [
         {id: RelativeTimes.On, text: 'The week of'},

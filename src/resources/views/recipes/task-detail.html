@@ -28,7 +28,7 @@
                 <div class="field four wide">
                     <div class="field required">
                         <label for="name">Task Name:</label>
-                        <input type="text" id="name" value.bind="task.name">
+                        <input type="text" id="name" value.bind="task.name" autofocus>
                     </div>
                 </div>
                 <div class="field four wide">
@@ -138,8 +138,22 @@
                     <div class="fields inline">
                         <label>Every</label>
                         <input type="number" value.bind="numberOfPeriods">
-                        <label>&nbsp;week${numberOfPeriods == 1 ? '' : 's'} on</label>
+                        <label>&nbsp;week${numberOfPeriods == 1 ? '' : 's'}</label>
                         <div class="inline fields">
+                            <div class="field">
+                                <div class="ui radio checkbox">
+                                    <input type="radio" id="anyday" name="anyDay" model.bind="true" checked.bind="task.recurrence.anyDay">
+                                    <label for="anyday">Any day</label>
+                                </div>
+                            </div>
+                            <div class="field fields inline">
+                                <div class="ui radio checkbox">
+                                    <input type="radio" id="particularday" name="anyDay" model.bind="false" checked.bind="task.recurrence.anyDay">
+                                    <label for="particularday">On</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="inline fields" hide.bind="task.recurrence.anyDay">
                             <div class="field" repeat.for="day of weekdays">
                                 <div class="ui checkbox">
                                     <input type="checkbox" id="weekday-${day.id}" model.bind="day.id" checked.bind="weekDays">

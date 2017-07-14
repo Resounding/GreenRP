@@ -1,5 +1,5 @@
 import {computedFrom} from 'aurelia-framework';
-import {ActivityStatus, JournalRecordingType, WorkType} from './activity';
+import {ActivityStatus, JournalRecordingType, JournalRecordingTypes, WorkType, WorkTypes} from './activity';
 import {Recurrence, RecurrenceDocument, Time, TimeDocument} from './recurrence';
 
 export interface Task {
@@ -20,10 +20,10 @@ export class TaskDocument implements Task {
     name:string;
     startTime:TimeDocument = new TimeDocument;
     status:ActivityStatus;
-    workType:WorkType;
-    description:string;
-    recordingType:JournalRecordingType;
-    unitOfMeasure?:string;
+    workType:WorkType = WorkTypes.Growing;
+    description:string = '';
+    recordingType:JournalRecordingType = JournalRecordingTypes.CheckList;
+    unitOfMeasure?:string = null;
     _recurring:boolean = false;
     recurrence:Recurrence = null;
 

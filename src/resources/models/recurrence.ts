@@ -1,23 +1,23 @@
-import {computedFrom} from 'aurelia-framework';
-
 export interface Recurrence {
     numberOfPeriods:number;
-    weekDays:number[];
-    numberOfOccurrences:number;
-    endTime:Time;
+    weekDays:number[] | null;
+    numberOfOccurrences:number | null;
+    endTime:Time | null;
     period:Period;
     endingType:EndingType;
+    anyDay:boolean;
 }
 
 export class RecurrenceDocument implements Recurrence {
     private _period:Period = Periods.Day;
     private _endingType:EndingType = EndingTypes.NoEnd;
+    private _anyDay:boolean = true;
 
     numberOfPeriods:number = 1;
-    weekDays:number[] = [];
+    weekDays:number[] | null = [];
 
-    numberOfOccurrences:number = null;
-    endTime:TimeDocument = null;
+    numberOfOccurrences:number | null = null;
+    endTime:TimeDocument | null = null;
 
     constructor(data:Recurrence | {endTime?:any} = {}) {
         Object.assign(this, data);
@@ -27,7 +27,6 @@ export class RecurrenceDocument implements Recurrence {
         }
     }
 
-    @computedFrom('_period')
     get period():Period {
         return this._period;
     }
@@ -36,14 +35,27 @@ export class RecurrenceDocument implements Recurrence {
             this._period = value;
 
             if(equals(value, Periods.Week)) {
-                if(!this.weekDays || !this.weekDays.length) {
-                    this.weekDays = [1];
+                if(!this.anyDay) {
+                    if(!this.weekDays || !this.weekDays.length) {
+                        this.weekDays = [1];
+                    }
+                } else {
+                    this.weekDays = [];
                 }
             }            
         }        
     }
 
-    @computedFrom('_endingType')
+    get anyDay():boolean {
+        return this._anyDay;
+    }
+    set anyDay(value:boolean) {
+        if(this._anyDay === value) return;
+
+        this._anyDay = value;
+        this.weekDays = value ? null : [1];
+    }
+
     get endingType():EndingType {
         return this._endingType;
     }
@@ -64,20 +76,21 @@ export class RecurrenceDocument implements Recurrence {
     }
 
     toJSON():Recurrence {
-        const json = {
+        const json:Recurrence = {
             numberOfPeriods: this.numberOfPeriods,
             weekDays: null,
             numberOfOccurrences: null,
             endTime: null,
             period: this.period,
-            endingType: this.endingType
+            endingType: this.endingType,
+            anyDay: this.anyDay
         };
-        if(equals(this.period, Periods.Week)) {
+        if(equals(this.period, Periods.Week) && this.anyDay) {
             json.weekDays = this.weekDays;
         }
         if(equals(this.endingType, EndingTypes.EndAfter)) {
             json.numberOfOccurrences = this.numberOfOccurrences;
-        } else if(equals(this.endingType, EndingTypes.EndDate)) {
+        } else if(equals(this.endingType, EndingTypes.EndDate) && this.endTime) {
             json.endTime = this.endTime.toJSON();
         }
         return json;
@@ -86,9 +99,9 @@ export class RecurrenceDocument implements Recurrence {
 
 export interface Time {
     event:Event;
-    weekday:number;
-    relativePeriod:Period;
-    numberOfRelativePeriods:number;
+    weekday:number | null;
+    relativePeriod:Period | null;
+    numberOfRelativePeriods:number | null;
     relativeTime:RelativeTime;
     anyDay:boolean;
 }
@@ -98,15 +111,14 @@ export class TimeDocument implements Time {
     private _anyDay:boolean = true;
 
     event:Event = Events.Stick;
-    weekday:number;
-    relativePeriod:Period = null;
-    numberOfRelativePeriods:number = null;
+    weekday:number | null;
+    relativePeriod:Period | null = null;
+    numberOfRelativePeriods:number | null = null;
 
     constructor(data:Time | {} = {}) {
         Object.assign(this, data);
     }
 
-    @computedFrom('_relativeTime')
     get relativeTime():RelativeTime {
         return this._relativeTime;
     }
@@ -125,7 +137,6 @@ export class TimeDocument implements Time {
         }
     }
 
-    @computedFrom('_anyDay')
     get anyDay():boolean {
         return this._anyDay;
     }
@@ -165,7 +176,7 @@ export class Periods {
     public static Day:Period = 'Day';
     public static Week:Period = 'Week';
 
-    public static equals(a:Period, b:Period):boolean {
+    public static equals(a:Period | null, b:Period | null):boolean {
         return equals(a, b);
     }
 }
@@ -175,12 +186,15 @@ export class RelativeTimes {
     public static On:RelativeTime = 'On';
     public static Before:RelativeTime = 'Before';
     public static After:RelativeTime = 'After';
+
+    public static equals(a:RelativeTime, b:RelativeTime) {
+        return equals(a, b);
+    }
 }
 
-export type Event = 'Stick' | 'Space' | 'Lights-out' | 'Flower';
+export type Event = 'Stick' | 'Lights-out' | 'Flower';
 export class Events {
     public static Stick:Event = 'Stick';
-    public static Space:Event = 'Space';
     public static LightsOut:Event = 'Lights-out';
     public static Flower:Event = 'Flower';
 
@@ -200,7 +214,7 @@ export class EndingTypes {
     }
 }
 
-function equals(a:string, b:string) {
+function equals(a:string | null, b:string | null) {
     if(a == null || b == null) return false;
     return a.toLowerCase() === b.toLowerCase();
 }

@@ -39,7 +39,7 @@ export class App {
             ]);
         }
 
-        if(this.auth.isInRole(Roles.ProductionManager) || this.auth.isInRole(Roles.Administrator)) {
+        if(this.auth.isInRole(Roles.ProductionManager) || this.auth.isInRole(Roles.Administrator) || this.auth.isInRole(Roles.Grower)) {
             config.map([
                 {route: 'recipes', name: 'recipes', moduleId: 'resources/views/recipes/index', title: 'Recipes', nav: true, settings: { auth: true }},
                 {route: 'recipes/:id', name: 'recipe-detail', moduleId: 'resources/views/recipes/detail', settings: { auth: true }},
