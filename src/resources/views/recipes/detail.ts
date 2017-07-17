@@ -21,43 +21,40 @@ export class ReceipeDetail {
     constructor(private service:RecipesService, private referenceService:ReferenceService,
         private router:Router, private dialogService:DialogService) { }
 
-    activate(params) {
-        const setup = Promise.all([
-            this.referenceService.plants()
-                .then(plants => this.plants = plants),
-            this.referenceService.zones()
-                .then(zones => {
-                    this.zones = zones.reduce((memo, zone) => {
-                        if(zone.name === 'F/G') {
-                            const f = Object.assign({}, zone),
-                                g = Object.assign({}, zone);
-                            f.name = 'F';
-                            g.name = 'G';
-                            memo.push(f);
-                            memo.push(g);
-                        } else {
-                            memo.push(zone);
-                        }
-                        return memo;
-                    }, []);
-                })
-        ]);
+    async activate(params) {
+        try {
 
-        return setup
-            .then(() => {
-                if(params.id && params.id !== 'new') {
-                    this.service.getOne(params.id)
-                        .then(result => {
-                            this.recipe = result;
-                            this.recipeId = this.recipe._id;
-                            this.title = 'Edit Recipe';
-                        })
-                        .catch(Notifications.error);
+            this.plants = await this.referenceService.plants();
+            const zones = await this.referenceService.zones();
+            this.zones = zones.reduce((memo, zone) => {
+                if(zone.name === 'F/G') {
+                    const f = Object.assign({}, zone),
+                        g = Object.assign({}, zone);
+                    f.name = 'F';
+                    g.name = 'G';
+                    memo.push(f);
+                    memo.push(g);
                 } else {
-                    this.hasPlant = true;
+                    memo.push(zone);
                 }
-            })
-            .catch(Notifications.error);
+                return memo;
+            }, []);
+
+            if(params.id && params.id !== 'new') {
+                this.service.getOne(params.id)
+                    .then(result => {
+                        this.recipe = result;
+                        this.recipeId = this.recipe._id;
+                        this.title = 'Edit Recipe';
+                    })
+                    .catch(Notifications.error);
+            } else {
+                this.hasPlant = true;
+            }
+            
+        } catch(e) {
+            Notifications.error(e);
+        }
     }
 
     save() {

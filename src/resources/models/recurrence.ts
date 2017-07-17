@@ -99,6 +99,7 @@ export class RecurrenceDocument implements Recurrence {
 
 export interface Time {
     event:Event;
+    weekNumber:number | null;
     weekday:number | null;
     relativePeriod:Period | null;
     numberOfRelativePeriods:number | null;
@@ -109,8 +110,9 @@ export interface Time {
 export class TimeDocument implements Time {
     private _relativeTime:RelativeTime;
     private _anyDay:boolean = true;
+    private _weekNumber:number | null = null;
 
-    event:Event = Events.Stick;
+    event:Event = Events.Stick;    
     weekday:number | null;
     relativePeriod:Period | null = null;
     numberOfRelativePeriods:number | null = null;
@@ -151,12 +153,24 @@ export class TimeDocument implements Time {
         }
     }
 
+    get weekNumber():number | null {
+        return this._weekNumber;
+    }
+    set weekNumber(value:number | null) {
+        if(value == null) {
+            this._weekNumber = null;
+        } else {
+            this._weekNumber = numeral(value).value();
+        }
+    }
+
     toJSON():Time {
         const json:Time = {
             event: this.event,
             relativeTime: this.relativeTime,
             anyDay: this.anyDay,
             weekday: null,
+            weekNumber: null,
             relativePeriod: null,
             numberOfRelativePeriods: null            
         };
@@ -166,6 +180,9 @@ export class TimeDocument implements Time {
         }
         if(!this.anyDay) {
             json.weekday = this.weekday;
+        }
+        if(Events.equals(this.event, Events.Week)) {
+            json.weekNumber = this.weekNumber;
         }
         return json;
     }
@@ -192,11 +209,12 @@ export class RelativeTimes {
     }
 }
 
-export type Event = 'Stick' | 'Lights-out' | 'Flower';
+export type Event = 'Stick' | 'Lights-out' | 'Flower' | 'Week';
 export class Events {
     public static Stick:Event = 'Stick';
     public static LightsOut:Event = 'Lights-out';
     public static Flower:Event = 'Flower';
+    public static Week:Event = 'Week';
 
     public static equals(a:Event, b:Event):boolean {
         return equals(a, b);

@@ -1,7 +1,7 @@
 <template>
     <require from="styles/tasks.css"></require>
 
-    <div class="ui ${task.recurring ? 'recurring' : 'not-recurring'}" id="task-detail-container" ref="el">
+    <div class="ui ${task.recurring ? 'recurring' : 'not-recurring'} ${isPlant ? 'plant-task' : ''} ${isZone ? 'zone-task' : ''}" id="task-detail-container" ref="el">
         <div class="button-container">
             <button type="button" class="ui basic red icon button" click.delegate="delete()" data-tooltip="Click to Delete this Task" data-position="bottom right" hide.bind="task.isNew">
                 <i class="trash button icon"></i>
@@ -63,23 +63,28 @@
             <div class="fields row">
                 <div with.bind="task.startTime" class="fields inline ${relativeTime} ${anyDay ? 'any-day' : ''}">
                     <label for="relativeTime">Starting&nbsp;</label>
-                    <input type="number" value.bind="numberOfRelativePeriods" class="not-on">
-                    <field>
+                    <input type="number" value.bind="numberOfRelativePeriods" class="not-on plant-field">
+                    <div class="plant-field">
                         <select value.bind="relativePeriod" class="not-on">
                             <option value.bind="periods.Day">Day${numberOfRelativePeriods == 1 ? '' : 's'}</option>
                             <option value.bind="periods.Week">Week${numberOfRelativePeriods == 1 ? '' : 's'}</option>
                         </select>
-                    </field>
-                    <field>
+                    </div>
+                    <div class="plant-field">
                         <select id="relativeTime" value.bind="relativeTime">
                             <option repeat.for="time of relativeTimes" value.bind="time.id">${time.text}</option>
                         </select>
-                    </field>
-                    <field>
+                    </div>
+                    <div class="plant-field">
                         <select value.bind="event">
                             <option repeat.for="event of events" value.bind="event">${event}</option>
                         </select>
-                    </field>
+                    </div>
+                    <div class="zone-field">
+                        <select class="dropdown start-week">
+                            <option repeat.for="week of weeks" value.bind="week.value">${week.text}</option>
+                        </select>
+                    </div>
                     <div class="field">
                         <div class="ui radio checkbox">
                             <input type="radio" id="starts-any-day" name="start-any-day" model.bind="true" checked.bind="anyDay">
@@ -93,11 +98,11 @@
                             <label for="starts-on-day">On</label>
                         </div>
                     </div>
-                    <field class="weekday">
+                    <div class="weekday">
                         <select value.bind="weekday">
                             <option repeat.for="day of weekdays" value.bind="day.id">${day.text}</option>
                         </select>
-                    </field>
+                    </div>
                 </div>                
             </div>
             <div class="fields row">
@@ -180,28 +185,33 @@
                         <label for="end-after-date">End date</label>
                     </div>
                 </div>
-                <div with.bind="task.recurrence" class="fields inline recurrence end-after-occurrences">
+                <div with.bind="task.recurrence" class="fields inline recurrence end-after-occurrences plant-field">
                     <input type="number" id="numberOfOccurrences" value.bind="numberOfOccurrences">
                     <label for="numberOfOccurrences">occurrence${numberOfOccurrences == 1 ? '' : 's'}.</label>
                 </div>
                 <div with.bind="task.recurrence.endTime" class="fields inline recurrence end-date ${relativeTime} ${anyDay ? 'any-day' : ''}">
-                    <input type="number" value.bind="numberOfRelativePeriods" class="not-on">
-                    <field>
+                    <input type="number" value.bind="numberOfRelativePeriods" class="not-on plant-field">
+                    <div class="plant-field">
                         <select value.bind="relativePeriod" class="not-on">
                             <option value.bind="periods.Day">Day${numberOfRelativePeriods == 1 ? '' : 's'}</option>
                             <option value.bind="periods.Week">Week${numberOfRelativePeriods == 1 ? '' : 's'}</option>
                         </select>
-                    </field>
-                    <field>
+                    </div>
+                    <div class="plant-field">
                         <select id="relativeTime" value.bind="relativeTime">
                             <option repeat.for="time of relativeTimes" value.bind="time.id">${time.text}</option>
                         </select>
-                    </field>
-                    <field>
+                    </div>
+                    <div class="plant-field">
                         <select value.bind="event">
                             <option repeat.for="event of events" value.bind="event">${event}</option>
                         </select>
-                    </field>
+                    </div>
+                    <div class="zone-field">
+                        <select class="dropdown end-week">
+                            <option repeat.for="week of weeks" value.bind="week.value">${week.text}</option>
+                        </select>
+                    </div>
                     <div class="field">
                         <div class="ui radio checkbox">
                             <input type="radio" id="ends-any-day" name="end-any-day" model.bind="true" checked.bind="anyDay">
@@ -215,11 +225,11 @@
                             <label for="ends-on-day">On</label>
                         </div>
                     </div>
-                    <field class="weekday">
+                    <div class="weekday">
                         <select value.bind="weekday">
                             <option repeat.for="day of weekdays" value.bind="day.id">${day.text}</option>
                         </select>
-                    </field>
+                    </div>
                 </div>
             </div>
         </form>

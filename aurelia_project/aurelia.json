@@ -96,7 +96,7 @@
                     "node_modules/underscore/underscore.js",
                     "node_modules/toastr/toastr.js",
                     "node_modules/pouchdb/dist/pouchdb.js",
-                    "node_modules/pouchdb-find/dist/pouchdb.find.js",
+                    "node_modules/pouchdb/dist/pouchdb.find.js",
                     "node_modules/semantic-ui-css/semantic.js",
                     "node_modules/semantic-ui-calendar/dist/calendar.js",
                     "scripts/pdfmake.min.js",

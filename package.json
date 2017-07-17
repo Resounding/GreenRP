@@ -2,7 +2,7 @@
   "name": "GreenRP",
   "description": "The Greenhouse Resource Planning application for Boekestyn Greenhouses.",
   "publisher": "Resounding Software",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/Resounding/GreenRP"
@@ -20,8 +20,8 @@
     "jquery": "^3.1.0",
     "moment": "^2.18.1",
     "numeral": "^2.0.6",
-    "pouchdb": "^6.2.0",
-    "pouchdb-find": "^0.10.5",
+    "pouchdb": "^6.3.4",
+    "pouchdb-find": "^6.3.4",
     "requirejs": "^2.3.3",
     "semantic-ui-calendar": "^0.0.8",
     "semantic-ui-css": "^2.2.10",

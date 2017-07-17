@@ -15,6 +15,9 @@ export class TaskDetail {
     errors:string[] = [];
     recipe:RecipeDocument;
     task:TaskDocument;
+    isPlant:boolean = false;
+    isZone:boolean = false;
+    weeks:WeekSelection[] = [];
     workTypes:WorkType[];
     periods:Periods = Periods;
     endingTypes:EndingTypes = EndingTypes;
@@ -49,8 +52,23 @@ export class TaskDetail {
         return this.service.getOne(params.id)
             .then(result => {
                 this.recipe = result;
+
+                this.isPlant = this.recipe.plant != null;
+                this.isZone = this.recipe.zone != null;
+
+                if(this.isZone) {
+                    for(let i = 1; i < 53; i++) {
+                        this.weeks.push({ value: i, text: `Week ${i}`});
+                    }
+                    this.events = [Events.Week];
+                }
+
                 if(isNew) {
                     this.task = new TaskDocument({ startTime: new TimeDocument }, -1);
+                    if(this.isZone) {
+                        this.task.startTime.event = Events.Week;
+                        this.task.startTime.weekNumber = moment().isoWeek();
+                    }
                 } else {
                     const taskIndex = parseInt(taskId) || 0;
                     this.task = new TaskDocument(this.recipe.tasks[taskIndex].toJSON(), taskIndex);
@@ -65,6 +83,20 @@ export class TaskDetail {
 
         if(!this.task.isNew) {
             $workType.dropdown('set selected', this.task.workType);
+        }
+
+        const $startWeek = $('.dropdown.start-week', this.el)
+            .dropdown({ onChange: this.onStartWeekChange.bind(this) });
+
+        if(!this.task.isNew) {
+            $startWeek.dropdown('set selected', this.task.startTime.weekNumber);
+        }
+
+        const $endWeek = $('.dropdown.end-week', this.el)
+            .dropdown({ onChange: this.onEndWeekChange.bind(this) });
+
+        if(!this.task.isNew && this.task.recurrence) {
+            $endWeek.dropdown('set selected', this.task.recurrence.endTime.weekNumber);
         }
     }
 
@@ -139,7 +171,22 @@ export class TaskDetail {
         this.task.workType = value;
     }
 
+    private onStartWeekChange(value:number) {
+        this.task.startTime.weekNumber = numeral(value).value();
+    }
+
+    private onEndWeekChange(value:number) {
+        if(this.task.recurrence) {
+            this.task.recurrence.endTime.weekNumber = numeral(value).value();
+        }
+    }
+
     private goToRecipe() {
         return this.router.navigateToRoute('recipe-detail', { id: this.recipe._id });
     }
+}
+
+interface WeekSelection {
+    value:number;
+    text:string;
 }
