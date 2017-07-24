@@ -1,0 +1,4 @@
+{
+    "name": "deploy",
+    "description": "Builds the project in release environment & deploys to the Deployment Directory"
+}
