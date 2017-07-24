@@ -10,7 +10,7 @@ export class EventViewCustomElement {
     el:Element;
 
     attached() {
-        $('.calendar', this.el).calendar({
+        $(this.el).calendar({
             type: 'date',
             initialDate: this.event.date,
             onChange: this.onDateChange.bind(this)
@@ -22,7 +22,7 @@ export class EventViewCustomElement {
     }
 
     detached() {
-        $('.calendar', this.el).calendar('destroy');
+        $(this.el).calendar('destroy');
         $('.dropdown', this.el).dropdown('destroy');
     }
 
