@@ -37,7 +37,12 @@ export class ZoneDetailService {
                     zoneOrders = orders
                         .reduce((memo:Map<string, Map<string,number>>, o:OrderDocument) => {
                             _.forEach(o.weeksInHouse, (value, key) => {
-                                const plantWeek = memo.get(o.plant.name);
+                                let plantWeek = memo.get(o.plant.name);
+
+                                if(!plantWeek) {
+                                    plantWeek =  new Map<string,number>();
+                                    memo.set(o.plant.name, plantWeek);                                    
+                                }
 
                                 if(!plantWeek.has(key)) {
                                     plantWeek.set(key, 0);
