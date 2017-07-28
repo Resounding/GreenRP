@@ -10,8 +10,10 @@ import {ActivitiesService} from '../../services/data/activities-service';
 import {User, UsersService} from '../../services/data/users-service';
 import {Notifications} from "../../services/notifications";
 
+const FILTER_SETTINGS_KEY:string = 'activityListFilterSettings';
+
 @autoinject
-export class ActivityIndex {
+export class ActivityIndex implements FilterSettings {
     allActivities:ActivityDocument[] = [];
     activities:ActivityDocument[] = [];
     workTypes:WorkType[];
@@ -22,7 +24,7 @@ export class ActivityIndex {
     filtersExpanded:boolean = false;
     el:Element;
     private _week:string = moment().toWeekNumberId();
-    private _workType:WorkType = null;
+    private _workType:WorkType = WorkTypes.ALL_WORK_TYPES;
     private _showAll:boolean = false;
     private _showCompleted:boolean = false;
     private _showIncomplete:boolean = false;
@@ -31,6 +33,8 @@ export class ActivityIndex {
         private auth:Authentication, private events:EventAggregator) { }
 
     activate() {
+        this.loadFilterSettings();
+        
         this.activitySyncChangeSubscription = this.events.subscribe(Database.ActivitiesSyncChangedEvent, this.load.bind(this));        
         this.activitiesChangedSubscription = this.events.subscribe(ActivitiesService.ActivitiesChangedEvent, this.load.bind(this));
 
@@ -61,17 +65,19 @@ export class ActivityIndex {
     deactivate() {
         this.activitySyncChangeSubscription.dispose();
         this.activitiesChangedSubscription.dispose();
+
+        this.saveFilterSettings();
     }
 
     attached() {
         $('.dropdown.work-type', this.el).dropdown({
             forceSelection: true,
             onChange: this.onWorkTypeChange.bind(this)
-        });
+        }).dropdown('set selected', this.workType);
         $('.dropdown.week', this.el).dropdown({
             forceSelection: true,
             onChange: this.onWeekChange.bind(this)
-        }).dropdown('set selected', this._week);
+        }).dropdown('set selected', this.week);
     }
 
     detached() {
@@ -100,6 +106,22 @@ export class ActivityIndex {
             .catch(err => {
                 log.error(err);
             });
+    }
+
+    @computedFrom('_week')
+    get week():string {
+        return this._week;
+    }
+    set week(value:string) {
+        this._week = value;
+    }
+
+    @computedFrom('_workType')
+    get workType():WorkType {
+        return this._workType;
+    }
+    set workType(value:WorkType) {
+        this._workType = value;
     }
 
     @computedFrom('_showAll')
@@ -142,35 +164,74 @@ export class ActivityIndex {
 
     private filter() {
         this.activities = this.allActivities;
-        if(!this._showAll) {
+        if(!this.showAll) {
             this.activities = this.activities.filter(a => a.assignedTo === this.auth.userInfo.name);
         }
-        if(!this._showCompleted) {
+        if(!this.showCompleted) {
             this.activities = this.activities.filter(a => !ActivityStatuses.equals(a.status, ActivityStatuses.Complete))
         }
-        if(!this._showIncomplete) {
+        if(!this.showIncomplete) {
             this.activities = this.activities.filter(a => !ActivityStatuses.equals(a.status, ActivityStatuses.Incomplete))
         }
-        if(this._workType && !WorkTypes.equals(this._workType, WorkTypes.ALL_WORK_TYPES)) {
-            this.activities = this.activities.filter(a => WorkTypes.equals(a.workType, this._workType));
+        if(this.week && !WorkTypes.equals(this.workType, WorkTypes.ALL_WORK_TYPES)) {
+            this.activities = this.activities.filter(a => WorkTypes.equals(a.workType, this.workType));
         }
-        if(this._week) {
-            this.activities = this.activities.filter(a => moment(a.date).toWeekNumberId() === this._week);
+        if(this.week) {
+            const thisWeek = this.week === moment().toWeekNumberId();
+            this.activities = this.activities.filter(a => (moment(a.date).toWeekNumberId() === this.week) ||
+                // asking for this week & not started & prior to today
+                (thisWeek && ActivityStatuses.equals(a.status, ActivityStatuses.NotStarted) && moment(a.date).isBefore(moment(), 'day')));
         }
     }
 
     private onWorkTypeChange(value:WorkType) {
-        this._workType = value;
+        this.workType = value;
         this.filter();
     }
 
     private onWeekChange(value:string) {
-        this._week = value;
+        this.week = value;
         this.filter();
+    }
+
+    private loadFilterSettings() {
+        const settingsJSON = sessionStorage.getItem(FILTER_SETTINGS_KEY);
+        if(settingsJSON) {
+            const defaults = {
+                    week: moment().toWeekNumberId(),
+                    workType: WorkTypes.ALL_WORK_TYPES,
+                    showAll: false,
+                    showCompleted: false,
+                    showIncomplete: false
+                },
+                settings:FilterSettings = JSON.parse(settingsJSON);
+            Object.assign(this, defaults, settings);
+        }
+    }
+
+    private saveFilterSettings() {
+        const settings:FilterSettings = {
+                week: this.week,
+                workType: this.workType,
+                showAll: this.showAll,
+                showCompleted: this.showCompleted,
+                showIncomplete: this.showIncomplete
+            },
+            json = JSON.stringify(settings);
+        
+        sessionStorage.setItem(FILTER_SETTINGS_KEY, json);
     }
 }
 
 interface WeekItem {
     id:string;
     text:string;
+}
+
+interface FilterSettings {
+    week:string;
+    workType:WorkType;
+    showAll:boolean;
+    showCompleted:boolean;
+    showIncomplete:boolean;
 }
