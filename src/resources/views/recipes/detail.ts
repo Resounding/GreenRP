@@ -23,32 +23,49 @@ export class ReceipeDetail {
 
     async activate(params) {
         try {
-
-            this.plants = await this.referenceService.plants();
-            const zones = await this.referenceService.zones();
-            this.zones = zones.reduce((memo, zone) => {
-                if(zone.name === 'F/G') {
-                    const f = Object.assign({}, zone),
-                        g = Object.assign({}, zone);
-                    f.name = 'F';
-                    g.name = 'G';
-                    memo.push(f);
-                    memo.push(g);
-                } else {
-                    memo.push(zone);
-                }
-                return memo;
-            }, []);
-
             if(params.id && params.id !== 'new') {
                 this.service.getOne(params.id)
                     .then(result => {
                         this.recipe = result;
                         this.recipeId = this.recipe._id;
                         this.title = 'Edit Recipe';
+                        
+                        if(result.plant) {
+                            this.plants = [result.plant];
+                        } else if(result.zone) {
+                            this.zones = [result.zone];
+                        }
                     })
                     .catch(Notifications.error);
             } else {
+                const recipes = await this.service.getAll();
+
+                const plants = await this.referenceService.plants();
+                this.plants = plants.reduce((memo, plant) => {
+                    if(!recipes.some(r => r.plant && r.plant.id === plant.id)) {
+                        memo.push(plant);
+                    }
+                    return memo;
+                }, []);
+
+                const zones = await this.referenceService.zones(),
+                    fgIndex = zones.findIndex(z => z.name === 'F/G');
+                if(fgIndex !== -1) {
+                    
+                    const fg = zones[fgIndex],
+                        f = Object.assign({}, fg, { name: 'F' }),
+                        g = Object.assign({}, fg, { name: 'G' });
+
+                    zones.splice(fgIndex, 1, f, g);
+                }
+                
+                this.zones = zones.reduce((memo, zone) => {
+                    if(!recipes.some(r => r.zone && r.zone.name === zone.name)) {
+                        memo.push(zone);
+                    }
+                    return memo;
+                }, []);
+
                 this.hasPlant = true;
             }
             
