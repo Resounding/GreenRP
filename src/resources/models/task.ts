@@ -6,7 +6,6 @@ export interface Task {
     type:string;
     name:string;
     startTime:Time;
-    status:ActivityStatus;
     workType:WorkType;
     description:string;
     recordingType:JournalRecordingType;
@@ -19,7 +18,6 @@ export class TaskDocument implements Task {
     type:string;
     name:string;
     startTime:TimeDocument = new TimeDocument;
-    status:ActivityStatus;
     workType:WorkType = WorkTypes.Growing;
     description:string = '';
     recordingType:JournalRecordingType = JournalRecordingTypes.CheckList;
@@ -64,7 +62,6 @@ export class TaskDocument implements Task {
             type: this.type,
             name: this.name,
             startTime: this.startTime.toJSON(),
-            status: this.status,
             workType: this.workType,
             description: this.description,
             recordingType: this.recordingType,

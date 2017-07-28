@@ -1,3 +1,4 @@
+import {ActivitiesService} from '../../services/data/activities-service';
 import {autoinject, computedFrom} from 'aurelia-framework';
 import {DialogService} from 'aurelia-dialog';
 import {Router} from 'aurelia-router';
@@ -40,14 +41,16 @@ export class TaskDetail {
     ];
     el:Element;
 
-    constructor(private service:RecipesService, private router:Router, private dialogService:DialogService) { }
+    constructor(private service:RecipesService, private activityService:ActivitiesService,
+            private router:Router, private dialogService:DialogService) { }
 
     activate(params) {
         this.workTypes = WorkTypes.getAll();
 
         const recipeId = params.id,
             taskId = params.taskid,
-            isNew = taskId === 'new';
+            isNew = taskId === 'new',
+            activityId = params.activityid;
 
         return this.service.getOne(params.id)
             .then(result => {
@@ -69,6 +72,20 @@ export class TaskDetail {
                         this.task.startTime.event = Events.Week;
                         this.task.startTime.weekNumber = moment().isoWeek();
                     }
+
+                    if(activityId) {
+                        this.activityService.getOne(activityId)
+                            .then(activity => {
+                                Object.assign(this.task, {
+                                    name: activity.name,
+                                    description: activity.description,
+                                    workType: activity.workType,
+                                    recordingType: activity.recordingType,
+                                    unitOfMeasure: activity.unitOfMeasure                                    
+                                });
+                            })
+                            .catch(Notifications.error);
+                    }
                 } else {
                     const taskIndex = parseInt(taskId) || 0;
                     this.task = new TaskDocument(this.recipe.tasks[taskIndex].toJSON(), taskIndex);
@@ -81,7 +98,7 @@ export class TaskDetail {
         const $workType = $('.dropdown.workType', this.el)
             .dropdown({ onChange: this.onWorkTypeChange.bind(this) });
 
-        if(!this.task.isNew) {
+        if(this.task.workType) {
             $workType.dropdown('set selected', this.task.workType);
         }
 

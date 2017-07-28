@@ -1,12 +1,19 @@
 <template>
     <require from="styles/activities.css"></require>
-
     <div class="ui ${activity.isNew ? 'new' : ''}" id="activity-detail-container" ref="el">
         <div class="button-container">
             <button type="button" class="ui basic red icon button" click.delegate="delete()" data-tooltip="Click to Delete this Activity" data-position="bottom right" hide.bind="activity.isNew">
                 <i class="trash button icon"></i>
                 <span class="hide-mobile">Delete</span>
             </button>
+            <div class="ui basic button icon pointing dropdown recipe">
+                <i class="address card outline button icon"></i>
+                <div class="text">Add to Recipe</div>
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                    <a class="item" route-href="route:task-detail; params.bind: { id: recipe._id, taskid: 'new', activityid: activity._id }" repeat.for="recipe of recipes | sort:'name'">${recipe.name}</a>
+                </div>
+            </div>
             <a class="ui basic icon button" route-href="route: activities">
                 <i class="undo button icon"></i>
                 <span class="hide-mobile">Cancel</span>

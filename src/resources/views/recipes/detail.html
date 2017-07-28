@@ -18,7 +18,7 @@
         </div>
 
         <form class="ui form segment ${errors.length ? 'error' : ''}">
-            <h4 class="ui dividing header">${title}</h4>
+            <h2 class="ui dividing header">${title}</h2>
 
             <div class="ui error message" show.bind="errors.length">
                 <div class="ui list" repeat.for="e of errors">
@@ -26,44 +26,42 @@
                 </div>
             </div>
 
-            <div class="fields">
-                <div class="field eight wide" show.bind="!recipe.isNew && recipe.plant">
-                    <h4>${recipe.plant.name}</h4>
-                </div>
-                <div class="field eight wide" show.bind="!recipe.isNew && recipe.zone">
-                    <h4>${recipe.zone.name}</h4>
-                </div>
-                <div class="field eight wide" show.bind="recipe.isNew">
-                    <div class="inline fields ${recipe.plant ? 'has-plant' : ''} ${recipe.zone ? 'has-zone' : ''}">
-                        <div class="field">
-                            <div class="ui radio checkbox">
-                                <input type="radio" id="plant" name="plant-or-zone" model.bind="true" checked.bind="hasPlant">
-                                <label for="plant">Plant:</label>
+            <div class="grid">
+                <div class="row">
+                    <div class="eight wide" show.bind="recipe.isNew">
+                        <div class="inline fields ${recipe.plant ? 'has-plant' : ''} ${recipe.zone ? 'has-zone' : ''}">
+                            <div class="field">
+                                <div class="ui radio checkbox">
+                                    <input type="radio" id="plant" name="plant-or-zone" model.bind="true" checked.bind="hasPlant">
+                                    <label for="plant">Plant:</label>
+                                </div>
                             </div>
-                        </div>
-                        <div class="field plant">
-                            <select value.bind="recipe.plant" matcher.bind="plantMatcher">
-                                <option model.bind="null">Choose Plant</option>
-                                <option repeat.for="plant of plants | sort:'name'" model.bind="plant">${plant.name}</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <div class="ui radio checkbox">
-                                <input type="radio" id="zone" name="plant-or-zone" model.bind="true" checked.bind="hasZone">
-                                <label for="zone">Zone:</label>
+                            <div class="field plant">
+                                <select value.bind="recipe.plant" matcher.bind="plantMatcher">
+                                    <option model.bind="null">Choose Plant</option>
+                                    <option repeat.for="plant of plants | sort:'name'" model.bind="plant">${plant.name}</option>
+                                </select>
                             </div>
-                        </div>
-                        <div class="field zone">
-                            <select value.bind="recipe.zone" matcher.bind="zoneMatcher">
-                                <option model.bind="null">Choose Zone</option>
-                                <option repeat.for="zone of zones" model.bind="zone">${zone.name}</option>
-                            </select>
+                            <div class="field">
+                                <div class="ui radio checkbox">
+                                    <input type="radio" id="zone" name="plant-or-zone" model.bind="true" checked.bind="hasZone">
+                                    <label for="zone">Zone:</label>
+                                </div>
+                            </div>
+                            <div class="field zone">
+                                <select value.bind="recipe.zone" matcher.bind="zoneMatcher">
+                                    <option model.bind="null">Choose Zone</option>
+                                    <option repeat.for="zone of zones" model.bind="zone">${zone.name}</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="field eight wide">
-                    <label for="instructions">Instructions:</label>
-                    <textarea id="instructions" value.bind="recipe.instructions"></textarea>
+                <div class="row">
+                    <div class="ten wide">
+                        <label for="instructions">Instructions:</label>
+                        <textarea id="instructions" value.bind="recipe.instructions"></textarea>
+                    </div>
                 </div>
             </div>            
 

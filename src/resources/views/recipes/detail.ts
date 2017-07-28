@@ -10,7 +10,7 @@ import {ReferenceService} from '../../services/data/reference-service';
 import {Notifications} from '../../services/notifications';
 
 @autoinject
-export class ReceipeDetail {
+export class RecipeDetail {
     recipeId:string = 'new';
     recipe:RecipeDocument = new RecipeDocument;
     plants:Plant[];
@@ -28,7 +28,7 @@ export class ReceipeDetail {
                     .then(result => {
                         this.recipe = result;
                         this.recipeId = this.recipe._id;
-                        this.title = 'Edit Recipe';
+                        this.title = `Recipe for ${this.recipe.zone ? ' Zone ' : ''} ${this.recipe.name}`;
                         
                         if(result.plant) {
                             this.plants = [result.plant];

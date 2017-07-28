@@ -1,3 +1,4 @@
+import * as jquery from 'jquery';
 import {autoinject, computedFrom} from 'aurelia-framework';
 import {DialogService} from 'aurelia-dialog';
 import {Router} from 'aurelia-router';
@@ -13,11 +14,13 @@ import {
     WorkTypes,
 } from '../../models/activity';
 import {OrderDocument} from '../../models/order';
+import {Recipe} from '../../models/recipe';
 import {Zone} from '../../models/zone';
 import {Authentication, Roles} from '../../services/authentication';
 import {log} from '../../services/log';
 import {ActivitiesService, ActivitySaveResult} from '../../services/data/activities-service';
 import {OrdersService} from '../../services/data/orders-service';
+import {RecipesService} from '../../services/data/recipes-service';
 import {ReferenceService} from '../../services/data/reference-service';
 import {User, UsersService} from '../../services/data/users-service';
 import {Notifications} from '../../services/notifications';
@@ -33,98 +36,101 @@ export class ActivityDetail {
     users:User[];
     journalShowing:boolean = false;
     journalRecordingTypes:JournalRecordingType[];
+    recipes:Recipe[];
     el:Element;
     
     constructor(private service:ActivitiesService, private router:Router, private auth:Authentication,
         private referenceService:ReferenceService, private usersService:UsersService,
-        private ordersService:OrdersService, private dialogService:DialogService) { }
+        private ordersService:OrdersService, private recipeService:RecipesService, private dialogService:DialogService) { }
 
-    activate(params) {
-        const actions:Promise<any>[] = [
-            this.usersService.getAll()
-                .then(result => this.users = result),
-            this.referenceService.zones()
-                .then(result => {
-                    this.zones = result.reduce((memo, zone) => {
-                        if(zone.name === 'F/G') {
-                            const f = Object.assign({}, zone),
-                                g = Object.assign({}, zone);
-                            f.name = 'F';
-                            g.name = 'G';
-                            memo.push(f);
-                            memo.push(g);
-                        } else {
-                            memo.push(zone);
-                        }
-                        return memo;
-                    }, []);
-                }),
-            this.ordersService.getAll()
-                .then(orders => {
-                    const now = moment().toWeekNumberId(),
-                        ordersInHouse = orders.filter(o => {
-                            const weeks = Object.keys(o.weeksInHouse),
-                                isInHouse = weeks.indexOf(now) !== -1;  
+    async activate(params) {
+        try {
+            this.recipes = await this.recipeService.getAll();
+            this.users = await this.usersService.getAll();
+            const zones = await this.referenceService.zones(),
+                fgIndex = zones.findIndex(z => z.name === 'F/G');
+            if(fgIndex !== -1) {
+                
+                const fg = zones[fgIndex],
+                    f = Object.assign({}, fg, { name: 'F' }),
+                    g = Object.assign({}, fg, { name: 'G' });
 
-                            return isInHouse;
-                        })
-                        .map(o => {
-                            const plant = o.plant ? o.plant.abbreviation : '',
-                                customer = o.customer ? o.customer.abbreviation : '',
-                                arrival = moment(o.arrivalDate),
-                                stick = moment(o.stickDate),
-                                arrivalWeek = arrival.isoWeek(),
-                                arrivalDay = arrival.isoWeekday(),
-                                stickYear = stick.isoWeekYear(),
-                                stickWeek = stick.isoWeek(),
-                                stickDay = stick.isoWeekday(),
-                                orderNumber = `${plant}${customer}${stickYear}-${stickWeek}-${stickDay} (${arrivalWeek}-${arrivalDay})`;
-                            
-                            return orderNumber;
-                        })
-                        .sort();
-                    this.orders = ordersInHouse;
-                })
-        ];
-
-        if(params.id === 'new') {
-            this.activity = new ActivityDocument;
-            this.activity.date = new Date;
-            if(this.auth.isInRole(Roles.Grower)) {
-                this.activity.assignedTo = this.auth.userInfo.name;
-                this.activity.workType = WorkTypes.Growing;
-            } else if(this.auth.isInRole(Roles.LabourSupervisor)) {
-                this.activity.assignedTo = this.auth.userInfo.name;
-                this.activity.workType = WorkTypes.Labour;
+                zones.splice(fgIndex, 1, f, g);
             }
-        } else {
-            actions.push(this.service.getOne(params.id)
-                .then(result => {
-                    this.activity = result;
-                    if(!this.activity.journal) {
-                        this.activity.journal = new JournalDocument;
-                    }
-                }));
-        }
+            this.zones = zones;
 
-        this.workTypes = WorkTypes.getAll();
-        this.journalRecordingTypes = JournalRecordingTypes.getAll();        
+            const orders = await this.ordersService.getAll(),
+                now = moment().toWeekNumberId(),
+                ordersInHouse = orders.filter(o => {
+                    const weeks = Object.keys(o.weeksInHouse),
+                        isInHouse = weeks.indexOf(now) !== -1;  
 
-        return Promise.all(actions)
-            .then(() => {
-                if(!this.activity.done || this.auth.isInRole(Roles.ProductionManager)) {
-                    this.statuses = [
-                        ActivityStatuses.NotStarted,
-                        ActivityStatuses.InProgress,
-                        ActivityStatuses.Incomplete,
-                        ActivityStatuses.Complete,
-                    ];
+                    return isInHouse;
+                })
+                .map(o => {
+                    const plant = o.plant ? o.plant.abbreviation : '',
+                        customer = o.customer ? o.customer.abbreviation : '',
+                        arrival = moment(o.arrivalDate),
+                        stick = moment(o.stickDate),
+                        arrivalWeek = arrival.isoWeek(),
+                        arrivalDay = arrival.isoWeekday(),
+                        stickYear = stick.isoWeekYear(),
+                        stickWeek = stick.isoWeek(),
+                        stickDay = stick.isoWeekday(),
+                        orderNumber = `${plant}${customer}${stickYear}-${stickWeek}-${stickDay} (${arrivalWeek}-${arrivalDay})`;
+                    
+                    return orderNumber;
+                })
+                .sort();
+            this.orders = ordersInHouse;
+            
+            if(params.id === 'new') {
+                this.activity = new ActivityDocument;
+                this.activity.date = new Date;
+                if(this.auth.isInRole(Roles.Grower)) {
+                    this.activity.assignedTo = this.auth.userInfo.name;
+                    this.activity.workType = WorkTypes.Growing;
+                } else if(this.auth.isInRole(Roles.LabourSupervisor)) {
+                    this.activity.assignedTo = this.auth.userInfo.name;
+                    this.activity.workType = WorkTypes.Labour;
                 }
-            })
-            .catch(Notifications.error);
+            } else {
+                this.activity = await this.service.getOne(params.id);
+                if(!this.activity.journal) {
+                    this.activity.journal = new JournalDocument;
+                }
+                const crops = this.activity.crops;
+                // any crops not currently in the house put at the top of the list
+                if(Array.isArray(crops)) {
+                    for(let i = crops.length - 1; i >= 0; i--) {
+                        const crop = crops[i];
+                        if(this.orders.indexOf(crop) === -1) {
+                            this.orders.unshift(crop);
+                        }
+                    }
+                }
+            }
+
+            this.workTypes = WorkTypes.getAll();
+            this.journalRecordingTypes = JournalRecordingTypes.getAll();        
+
+            if(!this.activity.done || this.auth.isInRole(Roles.ProductionManager)) {
+                this.statuses = [
+                    ActivityStatuses.NotStarted,
+                    ActivityStatuses.InProgress,
+                    ActivityStatuses.Incomplete,
+                    ActivityStatuses.Complete,
+                ];
+            }
+        } catch(e) {
+            Notifications.error(e);
+        }
     }
 
     attached() {
+        $('.dropdown.recipe', this.el)
+            .dropdown({ onChange: this.onAddToRecipeChange.bind(this) });
+
         if(!this.activity.done || this.auth.isInRole(Roles.ProductionManager)) {
             $('.dropdown.status', this.el)
                 .dropdown({ onChange: this.onStatusChange.bind(this) })
@@ -266,6 +272,18 @@ export class ActivityDetail {
     onZoneChange(values:string[]) {
         const zones = this.zones.filter(z => values.indexOf(z.name) !== -1);
         this.activity.zones = zones;
+    }
+    async onAddToRecipeChange(value:string, text:string, $choice:jQuery) {
+        try {
+            const result = await this.saveActivity();
+            if(result.ok) {
+                const href = $choice.get(0).href;
+                this.router.navigate(href);
+            }
+
+        } catch(e) {
+            Notifications.error(e);
+        }
     }
 
     @computedFrom('activity.isNew')
