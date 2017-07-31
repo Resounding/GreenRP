@@ -88,19 +88,8 @@
             {
                 "name": "vendor-bundle.js",
                 "prepend": [
-                    "node_modules/bluebird/js/browser/bluebird.core.js",
-                    "node_modules/whatwg-fetch/fetch.js",
-                    "node_modules/jquery/dist/jquery.js",
-                    "node_modules/moment/moment.js",
-                    "node_modules/numeral/numeral.js",
-                    "node_modules/underscore/underscore.js",
-                    "node_modules/toastr/toastr.js",
-                    "node_modules/pouchdb/dist/pouchdb.js",
                     "node_modules/pouchdb/dist/pouchdb.find.js",
-                    "node_modules/semantic-ui-css/semantic.js",
                     "node_modules/semantic-ui-calendar/dist/calendar.js",
-                    "scripts/pdfmake.min.js",
-                    "scripts/vfs_fonts.js",
                     "scripts/moment-plugins.js",
                     "node_modules/requirejs/require.js"
                 ],
