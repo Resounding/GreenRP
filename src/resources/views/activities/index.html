@@ -53,6 +53,16 @@
                         </div>
                     </div>
                 </div>
+                <div class="column">
+                    <label for="week">Zone:</label>
+                    <div class="ui inline dropdown zone">
+                        <div class="text"></div>
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            <div class="item" repeat.for="zone of zones">${zone}</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="ui cards" show.bind="activities.length">

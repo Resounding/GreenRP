@@ -1,5 +1,5 @@
 import {autoinject, computedFrom} from 'aurelia-framework';
-import {DialogService, DialogResult} from 'aurelia-dialog';
+import {DialogService, DialogOpenResult} from 'aurelia-dialog';
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {Database} from "../../services/database";
 import {OrdersService} from "../../services/data/orders-service";
@@ -114,7 +114,7 @@ export class WeekDetail {
         this.dialogService.open({
             viewModel: OrderDetail,
             model: order
-        }).whenClosed((result:DialogResult) => {
+        }).whenClosed((result:DialogOpenResult) => {
             if(result.wasCancelled) return;
 
             this.loadOrders().then(this.refresh.bind(this));

@@ -1,5 +1,4 @@
 import {computedFrom} from 'aurelia-framework';
-import * as moment from 'moment';
 import { Zone } from './zone';
 
 export interface Activity {
@@ -60,6 +59,11 @@ export class ActivityDocument implements Activity {
     @computedFrom('status')
     get done():boolean {
         return ActivityStatuses.equals(this.status, ActivityStatuses.Complete) || ActivityStatuses.equals(this.status, ActivityStatuses.Incomplete);
+    }
+
+    @computedFrom('date')
+    get weekId():string {
+        return moment(this.date).toWeekNumberId();
     }
 
     toJSON() {

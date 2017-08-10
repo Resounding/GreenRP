@@ -92,6 +92,18 @@ export class OrdersService {
         });
     }
 
+    getOne(id):Promise<OrderDocument> {
+
+        return new Promise((resolve, reject) => {
+            this.database.db.get(id)
+                .then(result => {
+                    const doc = new OrderDocument(result);
+                    resolve(doc);
+                })
+                .catch(reject);
+        });
+    }
+
     edit(doc:OrderDocument):Promise<OrderDocument> {
         return new Promise((resolve, reject) => {
             this.database.db.put(doc)

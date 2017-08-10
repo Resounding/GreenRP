@@ -1,8 +1,9 @@
-import * as jquery from 'jquery';
 import {autoinject, computedFrom} from 'aurelia-framework';
 import {DialogService} from 'aurelia-dialog';
 import {Router} from 'aurelia-router';
+import * as jquery from 'jquery';
 import {Prompt} from '../controls/prompt';
+import {OrderDetail} from '../orders/order-detail';
 import {
     ActivityDocument,
     ActivityStatus,
@@ -38,6 +39,7 @@ export class ActivityDetail {
     journalRecordingTypes:JournalRecordingType[];
     recipes:Recipe[];
     el:Element;
+    orderNumberMap = { };
     
     constructor(private service:ActivitiesService, private router:Router, private auth:Authentication,
         private referenceService:ReferenceService, private usersService:UsersService,
@@ -79,6 +81,9 @@ export class ActivityDetail {
                         stickDay = stick.isoWeekday(),
                         orderNumber = `${plant}${customer}${stickYear}-${stickWeek}-${stickDay} (${arrivalWeek}-${arrivalDay})`;
                     
+                    // save this so we can show the modal later on.
+                    this.orderNumberMap[orderNumber] = o._id;
+
                     return orderNumber;
                 })
                 .sort();
@@ -146,6 +151,7 @@ export class ActivityDetail {
                 .dropdown('set selected', this.activity.crops);
             const $zone = $('.dropdown.zone', this.el)
                 .dropdown({ onChange: this.onZoneChange.bind(this) });
+            $('.dropdown.crop', this.el).on('click', 'a.ui', this.onCropClick.bind(this));
             if(this.activity.zones && this.activity.zones.length) {
                 $zone.dropdown('set selected', this.activity.zones.map(z => z.name));
             }
@@ -272,6 +278,25 @@ export class ActivityDetail {
     onZoneChange(values:string[]) {
         const zones = this.zones.filter(z => values.indexOf(z.name) !== -1);
         this.activity.zones = zones;
+    }
+    async onCropClick(e:Event) {
+        try {
+            // if they click the X to remove it, it will be an <i> element
+            const target:HTMLElement = <HTMLElement>e.target;
+            if(target.tagName === 'A') {
+                const orderNumber = target.innerText,
+                    originalOrderNumber = this.orderNumberMap[orderNumber];
+                if(originalOrderNumber) {
+                    const order = await this.ordersService.getOne(originalOrderNumber);
+                    this.dialogService.open({
+                        viewModel: OrderDetail,
+                        model: order
+                    });
+                }
+            }
+        } catch(e) {
+            Notifications.error(e);
+        }
     }
     async onAddToRecipeChange(value:string, text:string, $choice:jQuery) {
         try {

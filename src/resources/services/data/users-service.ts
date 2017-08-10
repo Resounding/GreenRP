@@ -11,6 +11,8 @@ interface UserDoc {
 
 export interface User {
     name:string;
+    email:string;
+    phone:string;
     roles:string[]
 }
 

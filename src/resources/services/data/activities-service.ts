@@ -37,6 +37,19 @@ export class ActivitiesService {
         });
     }
 
+    async find(filter):Promise<ActivityDocument[]> {
+        try {
+
+            const result = await this.database.db.find(filter),
+                docs = result.docs.map(doc => new ActivityDocument(doc));
+            
+            return docs;
+
+        } catch(e) {
+            throw e;
+        }
+    }
+
     save(activity:Activity):Promise<ActivitySaveResult> {
         return new Promise((resolve, reject) => {
 
