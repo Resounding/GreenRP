@@ -1,11 +1,11 @@
-import { OrderDetail } from '../orders/order-detail';
-import { OrderDocument } from '../../models/order';
 import {autoinject} from 'aurelia-framework';
-import {DialogController, DialogService, DialogResult} from 'aurelia-dialog';
+import {DialogController, DialogService, DialogCloseResult} from 'aurelia-dialog';
+import {OrderDetail} from '../orders/order-detail';
 import {OrdersService} from "../../services/data/orders-service";
 import {ReferenceService} from "../../services/data/reference-service";
 import {SearchFilter, SearchOrder, SearchService} from './search-service';
 import {Week} from "../../models/week";
+import {OrderDocument} from '../../models/order';
 import {Plant} from '../../models/plant';
 
 @autoinject()
@@ -80,7 +80,7 @@ export class Search {
         this.dialogService.open({
             viewModel: OrderDetail,
             model: order
-        }).whenClosed((result:DialogResult) => {
+        }).whenClosed((result:DialogCloseResult) => {
             if(result.wasCancelled) return;
 
             this.loadOrders().then(this.refresh.bind(this));

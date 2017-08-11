@@ -1,3 +1,4 @@
+import {computedFrom} from 'aurelia-framework';
 import { EscapeQuotesValueConverter } from '../controls/escape-quotes-value-converter';
 import { Plant } from '../../models/plant';
 import { OrdersService } from '../../services/data/orders-service';
@@ -5,6 +6,7 @@ import { OrderDocument } from '../../models/order';
 
 export class SearchFilter {
     zone:string = null;
+    rootZone:string = null;
     plant:string = null;
     crop:string = null;
     customer:string = null;
@@ -29,7 +31,8 @@ export class SearchOrder {
     stick:moment.Moment;
     flower:moment.Moment;
     ship:moment.Moment;
-    zone:string;
+    zone:string;    
+    rootZone:string;
 
     constructor(private order:OrderDocument) {
         this.batch = order.orderNumber;
@@ -41,6 +44,16 @@ export class SearchOrder {
         this.ship = moment(order.arrivalDate);
         this.zone = order.zone.name;
         this.customer = order.customer.name;
+
+        const firstWeek = Object.keys(order.weeksInHouse)[0];
+        if(firstWeek) {
+            this.rootZone = order.weeksInHouse[firstWeek].zone;
+        }
+    }
+
+    @computedFrom('zone', 'rootZone')
+    get differentRootZone():boolean {
+        return this.zone !== this.rootZone;
     }
 
     get stickDate():Date {
@@ -89,6 +102,7 @@ export class SearchService {
         return this.orders            
             .map(o => new SearchOrder(o))
             .filter(currentYear)
+            .filter(rootZones)
             .filter(zones)
             .filter(plants)
             .filter(crops)
@@ -97,6 +111,10 @@ export class SearchService {
 
         function currentYear(order:SearchOrder):boolean {
             return order.stick.isoWeekYear() === year || order.ship.isoWeekYear() === year;
+        }
+
+        function rootZones(order:SearchOrder):boolean {
+            return !filter.rootZone || filter.rootZone === SearchFilter.ALL_ZONES || filter.rootZone === order.rootZone;
         }
 
         function zones(order:SearchOrder):boolean {
