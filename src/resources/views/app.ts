@@ -35,7 +35,9 @@ export class App {
             config.map([
                 route,
                 {route: 'activities/:id', name: 'activity-detail', moduleId: 'resources/views/activities/activity-detail', nav: false, settings: { auth: true }},
-                {route: 'activities/:id/journal', name: 'journal-detail', moduleId: 'resources/views/activities/journal-detail', nav: false, settings: { auth: true }}
+                {route: 'activities/:id/journal', name: 'journal-detail', moduleId: 'resources/views/activities/journal-detail', nav: false, settings: { auth: true }},
+                {route: 'activities/by-crop', name: 'activities-by-crop', moduleId: 'resources/views/activities/activities-by-crop', nav: false, settings: { auth: true }},
+                {route: 'activities/by-recipe', name: 'activities-by-recipe', moduleId: 'resources/views/activities/activities-by-recipe', nav: false, settings: { auth: true }}
             ]);
         }
 

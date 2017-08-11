@@ -1,7 +1,8 @@
 import {autoinject} from 'aurelia-framework';
 import {EventAggregator} from 'aurelia-event-aggregator';
-import {Activity, ActivityDocument, ActivityStatuses} from '../../models/activity';
 import {Database} from '../database';
+import {Activity, ActivityDocument, ActivityStatuses} from '../../models/activity';
+import {Recipe, RecipeDocument} from '../../models/recipe';
 
 export interface ActivitySaveResult {
     ok:boolean;
@@ -127,4 +128,76 @@ export class ActivitiesService {
                 .catch(reject);
         });
     }
+
+    byCrop():Promise<ActivitiesByCropItem[]> {
+        return new Promise((resolve, reject) => {
+            this.database.db.query('filters/activities-by-crop')
+                .then(result => {
+                    const response:ActivitiesByCropResponse = result.rows[0].value,
+                        keys = Object.keys(response),
+                        returnValue:ActivitiesByCropItem[] = [];
+                    
+                    for(const key of keys.sort()) {
+                        const item = { crop: key, activities: response[key] };
+                        returnValue.push(item);
+                    }
+
+                    resolve(returnValue);
+                })
+                .catch(reject);
+        });
+    }
+
+    byRecipe():Promise<ActivitiesByRecipeItem[]> {
+        return new Promise((resolve, reject) => {
+            this.database.db.find({ selector: {
+                type: { '$eq': RecipeDocument.RecipeDocumentType }
+            }})
+            .then((recipesResult) => {
+                const recipes = recipesResult.docs.reduce((memo, doc) => {
+                    memo[doc._id] = doc;
+                    return memo;
+                }, {});
+                
+
+                this.database.db.query('filters/activities-by-recipe')
+                    .then(result => {
+                        const response:ActivitiesByRecipeResponse = result.rows[0].value,
+                            keys = Object.keys(response),
+                            returnValue:ActivitiesByRecipeItem[] = [];
+                        
+                        for(const key of keys.sort()) {
+                            const recipe = recipes[key];
+                            if(recipe) {
+                                const item = { recipe, activities: response[key] };
+                                returnValue.push(item);
+                            }
+                        }
+
+                        resolve(returnValue);
+                    })
+                    .catch(reject);
+            })
+            .catch(reject);
+
+        });
+    }
+}
+
+interface ActivitiesByCropResponse {
+    [index:string]: Activity[];
+}
+
+export interface ActivitiesByCropItem {
+    crop:string;
+    activities:Activity[];
+}
+
+interface ActivitiesByRecipeResponse {
+    [index:string]: Activity[];
+}
+
+export interface ActivitiesByRecipeItem {
+    recipe:Recipe;
+    activities:Activity[];
 }

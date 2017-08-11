@@ -3,7 +3,7 @@ export class DateFormatValueConverter {
         var m = moment(value);
         if(!m.isValid()) return '';
 
-        format = format || 'dd-MMM-yyyy';
+        format = format || 'DD-MMM-YYYY';
 
         return m.format(format);
     }

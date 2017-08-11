@@ -1,0 +1,26 @@
+<template>
+    <div class="ui">
+        <div class="ui clearing segment">
+            <a class="basic ui primary icon button left floated" route-href="route: activities;">
+                <i class="icon left arrow"></i>
+                Back to Activities
+            </a>
+        </div>
+        <div class="ui secondary segment">
+            <div class="ui list">
+                <div class="item" repeat.for="crop of crops">
+                    <div class="header">${crop.crop}</div>
+                    <div class="list">
+                        <div class="item" repeat.for="activity of crop.activities | sort:'date'">
+                            <a route-href="route: activity-detail; params.bind: { id: activity._id }">${activity.name}</a>
+                            <div class="description">
+                                ${activity.date | dateFormat: "ddd, MMM D, YYYY"}<br>
+                                ${activity.assignedTo ? ("Assigned To " + activity.assignedTo) : "Unassigned"}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

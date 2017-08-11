@@ -8,6 +8,14 @@
                 <i class="plus icon"></i>
                 New Activity
             </a>
+            <a class="basic ui secondary icon button right floated" route-href="route: activities-by-crop">
+                <i class="icon tree"></i>
+                <span class="hide-mobile">By Crop</span>
+            </a>
+            <a class="basic ui secondary icon button right floated" route-href="route: activities-by-recipe">
+                <i class="icon address card outline"></i>
+                <span class="hide-mobile">By Recipe</span>
+            </a>
             <button class="ui icon button basic right floated hide-desktop mini" click.trigger="toggleFiltersExpanded()">
                 <i class="dropdown icon ${filtersExpanded ? 'vertically flipped' : ''}"></i>
             </button>
