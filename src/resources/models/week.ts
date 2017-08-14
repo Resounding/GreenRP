@@ -4,7 +4,7 @@ export interface WeekZone {
     zone:Zone;
     available:number;
     tables:number;
-    selected:boolean;
+    selected?:boolean;
 }
 
 export interface WeekZones {

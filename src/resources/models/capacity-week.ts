@@ -6,6 +6,7 @@ interface CapacityWeekZone {
     zone:Zone;
     tables:number;
     available:number;
+    selected?:boolean;
 }
 
 export interface CapacityWeekZones {
@@ -40,34 +41,5 @@ export class CapacityWeek implements Week {
     addOrder(week:WeekInHouse):void {
         const zone = this.zones[week.zone];
         zone.available -= week.tables;
-    }
-
-    removeOrder(order:OrderDocument) {
-        _.forEach(order.weeksInHouse, (value, key) => {
-            const zone = this.getZone(order, value);
-
-            if(key === this._id && zone.zone.name in this.zones) {
-                zone.available += value.tables;
-            }
-        });
-    }
-
-    getZone(order:OrderDocument, week:WeekInHouse):CapacityWeekZone {
-
-        if(order.lightsOutDate && order.rootInPropArea) {
-
-        const lightsOutDate = moment(order.lightsOutDate),
-            lightsOutWeek = lightsOutDate.isoWeek(),
-            lightsOutYear = lightsOutDate.isoWeekYear();
-
-            if(lightsOutYear < week.year || lightsOutYear === week.year && week.week < lightsOutWeek) {
-                const zoneValues = _.values(this.zones),
-                    propZone = _.find(zoneValues, z => z.zone.isPropagationZone);
-
-                if(propZone) return propZone;
-            }
-        }
-
-        return this.zones[order.zone.name];
     }
 }

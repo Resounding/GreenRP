@@ -567,6 +567,17 @@ export class OrderCalculator {
             }
         }
 
+        if(this.order._id) {
+            weeks.forEach(w => {
+                if(w.week._id in this.order.weeksInHouse) {
+                    const orderWeek = this.order.weeksInHouse[w.week._id];
+                    if(orderWeek.zone in w.zones) {
+                        const weekZone = w.zones[orderWeek.zone];
+                        weekZone.available += orderWeek.tables;
+                    }
+                }
+            });
+        }
         this.zones.forEach(z => z.weeks = weeks);
         this._weeks.splice(0, this._weeks.length);
         this._weeks.splice(0, 0, ...weeks);

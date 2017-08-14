@@ -51,11 +51,6 @@ export class OrderDetail {
                 weeks = result;
             })
         ]).then(() => {
-            if(order) {
-                weeks.forEach(w => {
-                    w.removeOrder(order);
-                });
-            }
             this.calculator = new OrderCalculator(zones, weeks, seasons, propagationTimes, flowerTimes, order);
         });
     }
