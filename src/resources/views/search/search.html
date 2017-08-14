@@ -62,9 +62,9 @@
                             </button>
                         </th>
                         <th>
-                            <button type="button" class="ui basic button fluid" click.delegate="sortBy('zone')">
+                            <button type="button" class="ui basic button fluid" click.delegate="sortBy('rootZone')">
                                 Root Zone
-                                <i class="sort ${filter.sortDirection} icon" show.bind="filter.sortBy=='zone'"></i>
+                                <i class="sort ${filter.sortDirection} icon" show.bind="filter.sortBy=='rootZone'"></i>
                             </button>
                         </th>
                         <th>
@@ -106,10 +106,10 @@
                         </td>
                         <td>${order.plant}</td>
                         <td class="center aligned">
-                            ${order.zone}
+                            ${order.rootZone}
                         </td>
                         <td class="center aligned">
-                            ${order.rootZone}
+                            ${order.zone}
                         </td>
                         <td class="right aligned">${order.pots|numericFormat}</td>
                         <td class="right aligned">${order.cases|numericFormat}</td>
