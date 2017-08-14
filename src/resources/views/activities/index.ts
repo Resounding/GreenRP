@@ -187,10 +187,10 @@ export class ActivityIndex implements FilterSettings {
                 filter.selector.$and.push({assignedTo: { $eq: this.auth.userInfo.name }});
             }
             if(!this.showCompleted) {
-                filter.selector.$and.push({status: { $nin: [ActivityStatuses.Incomplete,  ActivityStatuses.Incomplete.toLowerCase()]}});
+                filter.selector.$and.push({status: { $nin: [ActivityStatuses.Complete,  ActivityStatuses.Complete.toLowerCase()]}});
             }
             if(!this.showIncomplete) {
-                filter.selector.$and.push({status: { $nin: [ActivityStatuses.Complete,  ActivityStatuses.Complete.toLowerCase()]}});
+                filter.selector.$and.push({status: { $nin: [ActivityStatuses.Incomplete,  ActivityStatuses.Incomplete.toLowerCase()]}});
             }
             if(this.week && !WorkTypes.equals(this.workType, WorkTypes.ALL_WORK_TYPES)) {
                 const properCase = this.workType.charAt(0).toUpperCase() + this.workType.substr(1).toLowerCase(),
