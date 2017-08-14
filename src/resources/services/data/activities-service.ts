@@ -133,7 +133,11 @@ export class ActivitiesService {
         return new Promise((resolve, reject) => {
             this.database.db.query('filters/activities-by-crop')
                 .then(result => {
-                    const response:ActivitiesByCropResponse = result.rows[0].value,
+                    const rows = result.rows;
+
+                    if(!rows || !rows.length) return resolve([]);
+                        
+                    const response:ActivitiesByCropResponse = rows[0].value,
                         keys = Object.keys(response),
                         returnValue:ActivitiesByCropItem[] = [];
                     
@@ -162,7 +166,11 @@ export class ActivitiesService {
 
                 this.database.db.query('filters/activities-by-recipe')
                     .then(result => {
-                        const response:ActivitiesByRecipeResponse = result.rows[0].value,
+                        const rows = result.rows;
+
+                        if(!rows || !rows.length) return resolve([]);
+
+                        const response:ActivitiesByRecipeResponse = rows[0].value,
                             keys = Object.keys(response),
                             returnValue:ActivitiesByRecipeItem[] = [];
                         
