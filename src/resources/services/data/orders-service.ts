@@ -10,7 +10,7 @@ export class OrdersService {
 
     constructor(private database:Database, private events:EventAggregator) { }
 
-    create(order:Order):Promise<Order> {
+    create(order:Order):Promise<Order|void> {
         const orderDoc = new OrderDocument(order).toJSON();
 
         if(!orderDoc.customer) {
@@ -28,7 +28,7 @@ export class OrdersService {
                         orderDoc._id = result.id;
                         orderDoc._rev = result.rev;
                         this.events.publish(OrdersService.OrdersChangedEvent);
-                        resolve(orderDoc);
+                        return resolve(orderDoc);
                     } else {
                         reject(new Error('Order was not saved.'));
                     }
@@ -37,7 +37,7 @@ export class OrdersService {
         });
     }
 
-    createBulk(orders:Order[]):Promise<PouchDB.Core.Response> {
+    createBulk(orders:Order[]):Promise<PouchDB.Core.Response|void> {
         const orderDocs = orders.map(o => new OrderDocument(o).toJSON());
 
         if(_.any(orderDocs, o => !o.customer)) {
@@ -79,16 +79,13 @@ export class OrdersService {
     }
 
     getAll():Promise<OrderDocument[]> {
-
         return new Promise((resolve, reject) => {
-            this.database.db.find({ selector: {
-                type: { '$eq': OrderDocument.OrderDocumentType }
-            }})
-            .then((result) => {
-                const docs = result.docs.map(doc => new OrderDocument(doc));
-                resolve(docs);
-            })
-            .catch(reject);
+            this.database.db.query('filters/orders', { include_docs: true})
+                .then(result => {
+                    const docs = result.rows.map(row => new OrderDocument(row.doc));
+                    return resolve(docs);
+                })
+                .catch(reject);
         });
     }
 

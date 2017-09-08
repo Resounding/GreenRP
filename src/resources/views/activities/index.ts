@@ -169,7 +169,6 @@ export class ActivityIndex implements FilterSettings {
     }
 
     private async load() {
-        const result = await this.service.getAll();
         this.filter();
     }
 
@@ -218,9 +217,6 @@ export class ActivityIndex implements FilterSettings {
                     }
                     return true;
                 });
-            //     this.activities = this.activities.filter(a => (moment(a.date).toWeekNumberId() === this.week) ||
-            //         // asking for this week & not started & prior to today
-            //         (thisWeek && ActivityStatuses.equals(a.status, ActivityStatuses.NotStarted) && moment(a.date).isBefore(moment(), 'day')));
 
                 if(this.zone && !equals(this.zone, ALL_ZONES)) {
                     const orderNumbers = orders.map(o => {
@@ -247,7 +243,7 @@ export class ActivityIndex implements FilterSettings {
             // this is the same logic as ActivityDetail::activate()
             
             this.service.find(filter)
-                .then(result => {                    
+                .then(result => {
                     this.activities = result;
                     this.filtering = false;
                 })
@@ -277,18 +273,24 @@ export class ActivityIndex implements FilterSettings {
     }
 
     private loadFilterSettings() {
-        const settingsJSON = sessionStorage.getItem(FILTER_SETTINGS_KEY);
-        if(settingsJSON) {
-            const defaults = {
-                    week: moment().toWeekNumberId(),
-                    workType: WorkTypes.ALL_WORK_TYPES,
-                    showAll: false,
-                    showCompleted: false,
-                    showIncomplete: false,
-                    zone: ALL_ZONES
-                },
-                settings:FilterSettings = JSON.parse(settingsJSON);
-            Object.assign(this, defaults, settings);
+        try {
+            this.filtering = true;
+
+            const settingsJSON = sessionStorage.getItem(FILTER_SETTINGS_KEY);
+            if(settingsJSON) {
+                const defaults = {
+                        week: moment().toWeekNumberId(),
+                        workType: WorkTypes.ALL_WORK_TYPES,
+                        showAll: false,
+                        showCompleted: false,
+                        showIncomplete: false,
+                        zone: ALL_ZONES
+                    },
+                    settings:FilterSettings = JSON.parse(settingsJSON);
+                Object.assign(this, defaults, settings);
+            }
+        } finally {
+            this.filtering = false;
         }
     }
 

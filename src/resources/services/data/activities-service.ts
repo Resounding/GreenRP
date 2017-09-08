@@ -27,11 +27,11 @@ export class ActivitiesService {
         });
     }
 
-    getAll():Promise<ActivityDocument[]> {
+    getAll():Promise<ActivityDocument[]> {        
         return new Promise((resolve, reject) => {
-            this.database.db.find({ selector: { type: ActivityDocument.ActivityDocumentType }})
+            this.database.db.query('filters/activities', { include_docs: true})
                 .then(result => {
-                    const docs = result.docs.map(doc => new ActivityDocument(doc));
+                    const docs = result.rows.map(row => new ActivityDocument(row.doc));
                     resolve(docs);
                 })
                 .catch(reject);
