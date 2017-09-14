@@ -44,6 +44,13 @@ export class ActivityDocument implements Activity {
         if(args) {
             _.extend(this, args);
 
+            if(this.date) {
+                const date = moment(this.date);
+                if(date.isValid()) {
+                    this.date = date.toDate();
+                }
+            }
+
             if(args.journal) {
                 this.journal = new JournalDocument(args.journal);
             }
