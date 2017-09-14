@@ -92,11 +92,10 @@ export class ActivityDetail {
             if(params.id === 'new') {
                 this.activity = new ActivityDocument;
                 this.activity.date = new Date;
+                this.activity.assignedTo = this.auth.userInfo.name;
                 if(this.auth.isInRole(Roles.Grower)) {
-                    this.activity.assignedTo = this.auth.userInfo.name;
                     this.activity.workType = WorkTypes.Growing;
                 } else if(this.auth.isInRole(Roles.LabourSupervisor)) {
-                    this.activity.assignedTo = this.auth.userInfo.name;
                     this.activity.workType = WorkTypes.Labour;
                 }
             } else {

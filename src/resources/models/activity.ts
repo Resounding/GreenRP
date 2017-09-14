@@ -191,7 +191,7 @@ export class AssignedTo {
     public static UNASSIGNED:string = 'Unassigned';
 }
 
-function equals(a:string, b:string) {
+export function equals(a:string, b:string) {
     if(a == null || b == null) return false;
     return a.toLowerCase() === b.toLowerCase();
 }

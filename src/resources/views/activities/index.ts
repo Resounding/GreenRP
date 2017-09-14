@@ -79,7 +79,7 @@ export class ActivityIndex implements FilterSettings {
             }
 
             const result = await this.usersService.getAll();
-            this.users = ['Unassigned'].concat(result.map(u => u.name).sort());
+            this.users = result.map(u => u.name).sort();
 
             await this.load();
 
