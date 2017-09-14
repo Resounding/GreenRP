@@ -60,10 +60,11 @@ export class Database {
                     log.debug(change);
                     if(change.direction === 'pull' && _.isArray(change.change.docs)) {
 
-                        let ordersSynced:boolean = _.any(change.change.docs, doc => doc.type === OrderDocument.OrderDocumentType),
-                            zonesSynced:boolean = _.any(change.change.docs, doc => doc._id === 'zones'),
-                            plantsSynced:boolean = _.any(change.change.docs, doc => doc._id === 'plants'),
-                            activitiesSynced:boolean = _.any(change.change.docs, doc => doc.type === ActivityDocument.ActivityDocumentType);
+                        let deleted = _.any(change.change.docs, doc => doc._deleted),
+                            ordersSynced:boolean = deleted || _.any(change.change.docs, doc => doc.type === OrderDocument.OrderDocumentType),
+                            zonesSynced:boolean = deleted || _.any(change.change.docs, doc => doc._id === 'zones'),
+                            plantsSynced:boolean = deleted || _.any(change.change.docs, doc => doc._id === 'plants'),
+                            activitiesSynced:boolean = deleted || _.any(change.change.docs, doc => doc.type === ActivityDocument.ActivityDocumentType);
 
                         if(ordersSynced) {
                             this.events.publish(Database.OrdersSyncChangeEvent);
