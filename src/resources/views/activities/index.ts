@@ -178,19 +178,32 @@ export class ActivityIndex implements FilterSettings {
             this.filtering = true;
 
             const filter:any = {
-                selector: {
-                    $and: [{ type: 'activity'}]
-                }
-            };
+                    selector: {
+                        $and: [{
+                            type: 'activity'                        
+                        }]
+                    }
+                },
+                status = {
+                    $in: [
+                        ActivityStatuses.NotStarted,
+                        ActivityStatuses.NotStarted.toLowerCase(),
+                        ActivityStatuses.InProgress,
+                        ActivityStatuses.InProgress.toLowerCase()
+                    ]
+                };
             if(!this.showAll) {
                 filter.selector.$and.push({assignedTo: { $eq: this.auth.userInfo.name }});
             }
-            if(!this.showCompleted) {
-                filter.selector.$and.push({status: { $nin: [ActivityStatuses.Complete,  ActivityStatuses.Complete.toLowerCase()]}});
+            if(this.showCompleted) {
+                status.$in.push(ActivityStatuses.Complete);
+                status.$in.push(ActivityStatuses.Complete.toLowerCase());
             }
-            if(!this.showIncomplete) {
-                filter.selector.$and.push({status: { $nin: [ActivityStatuses.Incomplete,  ActivityStatuses.Incomplete.toLowerCase()]}});
+            if(this.showIncomplete) {
+                status.$in.push(ActivityStatuses.Incomplete);
+                status.$in.push(ActivityStatuses.Incomplete.toLowerCase());
             }
+            filter.selector.$and.push({status})
             if(this.week && !WorkTypes.equals(this.workType, WorkTypes.ALL_WORK_TYPES)) {
                 const properCase = this.workType.charAt(0).toUpperCase() + this.workType.substr(1).toLowerCase(),
                     lowerCase = this.workType.toLowerCase();
@@ -241,9 +254,20 @@ export class ActivityIndex implements FilterSettings {
                 }
             }
             // this is the same logic as ActivityDetail::activate()
-            
+            var perf = window.performance;
+
+            perf.clearMarks();
+            perf.clearMeasures();
+            perf.clearResourceTimings();
+
+            perf.mark('start');
             this.service.find(filter)
                 .then(result => {
+                    perf.mark('finish');
+                    perf.measure('find', 'start', 'finish');
+                    const entry = perf.getEntriesByType('measure')[0];
+                    console.log(`${entry.name}: ${entry.duration}`);
+
                     this.activities = result;
                     this.filtering = false;
                 })
