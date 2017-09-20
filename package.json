@@ -2,7 +2,7 @@
   "name": "GreenRP",
   "description": "The Greenhouse Resource Planning application for Boekestyn Greenhouses.",
   "publisher": "Resounding Software",
-  "version": "1.8.6",
+  "version": "1.8.7",
   "repository": {
     "type": "git",
     "url": "https://github.com/Resounding/GreenRP"
