@@ -12,6 +12,7 @@ export interface Activity {
     description:string;
     crops?:string[];
     zones?:Zone[];
+    recipeId?:string;
     assignedTo?:string;
     recordingType:JournalRecordingType;
     unitOfMeasure?:string;
@@ -35,6 +36,7 @@ export class ActivityDocument implements Activity {
     description:string;
     crops?:string[] = [];
     zones?:Zone[] = [];
+    recipeId?:string = null;
     assignedTo?:string = null;
     recordingType:JournalRecordingType = JournalRecordingTypes.CheckList;
     unitOfMeasure?:string = null;
@@ -83,6 +85,7 @@ export class ActivityDocument implements Activity {
             description: this.description,
             crops: null,
             zones: null,
+            recipeId: this.recipeId,
             assignedTo: this.assignedTo,
             recordingType: this.recordingType,
             unitOfMeasure: this.unitOfMeasure,
