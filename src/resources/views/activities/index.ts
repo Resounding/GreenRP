@@ -172,7 +172,7 @@ export class ActivityIndex implements FilterSettings {
         this.filter();
     }
 
-    private filter() {
+    private async filter() {
         try {
             if(this.filtering) return;
             this.filtering = true;
@@ -254,30 +254,17 @@ export class ActivityIndex implements FilterSettings {
                 }
             }
             // this is the same logic as ActivityDetail::activate()
-            var perf = window.performance;
-
-            perf.clearMarks();
-            perf.clearMeasures();
-            perf.clearResourceTimings();
-
-            perf.mark('start');
-            this.service.find(filter)
-                .then(result => {
-                    perf.mark('finish');
-                    perf.measure('find', 'start', 'finish');
-                    const entry = perf.getEntriesByType('measure')[0];
-                    console.log(`${entry.name}: ${entry.duration}`);
-
-                    this.activities = result;
-                    this.filtering = false;
-                })
-                .catch(err => {
-                    Notifications.error(err);
-                    this.filtering = false;
-                });
+            const result = await this.service.find(filter);
+            this.activities = result;
 
         } catch(e) {
+            if(e instanceof TypeError && e.message === 'Cannot read property \'type\' of undefined') {
+                return await this.filter();
+            }
+            
             Notifications.error(e);
+        } finally {
+            this.filtering = false;
         }
     }
 
