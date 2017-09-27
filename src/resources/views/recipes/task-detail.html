@@ -60,6 +60,20 @@
                     <textarea id="description" value.bind="task.description"></textarea>
                 </div>                    
             </div>
+            <div class="fields row" show.bind="isPlant">
+                <div class="field four wide">
+                    <div class="ui toggle checkbox">
+                        <input type="checkbox" id="specific-zones" checked.bind="specificZones">
+                        <label for="specific-zones">Specific Zones:</label>
+                    </div>
+                </div>
+                <div class="field ten wide">
+                    <select class="ui fluid search dropdown zones" multiple>
+                        <option value="">Select Zone(s)</option>
+                        <option repeat.for="z of zones" value="${z}">${z}</option>
+                    </select>
+                </div>
+            </div>
             <div class="fields row">
                 <div with.bind="task.startTime" class="fields inline ${relativeTime} ${anyDay ? 'any-day' : ''}">
                     <label for="relativeTime">Starting&nbsp;</label>
