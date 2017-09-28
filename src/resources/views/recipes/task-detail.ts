@@ -18,7 +18,6 @@ export class TaskDetail {
     recipe:RecipeDocument;
     task:TaskDocument;
     isPlant:boolean = false;
-    isZone:boolean = false;
     weeks:WeekSelection[] = [];
     workTypes:WorkType[];
     periods:Periods = Periods;
@@ -62,9 +61,8 @@ export class TaskDetail {
             this.recipe =  await this.service.getOne(params.id);
 
             this.isPlant = this.recipe.plant != null;
-            this.isZone = this.recipe.zone != null;            
 
-            if(this.isZone) {
+            if(!this.isPlant) {
                 for(let i = 1; i < 53; i++) {
                     this.weeks.push({ value: i, text: `Week ${i}`});
                 }
@@ -73,7 +71,7 @@ export class TaskDetail {
 
             if(isNew) {
                 this.task = new TaskDocument({ startTime: new TimeDocument }, -1);
-                if(this.isZone) {
+                if(!this.isPlant) {
                     this.task.startTime.event = Events.Week;
                     this.task.startTime.weekNumber = moment().isoWeek();
                 }
