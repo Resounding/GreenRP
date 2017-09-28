@@ -71,9 +71,10 @@ export class ActivityIndex implements FilterSettings {
                 week = moment().subtract(2, 'weeks');
             for(let i = 0; i < 6; i++) {
                 const id = week.toWeekNumberId(),
-                    text = id === thisWeek ? 'This week' :
-                    (id === lastweek ? 'Last Week' :
-                    (id === nextweek ? 'Next Week' : week.format('[Week] W')));
+                    formattedWeek = week.format('[Week] W'),
+                    text = id === thisWeek ? `This week (${formattedWeek})` : 
+                    (id === lastweek ? `Last Week (${formattedWeek})` :
+                    (id === nextweek ? `Next Week (${formattedWeek})` : formattedWeek ));
                 this.weeks.push({ id, text });
                 week.add(1, 'week');
             }
