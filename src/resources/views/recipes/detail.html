@@ -29,10 +29,10 @@
             <div class="grid">
                 <div class="row">
                     <div class="eight wide" show.bind="recipe.isNew">
-                        <div class="inline fields ${recipe.plant ? 'has-plant' : ''} ${recipe.zone ? 'has-zone' : ''}">
+                        <div class="inline fields ${recipe.plant ? 'has-plant' : ''} ${recipe.zone ? 'has-zone' : ''} ${recipe.user ? 'has-user' : ''}">
                             <div class="field">
                                 <div class="ui radio checkbox">
-                                    <input type="radio" id="plant" name="plant-or-zone" model.bind="true" checked.bind="hasPlant">
+                                    <input type="radio" id="plant" name="plant-or-zone-or-user" model.bind="true" checked.bind="hasPlant">
                                     <label for="plant">Plant:</label>
                                 </div>
                             </div>
@@ -44,7 +44,7 @@
                             </div>
                             <div class="field">
                                 <div class="ui radio checkbox">
-                                    <input type="radio" id="zone" name="plant-or-zone" model.bind="true" checked.bind="hasZone">
+                                    <input type="radio" id="zone" name="plant-or-zone-or-user" model.bind="true" checked.bind="hasZone">
                                     <label for="zone">Zone:</label>
                                 </div>
                             </div>
@@ -52,6 +52,18 @@
                                 <select value.bind="recipe.zone" matcher.bind="zoneMatcher">
                                     <option model.bind="null">Choose Zone</option>
                                     <option repeat.for="zone of zones" model.bind="zone">${zone.name}</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <div class="ui radio checkbox">
+                                    <input type="radio" id="user" name="plant-or-zone-or-user" model.bind="true" checked.bind="hasUser">                                    
+                                    <label for="user">Person:</label>
+                                </div>
+                            </div>
+                            <div class="field user">
+                                <select value.bind="recipe.user">
+                                    <option model.bind="null">Choose Person</option>
+                                    <option repeat.for="user of users">${user}</option>
                                 </select>
                             </div>
                         </div>

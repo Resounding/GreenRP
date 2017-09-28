@@ -24,7 +24,7 @@ export class TaskDocument implements Task {
     recordingType:JournalRecordingType = JournalRecordingTypes.CheckList;
     unitOfMeasure?:string = null;
     _recurring:boolean = false;
-    recurrence:Recurrence = null;
+    recurrence:RecurrenceDocument = null;
     zones?:string[] | undefined = undefined;
 
     constructor(data:Task | {startTime?:Time} = {}, public index:number) {
@@ -73,7 +73,7 @@ export class TaskDocument implements Task {
             zones: this.zones
         };
         if(this.recurring) {
-            json.recurrence = this.recurrence;
+            json.recurrence = new RecurrenceDocument(this.recurrence).toJSON();
         }
         return json;
     }
