@@ -33,6 +33,7 @@ export class ActivityIndex implements FilterSettings {
     week:string = moment().toWeekNumberId();
     workType:WorkType = WorkTypes.ALL_WORK_TYPES;
     zone:string = ALL_ZONES;
+    private _showMyOverdue:boolean = true;
     private _showAll:boolean = false;
     private _showCompleted:boolean = false;
     private _showIncomplete:boolean = false;
@@ -169,6 +170,15 @@ export class ActivityIndex implements FilterSettings {
         this.filter();
     }
 
+    @computedFrom('_showMyOverdue')
+    get showMyOverdue():boolean {
+        return this._showMyOverdue;
+    }
+    set showMyOverdue(value:boolean) {
+        this._showMyOverdue = value;
+        this.filter();
+    }
+
     private async load() {
         this.filter();
     }
@@ -255,8 +265,40 @@ export class ActivityIndex implements FilterSettings {
                 }
             }
             // this is the same logic as ActivityDetail::activate()
-            const result = await this.service.find(filter);
-            this.activities = result;
+
+            const results = await this.service.find(filter);
+
+            if(this.showMyOverdue) {
+                try {
+                    const overdueFilter = {
+                        selector: {
+                            $and: [
+                                { type: ActivityDocument.ActivityDocumentType },
+                                { status: { $in: [ActivityStatuses.NotStarted, ActivityStatuses.InProgress] } },
+                                { date: { $lt: moment().startOf('isoWeek').format('YYYY-MM-DD') }},
+                                { assignedTo: this.auth.userInfo.name }
+                            ]
+                        }
+                    },
+                    overdueItems = await this.service.find(overdueFilter);
+
+                    // we have to do this in a foreach b/c our indices change
+                    // as we delete things...
+                    overdueItems.forEach(i => {
+                        const duplicate = results.find(r => i._id === r._id);
+                        if(duplicate) {
+                            const index = results.indexOf(duplicate);
+                            results.splice(index, 1);
+                        }
+                    });
+
+                    results.splice(0, 0, ...overdueItems);
+                } catch(e) {
+                    Notifications.error(e);
+                }
+            }
+
+            this.activities = results;
 
         } catch(e) {
             if(e instanceof TypeError && e.message === 'Cannot read property \'type\' of undefined') {
