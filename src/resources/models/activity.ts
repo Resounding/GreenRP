@@ -17,6 +17,7 @@ export interface Activity {
     recordingType:JournalRecordingType;
     unitOfMeasure?:string;
     journal?:Journal;
+    changed:boolean | undefined;
 }
 
 export interface Journal {
@@ -41,6 +42,7 @@ export class ActivityDocument implements Activity {
     recordingType:JournalRecordingType = JournalRecordingTypes.CheckList;
     unitOfMeasure?:string = null;
     journal?:JournalDocument = null;
+    changed:boolean = false;
 
     constructor(args?:Activity) {
         if(args) {
@@ -89,6 +91,7 @@ export class ActivityDocument implements Activity {
             assignedTo: this.assignedTo,
             recordingType: this.recordingType,
             unitOfMeasure: this.unitOfMeasure,
+            changed: this.changed
         };
         if(Array.isArray(this.crops) && this.crops.length) {
             json.crops = this.crops;

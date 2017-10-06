@@ -76,7 +76,7 @@ export class ActivitiesService {
 
             if(!result.ok) {
                 return resolve(result);
-            }   
+            }
 
             if(doc.isNew) {
                 return this.database.db.post(json)
@@ -92,6 +92,9 @@ export class ActivitiesService {
                     })
                     .catch(reject);
             } else {
+                
+                json.changed = true;
+
                 return this.database.db.put(json)
                     .then((response:PouchDB.Core.Response) => {
                         if(response.ok) {
