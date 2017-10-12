@@ -39,7 +39,8 @@
     },
     "paths": {
         "root": "src",
-        "theme": "node_modules/semantic-ui-css/themes/**/*.*"
+        "theme": "node_modules/semantic-ui-css/themes/**/*.*",
+        "deploy": "../GreenRP-build"
     },
     "testFramework": {
         "id": "jasmine",

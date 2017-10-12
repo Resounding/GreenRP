@@ -22,6 +22,11 @@ export class RecurrenceDocument implements Recurrence {
     constructor(data:Recurrence | {endTime?:any} = {}) {
         Object.assign(this, data);
 
+        // this gets messed up with the setter during Object.assign
+        if(data != null && Array.isArray((<Recurrence>data).weekDays)) {
+            this.weekDays = (<Recurrence>data).weekDays;
+        }
+
         if(data.endTime) {
             this.endTime = new TimeDocument(data.endTime);
         }
@@ -85,7 +90,7 @@ export class RecurrenceDocument implements Recurrence {
             endingType: this.endingType,
             anyDay: this.anyDay
         };
-        if(equals(this.period, Periods.Week) && this.anyDay) {
+        if(equals(this.period, Periods.Week) && !this.anyDay) {
             json.weekDays = this.weekDays;
         }
         if(equals(this.endingType, EndingTypes.EndAfter)) {
