@@ -47,31 +47,6 @@
                     </div>
                 </div>
             </div>
-            <div class="fields row" show.bind="completed && !isMeasurement">
-                <div class="field sixteen wide">
-                    <label for="measurement">Checklist</label>
-                    <div class="ui ordered list">
-                        <template repeat.for="item of activity.journal.checklist">
-                            <div class="item">
-                                <div class="ui left action input">                                
-                                    <button type="button" class="mini ui icon button" tabindex="-1" click.delegate="removeFromChecklist($index)" data-tooltip="Remove this item">
-                                        <i class="icon button trash"></i>
-                                    </button>
-                                    <input type="text" value.bind="item.value" keypress.delegate="onChecklistItemKeyPress($event, $index)">
-                                </div>
-                            </div>
-                        </template>                        
-                    </div>
-                    <div class="ui list">
-                        <div class="item">
-                            <button type="button" class="ui basic button" click.delegate="addToChecklist()">
-                                <i class="icon plus"></i>
-                                Add an item
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div class="fields row">
                 <div class="field sixteen wide">
                     <label for="notes">Notes</label>

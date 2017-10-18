@@ -42,29 +42,7 @@ export class JournalDetail {
                 }
             });
     }
-
-    addToChecklist() {
-        if(!this.activity.journal.checklist) {
-            this.activity.journal.checklist = [];
-        }
-        this.activity.journal.checklist.push(new ChecklistItem);
-    }
-    removeFromChecklist(index:number) {
-        this.activity.journal.checklist.splice(index, 1);
-        if(!this.activity.journal.checklist.length) {
-            this.addToChecklist();
-        }
-    }
-
-    onChecklistItemKeyPress(e:KeyboardEvent, index:number) {
-        if(e.which === 13 && index === this.activity.journal.checklist.length - 1) {
-            this.addToChecklist();
-            return false;
-        }
-
-        return true;
-    }
-
+    
     editActivity() {
         this.saveActivity()
             .then(result => {
