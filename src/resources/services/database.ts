@@ -37,7 +37,8 @@ export class Database {
 
             remoteDB = new PouchDB(this.config.remote_database_name, opts);
 
-            const sync = localDB.sync(remoteDB, {live: true})
+            // batch_size option comes from https://stackoverflow.com/a/26555009
+            const sync = localDB.sync(remoteDB, {live: true, batch_size: 1000})
                 .on('complete', () => {
                     log.debug('Sync complete');
                 })
