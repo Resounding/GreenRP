@@ -32,7 +32,9 @@ export class TaskDetail {
         {id: 2, text: 'Tue'},
         {id: 3, text: 'Wed'},
         {id: 4, text: 'Thu'},
-        {id: 5, text: 'Fri'}
+        {id: 5, text: 'Fri'},
+        {id: 6, text: 'Sat'},
+        {id: 0, text: 'Sun'}
     ];
     relativeTimes = [
         {id: RelativeTimes.On, text: 'The week of'},
