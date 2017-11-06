@@ -119,7 +119,7 @@ export class TaskDetail {
         const $endWeek = $('.dropdown.end-week', this.el)
             .dropdown({ onChange: this.onEndWeekChange.bind(this) });
 
-        if(!this.task.isNew && this.task.recurrence) {
+        if(!this.task.isNew && this.task.recurrence && this.task.recurrence.endTime) {
             $endWeek.dropdown('set selected', this.task.recurrence.endTime.weekNumber);
         }
 
