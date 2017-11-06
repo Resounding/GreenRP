@@ -13,6 +13,7 @@ export interface Task {
     recurring:boolean;
     recurrence:Recurrence;
     zones?:string[] | undefined;
+    groupActivitiesTogether:boolean | undefined;
 }
 
 export class TaskDocument implements Task {
@@ -26,6 +27,7 @@ export class TaskDocument implements Task {
     _recurring:boolean = false;
     recurrence:RecurrenceDocument = null;
     zones?:string[] | undefined = undefined;
+    groupActivitiesTogether:boolean | undefined = false;
 
     constructor(data:Task | {startTime?:Time} = {}, public index:number) {
         Object.assign(this, data);
@@ -70,7 +72,8 @@ export class TaskDocument implements Task {
             unitOfMeasure: this.unitOfMeasure,
             recurring: this.recurring,
             recurrence: null,
-            zones: this.zones
+            zones: this.zones,
+            groupActivitiesTogether: !!this.groupActivitiesTogether
         };
         if(this.recurring) {
             json.recurrence = new RecurrenceDocument(this.recurrence).toJSON();

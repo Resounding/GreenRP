@@ -117,6 +117,13 @@
                             <option repeat.for="day of weekdays" value.bind="day.id">${day.text}</option>
                         </select>
                     </div>
+                    &nbsp;
+                    <div class="field">
+                        <div class="ui toggle checkbox">
+                            <input type="checkbox" id="group-activities" checked.bind="task.groupActivitiesTogether">
+                            <label for="group-activities">Group activities together</label>
+                        </div>
+                    </div>
                 </div>                
             </div>
             <div class="fields row">
