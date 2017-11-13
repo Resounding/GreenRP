@@ -573,7 +573,10 @@ export class OrderCalculator {
                     const orderWeek = this.order.weeksInHouse[w.week._id];
                     if(orderWeek.zone in w.zones) {
                         const weekZone = w.zones[orderWeek.zone];
-                        weekZone.available += orderWeek.tables;
+                        // this could be null (e.g. for zone B/C, after lights-out)
+                        if(weekZone) {
+                            weekZone.available += orderWeek.tables;
+                        }
                     }
                 }
             });
