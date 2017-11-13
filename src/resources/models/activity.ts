@@ -18,6 +18,7 @@ export interface Activity {
     unitOfMeasure?:string;
     journal?:Journal;
     changed:boolean | undefined;
+    groupActivitiesTogether:boolean | undefined;
 }
 
 export interface Journal {
@@ -43,6 +44,7 @@ export class ActivityDocument implements Activity {
     unitOfMeasure?:string = null;
     journal?:JournalDocument = null;
     changed:boolean = false;
+    groupActivitiesTogether:boolean | undefined;
 
     constructor(args?:Activity) {
         if(args) {
@@ -91,7 +93,8 @@ export class ActivityDocument implements Activity {
             assignedTo: this.assignedTo,
             recordingType: this.recordingType,
             unitOfMeasure: this.unitOfMeasure,
-            changed: this.changed
+            changed: this.changed,
+            groupActivitiesTogether: this.groupActivitiesTogether
         };
         if(Array.isArray(this.crops) && this.crops.length) {
             json.crops = this.crops;
