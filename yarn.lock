@@ -6,6 +6,10 @@
   version "0.0.29"
   resolved "https://registry.yarnpkg.com/@types/debug/-/debug-0.0.29.tgz#a1e514adfbd92f03a224ba54d693111dbf1f3754"
 
+"@types/jquery@^3.2.16":
+  version "3.2.16"
+  resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.2.16.tgz#04419c404a3194350e7d3f339a90e72c88db3111"
+
 "@types/moment@^2.13.0":
   version "2.13.0"
   resolved "https://registry.yarnpkg.com/@types/moment/-/moment-2.13.0.tgz#604ebd189bc3bc34a1548689404e61a2a4aac896"
@@ -301,9 +305,9 @@ atob@~1.1.0:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/atob/-/atob-1.1.3.tgz#95f13629b12c3a51a5d215abdce2aa9f32f80773"
 
-aurelia-animator-css@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/aurelia-animator-css/-/aurelia-animator-css-1.0.3.tgz#2948f736d2a9ea0e2e1c07a5e00e74c1cbb1a861"
+aurelia-animator-css@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/aurelia-animator-css/-/aurelia-animator-css-1.0.4.tgz#8336ab84f9a8bf60a4536e99145e73a80c0f0dac"
   dependencies:
     aurelia-metadata "^1.0.0"
     aurelia-pal "^1.0.0"
@@ -337,9 +341,9 @@ aurelia-bootstrapper@^2.1.1:
     aurelia-templating-resources "^1.0.0"
     aurelia-templating-router "^1.0.0"
 
-aurelia-cli@^0.31.3:
-  version "0.31.3"
-  resolved "https://registry.yarnpkg.com/aurelia-cli/-/aurelia-cli-0.31.3.tgz#a8992c47c1c2cc3877599eb218f6edfb1c96ccaf"
+aurelia-cli@^0.32.0:
+  version "0.32.0"
+  resolved "https://registry.yarnpkg.com/aurelia-cli/-/aurelia-cli-0.32.0.tgz#f9453166e7e7568744296a973520ea3896fc9d11"
   dependencies:
     aurelia-dependency-injection "^1.0.0"
     aurelia-logging "^1.2.0"
@@ -347,6 +351,7 @@ aurelia-cli@^0.31.3:
     esprima "^4.0.0"
     glob "^7.1.1"
     npm "^3.10.8"
+    npm-which "^3.0.1"
     preprocess "^3.1.0"
     rfc6902 "^1.2.2"
     semver "^5.3.0"
@@ -358,9 +363,9 @@ aurelia-dependency-injection@^1.0.0:
     aurelia-metadata "^1.0.0"
     aurelia-pal "^1.0.0"
 
-aurelia-dialog@^1.0.0-rc.1.0.3:
-  version "1.0.0-rc.1.0.3"
-  resolved "https://registry.yarnpkg.com/aurelia-dialog/-/aurelia-dialog-1.0.0-rc.1.0.3.tgz#cbc0f30ad9dad1135fe5f20d5db2357210009fae"
+aurelia-dialog@^1.0.0-rc.2.0.0:
+  version "1.0.0-rc.2.0.0"
+  resolved "https://registry.yarnpkg.com/aurelia-dialog/-/aurelia-dialog-1.0.0-rc.2.0.0.tgz#de863fc21bcde0d3a22f1a13e1a7367e64b0904c"
   dependencies:
     aurelia-dependency-injection "^1.0.0"
     aurelia-framework "^1.0.0"
@@ -528,9 +533,9 @@ aurelia-templating@^1.0.0:
     aurelia-path "^1.0.0"
     aurelia-task-queue "^1.1.0"
 
-aurelia-testing@^1.0.0-beta.3.0.1:
-  version "1.0.0-beta.3.0.1"
-  resolved "https://registry.yarnpkg.com/aurelia-testing/-/aurelia-testing-1.0.0-beta.3.0.1.tgz#436d35755ce65bfb4b4913c049abdc2f7f658502"
+aurelia-testing@^1.0.0-beta.4.0.0:
+  version "1.0.0-beta.4.0.0"
+  resolved "https://registry.yarnpkg.com/aurelia-testing/-/aurelia-testing-1.0.0-beta.4.0.0.tgz#8814f3ef0abd175455a3ad221953e3a696df57f0"
   dependencies:
     aurelia-dependency-injection "^1.0.0"
     aurelia-framework "^1.0.0"
@@ -3475,6 +3480,12 @@ npm-install-checks@~3.0.0:
     hosted-git-info "^2.1.5"
     semver "^5.1.0"
 
+npm-path@^2.0.2:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/npm-path/-/npm-path-2.0.3.tgz#15cff4e1c89a38da77f56f6055b24f975dfb2bbe"
+  dependencies:
+    which "^1.2.10"
+
 npm-registry-client@~7.2.1:
   version "7.2.1"
   resolved "https://registry.yarnpkg.com/npm-registry-client/-/npm-registry-client-7.2.1.tgz#c792266b088cc313f8525e7e35248626c723db75"
@@ -3500,6 +3511,14 @@ npm-run-path@^1.0.0:
 npm-user-validate@~0.1.5:
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/npm-user-validate/-/npm-user-validate-0.1.5.tgz#52465d50c2d20294a57125b996baedbf56c5004b"
+
+npm-which@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/npm-which/-/npm-which-3.0.1.tgz#9225f26ec3a285c209cae67c3b11a6b4ab7140aa"
+  dependencies:
+    commander "^2.9.0"
+    npm-path "^2.0.2"
+    which "^1.2.10"
 
 npm@^3.10.8:
   version "3.10.10"
