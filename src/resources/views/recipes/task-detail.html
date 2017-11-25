@@ -77,9 +77,9 @@
             <div class="fields row">
                 <div with.bind="task.startTime" class="fields inline ${relativeTime} ${anyDay ? 'any-day' : ''}">
                     <label for="relativeTime">Starting&nbsp;</label>
-                    <input type="number" value.bind="numberOfRelativePeriods" class="not-on plant-field">
-                    <div class="plant-field">
-                        <select value.bind="relativePeriod" class="not-on">
+                    <input type="number" value.bind="numberOfRelativePeriods" class="not-on not-week-of-year plant-field">
+                    <div class="plant-field not-on not-week-of-year">
+                        <select value.bind="relativePeriod">
                             <option value.bind="periods.Day">Day${numberOfRelativePeriods == 1 ? '' : 's'}</option>
                             <option value.bind="periods.Week">Week${numberOfRelativePeriods == 1 ? '' : 's'}</option>
                         </select>
@@ -89,12 +89,12 @@
                             <option repeat.for="time of relativeTimes" value.bind="time.id">${time.text}</option>
                         </select>
                     </div>
-                    <div class="plant-field">
+                    <div class="plant-field not-week-of-year">
                         <select value.bind="event">
                             <option repeat.for="event of events" value.bind="event">${event}</option>
                         </select>
                     </div>
-                    <div class="zone-field">
+                    <div class="not-on not-before not-after">
                         <select class="dropdown start-week">
                             <option repeat.for="week of weeks" value.bind="week.value">${week.text}</option>
                         </select>
@@ -211,9 +211,9 @@
                     <label for="numberOfOccurrences">occurrence${numberOfOccurrences == 1 ? '' : 's'}.</label>
                 </div>
                 <div with.bind="task.recurrence.endTime" class="fields inline recurrence end-date ${relativeTime} ${anyDay ? 'any-day' : ''}">
-                    <input type="number" value.bind="numberOfRelativePeriods" class="not-on plant-field">
-                    <div class="plant-field">
-                        <select value.bind="relativePeriod" class="not-on">
+                    <input type="number" value.bind="numberOfRelativePeriods" class="not-on not-week-of-year plant-field">
+                    <div class="plant-field not-on not-week-of-year">
+                        <select value.bind="relativePeriod">
                             <option value.bind="periods.Day">Day${numberOfRelativePeriods == 1 ? '' : 's'}</option>
                             <option value.bind="periods.Week">Week${numberOfRelativePeriods == 1 ? '' : 's'}</option>
                         </select>
@@ -223,12 +223,12 @@
                             <option repeat.for="time of relativeTimes" value.bind="time.id">${time.text}</option>
                         </select>
                     </div>
-                    <div class="plant-field">
+                    <div class="plant-field not-week-of-year">
                         <select value.bind="event">
                             <option repeat.for="event of events" value.bind="event">${event}</option>
                         </select>
                     </div>
-                    <div class="zone-field">
+                    <div class="not-on not-before-not-after">
                         <select class="dropdown end-week">
                             <option repeat.for="week of weeks" value.bind="week.value">${week.text}</option>
                         </select>
