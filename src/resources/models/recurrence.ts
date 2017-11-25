@@ -1,3 +1,5 @@
+import {equals, contains} from '../utilities/equals'
+
 export interface Recurrence {
     numberOfPeriods:number;
     weekDays:number[] | null;
@@ -133,12 +135,19 @@ export class TimeDocument implements Time {
         if(!equals(this._relativeTime, value)) {
             this._relativeTime = value;
 
-            if(!equals(value, RelativeTimes.On)) {
+            if(contains(value, RelativeTimes.Before, RelativeTimes.After)) {
                 if(!this.relativePeriod) {
                     this.relativePeriod = Periods.Day;
                 }
                 if(!this.numberOfRelativePeriods) {
                     this.numberOfRelativePeriods = 1;
+                }
+            } else if(equals(value, RelativeTimes.WeekOfYear)) {
+                this.relativePeriod = null;
+                this.numberOfRelativePeriods = null;
+                this.event = null;
+                if(!this.weekNumber) {
+                    this.weekNumber = 1;
                 }
             }
         }
@@ -179,9 +188,12 @@ export class TimeDocument implements Time {
             relativePeriod: null,
             numberOfRelativePeriods: null            
         };
-        if(!equals(this.relativeTime, RelativeTimes.On)) {
+        if(contains(this.relativeTime, RelativeTimes.Before, RelativeTimes.After)) {
             json.numberOfRelativePeriods = this.numberOfRelativePeriods;
             json.relativePeriod = this.relativePeriod;
+        }
+        if(equals(this.relativeTime, RelativeTimes.WeekOfYear)) {
+            json.weekNumber = this.weekNumber;
         }
         if(!this.anyDay) {
             json.weekday = this.weekday;
@@ -203,11 +215,12 @@ export class Periods {
     }
 }
 
-export type RelativeTime = 'On' | 'Before' | 'After';
+export type RelativeTime = 'On' | 'Before' | 'After' | 'WeekOfYear';
 export class RelativeTimes {
     public static On:RelativeTime = 'On';
     public static Before:RelativeTime = 'Before';
     public static After:RelativeTime = 'After';
+    public static WeekOfYear:RelativeTime = 'WeekOfYear';
 
     public static equals(a:RelativeTime, b:RelativeTime) {
         return equals(a, b);
@@ -235,9 +248,4 @@ export class EndingTypes {
     public static equals(a:EndingType, b:EndingType):boolean {
         return equals(a, b);
     }
-}
-
-function equals(a:string | null, b:string | null) {
-    if(a == null || b == null) return false;
-    return a.toLowerCase() === b.toLowerCase();
 }

@@ -39,7 +39,8 @@ export class TaskDetail {
     relativeTimes = [
         {id: RelativeTimes.On, text: 'The week of'},
         {id: RelativeTimes.Before, text: 'Before'},
-        {id: RelativeTimes.After, text: 'After'}
+        {id: RelativeTimes.After, text: 'After'},
+        {id: RelativeTimes.WeekOfYear, text: 'Week of the Year'},
     ];
     zones:string[];
     el:Element;
@@ -59,15 +60,15 @@ export class TaskDetail {
 
             const zones = await this.referenceService.zones();
             this.zones = zones.map(z => z.name);
+            for(let i = 1; i < 53; i++) {
+                this.weeks.push({ value: i, text: `Week ${i}`});
+            }
 
-            this.recipe =  await this.service.getOne(params.id);
+            this.recipe =  await this.service.getOne(params.id);            
 
             this.isPlant = this.recipe.plant != null;
 
-            if(!this.isPlant) {
-                for(let i = 1; i < 53; i++) {
-                    this.weeks.push({ value: i, text: `Week ${i}`});
-                }
+            if(!this.isPlant) {                
                 this.events = [Events.Week];
             }
 
