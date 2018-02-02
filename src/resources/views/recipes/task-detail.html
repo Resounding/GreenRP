@@ -94,7 +94,12 @@
                             <option repeat.for="event of events" value.bind="event">${event}</option>
                         </select>
                     </div>
-                    <div class="not-on not-before not-after">
+                    <div class="plant-field not-on not-before not-after">
+                        <select class="dropdown start-week">
+                            <option repeat.for="week of weeks" value.bind="week.value">${week.text}</option>
+                        </select>
+                    </div>
+                    <div class="zone-field">
                         <select class="dropdown start-week">
                             <option repeat.for="week of weeks" value.bind="week.value">${week.text}</option>
                         </select>
