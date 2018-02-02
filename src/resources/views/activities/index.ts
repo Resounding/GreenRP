@@ -220,7 +220,7 @@ export class ActivityIndex implements FilterSettings {
                     lowerCase = this.workType.toLowerCase();
                 filter.selector.$and.push({workType: { $in: [lowerCase, properCase] }});
             }
-            const regex = /week:(\d{4})\.(\d{2})/;
+            const regex = /week:(\d{4})\.(\d{1,2})/;
             let orders = this.orders;
             if(this.week && regex.test(this.week)) {
                 const match = regex.exec(this.week),
