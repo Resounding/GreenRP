@@ -1,15 +1,16 @@
-import {ActivitiesService} from '../../services/data/activities-service';
 import {autoinject, computedFrom} from 'aurelia-framework';
 import {DialogService} from 'aurelia-dialog';
 import {Router} from 'aurelia-router';
-import {EndingTypes, Event, Events, Periods, Recurrence, RelativeTimes} from '../../models/recurrence';
 import {Prompt} from '../controls/prompt';
+import {EndingTypes, Event, Events, Periods, Recurrence, RelativeTimes} from '../../models/recurrence';
 import {WorkType,WorkTypes,JournalRecordingTypes} from '../../models/activity';
 import {RecipeDocument} from '../../models/recipe';
 import {TimeDocument} from '../../models/recurrence';
 import {TaskDocument} from '../../models/task';
-import {RecipeSaveResult, RecipesService} from '../../services/data/recipes-service';
 import {Notifications} from '../../services/notifications';
+import {ActivitiesService} from '../../services/data/activities-service';
+import {RecipeSaveResult, RecipesService} from '../../services/data/recipes-service';
+import {ReferenceService} from '../../services/data/reference-service';
 
 @autoinject
 export class TaskDetail {
@@ -17,7 +18,6 @@ export class TaskDetail {
     recipe:RecipeDocument;
     task:TaskDocument;
     isPlant:boolean = false;
-    isZone:boolean = false;
     weeks:WeekSelection[] = [];
     workTypes:WorkType[];
     periods:Periods = Periods;
@@ -32,66 +32,74 @@ export class TaskDetail {
         {id: 2, text: 'Tue'},
         {id: 3, text: 'Wed'},
         {id: 4, text: 'Thu'},
-        {id: 5, text: 'Fri'}
+        {id: 5, text: 'Fri'},
+        {id: 6, text: 'Sat'},
+        {id: 0, text: 'Sun'}
     ];
     relativeTimes = [
         {id: RelativeTimes.On, text: 'The week of'},
         {id: RelativeTimes.Before, text: 'Before'},
-        {id: RelativeTimes.After, text: 'After'}
+        {id: RelativeTimes.After, text: 'After'},
+        {id: RelativeTimes.WeekOfYear, text: 'Week of the Year'},
     ];
+    zones:string[];
     el:Element;
+    private _specificZones:boolean;
 
-    constructor(private service:RecipesService, private activityService:ActivitiesService,
+    constructor(private service:RecipesService, private activityService:ActivitiesService, private referenceService:ReferenceService,
             private router:Router, private dialogService:DialogService) { }
 
-    activate(params) {
-        this.workTypes = WorkTypes.getAll();
+    async activate(params) {
+        try {
+            this.workTypes = WorkTypes.getAll();
 
-        const recipeId = params.id,
-            taskId = params.taskid,
-            isNew = taskId === 'new',
-            activityId = params.activityid;
+            const recipeId = params.id,
+                taskId = params.taskid,
+                isNew = taskId === 'new',
+                activityId = params.activityid;
 
-        return this.service.getOne(params.id)
-            .then(result => {
-                this.recipe = result;
+            const zones = await this.referenceService.zones();
+            this.zones = zones.map(z => z.name);
+            for(let i = 1; i < 53; i++) {
+                this.weeks.push({ value: i, text: `Week ${i}`});
+            }
 
-                this.isPlant = this.recipe.plant != null;
-                this.isZone = this.recipe.zone != null;
+            this.recipe =  await this.service.getOne(params.id);            
 
-                if(this.isZone) {
-                    for(let i = 1; i < 53; i++) {
-                        this.weeks.push({ value: i, text: `Week ${i}`});
-                    }
-                    this.events = [Events.Week];
+            this.isPlant = this.recipe.plant != null;
+
+            if(!this.isPlant) {                
+                this.events = [Events.Week];
+            }
+
+            if(isNew) {
+                this.task = new TaskDocument({ startTime: new TimeDocument }, -1);
+                if(!this.isPlant) {
+                    this.task.startTime.event = Events.Week;
+                    this.task.startTime.weekNumber = moment().isoWeek();
                 }
 
-                if(isNew) {
-                    this.task = new TaskDocument({ startTime: new TimeDocument }, -1);
-                    if(this.isZone) {
-                        this.task.startTime.event = Events.Week;
-                        this.task.startTime.weekNumber = moment().isoWeek();
-                    }
-
-                    if(activityId) {
-                        this.activityService.getOne(activityId)
-                            .then(activity => {
-                                Object.assign(this.task, {
-                                    name: activity.name,
-                                    description: activity.description,
-                                    workType: activity.workType,
-                                    recordingType: activity.recordingType,
-                                    unitOfMeasure: activity.unitOfMeasure                                    
-                                });
-                            })
-                            .catch(Notifications.error);
-                    }
-                } else {
-                    const taskIndex = parseInt(taskId) || 0;
-                    this.task = new TaskDocument(this.recipe.tasks[taskIndex].toJSON(), taskIndex);
+                if(activityId) {
+                    this.activityService.getOne(activityId)
+                        .then(activity => {
+                            Object.assign(this.task, {
+                                name: activity.name,
+                                description: activity.description,
+                                workType: activity.workType,
+                                recordingType: activity.recordingType,
+                                unitOfMeasure: activity.unitOfMeasure                                    
+                            });
+                        })
+                        .catch(Notifications.error);
                 }
-            })
-            .catch(Notifications.error);
+            } else {
+                const taskIndex = parseInt(taskId) || 0;
+                this.task = new TaskDocument(this.recipe.tasks[taskIndex].toJSON(), taskIndex);                
+            }
+
+        } catch(err) {
+            Notifications.error(err);
+        }
     }
 
     attached() {
@@ -112,9 +120,20 @@ export class TaskDetail {
         const $endWeek = $('.dropdown.end-week', this.el)
             .dropdown({ onChange: this.onEndWeekChange.bind(this) });
 
-        if(!this.task.isNew && this.task.recurrence) {
+        if(!this.task.isNew && this.task.recurrence && this.task.recurrence.endTime) {
             $endWeek.dropdown('set selected', this.task.recurrence.endTime.weekNumber);
         }
+
+        const $zones = $('.dropdown.zones', this.el)
+            .dropdown({ onChange: this.onZonesChange.bind(this) });
+
+        if(Array.isArray(this.task.zones) && this.task.zones.length) {
+            $zones.dropdown('set selected', this.task.zones);
+            this.specificZones = true;
+        } else {
+            this.specificZones = false;
+        }
+        $zones.dropdown('hide');
     }
 
     @computedFrom('task.isNew')
@@ -129,6 +148,23 @@ export class TaskDetail {
 
     set isMeasurement(value:boolean) {
         this.task.recordingType = value ? JournalRecordingTypes.Measurement : JournalRecordingTypes.CheckList;
+    }
+
+    get specificZones():boolean {
+        return this._specificZones;
+    }
+    set specificZones(value:boolean) {
+        const $zones = $('.dropdown.zones', this.el)
+        this._specificZones = value;
+        if(value) {
+            $zones
+                .show()
+                .dropdown('show');
+        } else {
+            delete this.task.zones;
+            $zones
+                .hide();
+        }
     }
 
     save() {
@@ -196,6 +232,10 @@ export class TaskDetail {
         if(this.task.recurrence) {
             this.task.recurrence.endTime.weekNumber = numeral(value).value();
         }
+    }
+
+    private onZonesChange(values:string[]) {
+        this.task.zones = values;
     }
 
     private goToRecipe() {

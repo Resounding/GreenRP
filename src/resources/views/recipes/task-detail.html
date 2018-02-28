@@ -1,7 +1,7 @@
 <template>
     <require from="styles/tasks.css"></require>
 
-    <div class="ui ${task.recurring ? 'recurring' : 'not-recurring'} ${isPlant ? 'plant-task' : ''} ${isZone ? 'zone-task' : ''}" id="task-detail-container" ref="el">
+    <div class="ui ${task.recurring ? 'recurring' : 'not-recurring'} ${isPlant ? 'plant-task' : 'non-plant-task'}" id="task-detail-container" ref="el">
         <div class="button-container">
             <button type="button" class="ui basic red icon button" click.delegate="delete()" data-tooltip="Click to Delete this Task" data-position="bottom right" hide.bind="task.isNew">
                 <i class="trash button icon"></i>
@@ -60,12 +60,26 @@
                     <textarea id="description" value.bind="task.description"></textarea>
                 </div>                    
             </div>
+            <div class="fields row" show.bind="isPlant">
+                <div class="field four wide">
+                    <div class="ui toggle checkbox">
+                        <input type="checkbox" id="specific-zones" checked.bind="specificZones">
+                        <label for="specific-zones">Specific Zones:</label>
+                    </div>
+                </div>
+                <div class="field ten wide">
+                    <select class="ui fluid search dropdown zones" multiple>
+                        <option value="">Select Zone(s)</option>
+                        <option repeat.for="z of zones" value="${z}">${z}</option>
+                    </select>
+                </div>
+            </div>
             <div class="fields row">
                 <div with.bind="task.startTime" class="fields inline ${relativeTime} ${anyDay ? 'any-day' : ''}">
                     <label for="relativeTime">Starting&nbsp;</label>
-                    <input type="number" value.bind="numberOfRelativePeriods" class="not-on plant-field">
-                    <div class="plant-field">
-                        <select value.bind="relativePeriod" class="not-on">
+                    <input type="number" value.bind="numberOfRelativePeriods" class="not-on not-week-of-year plant-field">
+                    <div class="plant-field not-on not-week-of-year">
+                        <select value.bind="relativePeriod">
                             <option value.bind="periods.Day">Day${numberOfRelativePeriods == 1 ? '' : 's'}</option>
                             <option value.bind="periods.Week">Week${numberOfRelativePeriods == 1 ? '' : 's'}</option>
                         </select>
@@ -75,9 +89,14 @@
                             <option repeat.for="time of relativeTimes" value.bind="time.id">${time.text}</option>
                         </select>
                     </div>
-                    <div class="plant-field">
+                    <div class="plant-field not-week-of-year">
                         <select value.bind="event">
                             <option repeat.for="event of events" value.bind="event">${event}</option>
+                        </select>
+                    </div>
+                    <div class="plant-field not-on not-before not-after">
+                        <select class="dropdown start-week">
+                            <option repeat.for="week of weeks" value.bind="week.value">${week.text}</option>
                         </select>
                     </div>
                     <div class="zone-field">
@@ -102,6 +121,13 @@
                         <select value.bind="weekday">
                             <option repeat.for="day of weekdays" value.bind="day.id">${day.text}</option>
                         </select>
+                    </div>
+                    &nbsp;
+                    <div class="field">
+                        <div class="ui toggle checkbox">
+                            <input type="checkbox" id="group-activities" checked.bind="task.groupActivitiesTogether">
+                            <label for="group-activities">Group activities together</label>
+                        </div>
                     </div>
                 </div>                
             </div>
@@ -190,9 +216,9 @@
                     <label for="numberOfOccurrences">occurrence${numberOfOccurrences == 1 ? '' : 's'}.</label>
                 </div>
                 <div with.bind="task.recurrence.endTime" class="fields inline recurrence end-date ${relativeTime} ${anyDay ? 'any-day' : ''}">
-                    <input type="number" value.bind="numberOfRelativePeriods" class="not-on plant-field">
-                    <div class="plant-field">
-                        <select value.bind="relativePeriod" class="not-on">
+                    <input type="number" value.bind="numberOfRelativePeriods" class="not-on not-week-of-year plant-field">
+                    <div class="plant-field not-on not-week-of-year">
+                        <select value.bind="relativePeriod">
                             <option value.bind="periods.Day">Day${numberOfRelativePeriods == 1 ? '' : 's'}</option>
                             <option value.bind="periods.Week">Week${numberOfRelativePeriods == 1 ? '' : 's'}</option>
                         </select>
@@ -202,12 +228,12 @@
                             <option repeat.for="time of relativeTimes" value.bind="time.id">${time.text}</option>
                         </select>
                     </div>
-                    <div class="plant-field">
+                    <div class="plant-field not-week-of-year">
                         <select value.bind="event">
                             <option repeat.for="event of events" value.bind="event">${event}</option>
                         </select>
                     </div>
-                    <div class="zone-field">
+                    <div class="not-on not-before-not-after">
                         <select class="dropdown end-week">
                             <option repeat.for="week of weeks" value.bind="week.value">${week.text}</option>
                         </select>

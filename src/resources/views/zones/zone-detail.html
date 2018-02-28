@@ -15,12 +15,16 @@
                 <th class="center aligned">Available</th>
             </tr>
         </thead>
-        <tbody>
-            <tr repeat.for="week of model.weeks">
-                <td>${week.weekNumber}</td>
-                <td class="center aligned" repeat.for="plant of week.plants">${plant}</td>
-                <td class="center aligned">${week.available}</td>
-            </tr>
-        </tbody>
     </table>
+    <div class="table-wrapper">
+        <table class="ui table">
+            <tbody>
+                <tr repeat.for="week of model.weeks">
+                    <td>${week.weekNumber}</td>
+                    <td class="center aligned" repeat.for="plant of week.plants">${plant}</td>
+                    <td class="center aligned">${week.available}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </template>

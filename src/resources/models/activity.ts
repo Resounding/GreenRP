@@ -12,10 +12,13 @@ export interface Activity {
     description:string;
     crops?:string[];
     zones?:Zone[];
+    recipeId?:string;
     assignedTo?:string;
     recordingType:JournalRecordingType;
     unitOfMeasure?:string;
     journal?:Journal;
+    changed:boolean | undefined;
+    groupActivitiesTogether:boolean | undefined;
 }
 
 export interface Journal {
@@ -35,14 +38,24 @@ export class ActivityDocument implements Activity {
     description:string;
     crops?:string[] = [];
     zones?:Zone[] = [];
+    recipeId?:string = null;
     assignedTo?:string = null;
     recordingType:JournalRecordingType = JournalRecordingTypes.CheckList;
     unitOfMeasure?:string = null;
     journal?:JournalDocument = null;
+    changed:boolean = false;
+    groupActivitiesTogether:boolean | undefined;
 
     constructor(args?:Activity) {
         if(args) {
             _.extend(this, args);
+
+            if(this.date) {
+                const date = moment(this.date);
+                if(date.isValid()) {
+                    this.date = date.toDate();
+                }
+            }
 
             if(args.journal) {
                 this.journal = new JournalDocument(args.journal);
@@ -76,9 +89,12 @@ export class ActivityDocument implements Activity {
             description: this.description,
             crops: null,
             zones: null,
+            recipeId: this.recipeId,
             assignedTo: this.assignedTo,
             recordingType: this.recordingType,
             unitOfMeasure: this.unitOfMeasure,
+            changed: this.changed,
+            groupActivitiesTogether: this.groupActivitiesTogether
         };
         if(Array.isArray(this.crops) && this.crops.length) {
             json.crops = this.crops;
@@ -191,7 +207,7 @@ export class AssignedTo {
     public static UNASSIGNED:string = 'Unassigned';
 }
 
-function equals(a:string, b:string) {
+export function equals(a:string, b:string) {
     if(a == null || b == null) return false;
     return a.toLowerCase() === b.toLowerCase();
 }

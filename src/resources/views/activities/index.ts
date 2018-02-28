@@ -33,6 +33,7 @@ export class ActivityIndex implements FilterSettings {
     week:string = moment().toWeekNumberId();
     workType:WorkType = WorkTypes.ALL_WORK_TYPES;
     zone:string = ALL_ZONES;
+    private _showMyOverdue:boolean = true;
     private _showAll:boolean = false;
     private _showCompleted:boolean = false;
     private _showIncomplete:boolean = false;
@@ -71,15 +72,16 @@ export class ActivityIndex implements FilterSettings {
                 week = moment().subtract(2, 'weeks');
             for(let i = 0; i < 6; i++) {
                 const id = week.toWeekNumberId(),
-                    text = id === thisWeek ? 'This week' :
-                    (id === lastweek ? 'Last Week' :
-                    (id === nextweek ? 'Next Week' : week.format('[Week] W')));
+                    formattedWeek = week.format('[Week] W'),
+                    text = id === thisWeek ? `This week (${formattedWeek})` : 
+                    (id === lastweek ? `Last Week (${formattedWeek})` :
+                    (id === nextweek ? `Next Week (${formattedWeek})` : formattedWeek ));
                 this.weeks.push({ id, text });
                 week.add(1, 'week');
             }
 
             const result = await this.usersService.getAll();
-            this.users = ['Unassigned'].concat(result.map(u => u.name).sort());
+            this.users = result.map(u => u.name).sort();
 
             await this.load();
 
@@ -168,36 +170,57 @@ export class ActivityIndex implements FilterSettings {
         this.filter();
     }
 
-    private async load() {
-        const result = await this.service.getAll();
+    @computedFrom('_showMyOverdue')
+    get showMyOverdue():boolean {
+        return this._showMyOverdue;
+    }
+    set showMyOverdue(value:boolean) {
+        this._showMyOverdue = value;
         this.filter();
     }
 
-    private filter() {
+    private async load() {
+        this.filter();
+    }
+
+    private async filter() {
         try {
             if(this.filtering) return;
             this.filtering = true;
 
             const filter:any = {
-                selector: {
-                    $and: [{ type: 'activity'}]
-                }
-            };
+                    selector: {
+                        $and: [{
+                            type: 'activity'                        
+                        }]
+                    }
+                },
+                status = {
+                    $in: [
+                        ActivityStatuses.NotStarted,
+                        ActivityStatuses.NotStarted.toLowerCase(),
+                        ActivityStatuses.InProgress,
+                        ActivityStatuses.InProgress.toLowerCase()
+                    ]
+                };
             if(!this.showAll) {
                 filter.selector.$and.push({assignedTo: { $eq: this.auth.userInfo.name }});
             }
-            if(!this.showCompleted) {
-                filter.selector.$and.push({status: { $nin: [ActivityStatuses.Incomplete,  ActivityStatuses.Incomplete.toLowerCase()]}});
+            if(this.showCompleted) {
+                status.$in.push(ActivityStatuses.Complete);
+                status.$in.push(ActivityStatuses.Complete.toLowerCase());
             }
-            if(!this.showIncomplete) {
-                filter.selector.$and.push({status: { $nin: [ActivityStatuses.Complete,  ActivityStatuses.Complete.toLowerCase()]}});
+            if(this.showIncomplete) {
+                status.$in.push(ActivityStatuses.Incomplete);
+                status.$in.push(ActivityStatuses.Incomplete.toLowerCase());
             }
+            filter.selector.$and.push({status})
             if(this.week && !WorkTypes.equals(this.workType, WorkTypes.ALL_WORK_TYPES)) {
                 const properCase = this.workType.charAt(0).toUpperCase() + this.workType.substr(1).toLowerCase(),
                     lowerCase = this.workType.toLowerCase();
                 filter.selector.$and.push({workType: { $in: [lowerCase, properCase] }});
             }
-            const regex = /week:(\d{4})\.(\d{2})/;
+            const regex = /week:(\d{4})\.(\d{1,2})/;
             let orders = this.orders;
             if(this.week && regex.test(this.week)) {
                 const match = regex.exec(this.week),
@@ -218,9 +241,6 @@ export class ActivityIndex implements FilterSettings {
                     }
                     return true;
                 });
-            //     this.activities = this.activities.filter(a => (moment(a.date).toWeekNumberId() === this.week) ||
-            //         // asking for this week & not started & prior to today
-            //         (thisWeek && ActivityStatuses.equals(a.status, ActivityStatuses.NotStarted) && moment(a.date).isBefore(moment(), 'day')));
 
                 if(this.zone && !equals(this.zone, ALL_ZONES)) {
                     const orderNumbers = orders.map(o => {
@@ -245,19 +265,49 @@ export class ActivityIndex implements FilterSettings {
                 }
             }
             // this is the same logic as ActivityDetail::activate()
-            
-            this.service.find(filter)
-                .then(result => {                    
-                    this.activities = result;
-                    this.filtering = false;
-                })
-                .catch(err => {
-                    Notifications.error(err);
-                    this.filtering = false;
-                });
+
+            const results = await this.service.find(filter);
+
+            if(this.showMyOverdue) {
+                try {
+                    const overdueFilter = {
+                        selector: {
+                            $and: [
+                                { type: ActivityDocument.ActivityDocumentType },
+                                { status: { $in: [ActivityStatuses.NotStarted, ActivityStatuses.InProgress] } },
+                                { date: { $lt: moment().startOf('isoWeek').format('YYYY-MM-DD') }},
+                                { assignedTo: this.auth.userInfo.name }
+                            ]
+                        }
+                    },
+                    overdueItems = await this.service.find(overdueFilter);
+
+                    // we have to do this in a foreach b/c our indices change
+                    // as we delete things...
+                    overdueItems.forEach(i => {
+                        const duplicate = results.find(r => i._id === r._id);
+                        if(duplicate) {
+                            const index = results.indexOf(duplicate);
+                            results.splice(index, 1);
+                        }
+                    });
+
+                    results.splice(0, 0, ...overdueItems);
+                } catch(e) {
+                    Notifications.error(e);
+                }
+            }
+
+            this.activities = results;
 
         } catch(e) {
+            if(e instanceof TypeError && e.message === 'Cannot read property \'type\' of undefined') {
+                return await this.filter();
+            }
+            
             Notifications.error(e);
+        } finally {
+            this.filtering = false;
         }
     }
 
@@ -277,18 +327,24 @@ export class ActivityIndex implements FilterSettings {
     }
 
     private loadFilterSettings() {
-        const settingsJSON = sessionStorage.getItem(FILTER_SETTINGS_KEY);
-        if(settingsJSON) {
-            const defaults = {
-                    week: moment().toWeekNumberId(),
-                    workType: WorkTypes.ALL_WORK_TYPES,
-                    showAll: false,
-                    showCompleted: false,
-                    showIncomplete: false,
-                    zone: ALL_ZONES
-                },
-                settings:FilterSettings = JSON.parse(settingsJSON);
-            Object.assign(this, defaults, settings);
+        try {
+            this.filtering = true;
+
+            const settingsJSON = sessionStorage.getItem(FILTER_SETTINGS_KEY);
+            if(settingsJSON) {
+                const defaults = {
+                        week: moment().toWeekNumberId(),
+                        workType: WorkTypes.ALL_WORK_TYPES,
+                        showAll: false,
+                        showCompleted: false,
+                        showIncomplete: false,
+                        zone: ALL_ZONES
+                    },
+                    settings:FilterSettings = JSON.parse(settingsJSON);
+                Object.assign(this, defaults, settings);
+            }
+        } finally {
+            this.filtering = false;
         }
     }
 

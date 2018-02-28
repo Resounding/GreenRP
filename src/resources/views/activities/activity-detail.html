@@ -50,13 +50,11 @@
             </div>
             <div class="fields row">
                 <div class="field eight wide">
-                    <label for="assignedTo">Assigned To</label>
                     <div class="ui search selection dropdown assignedTo">
                         <input type="hidden" id="assignedTo">
                         <i class="dropdown icon"></i>
-                        <div class="text"></div>
+                        <div class="default text">Unassigned</div>
                         <div class="menu">
-                            <div class="item" data-value="">Unassigned</div>
                             <div repeat.for="u of users" class="item">${u.name}</div>
                         </div>
                     </div>

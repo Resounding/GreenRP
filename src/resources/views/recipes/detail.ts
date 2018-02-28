@@ -5,9 +5,10 @@ import {Prompt} from '../controls/prompt';
 import {Plant} from '../../models/plant';
 import {RecipeDocument} from '../../models/recipe';
 import {Zone} from '../../models/zone';
+import {Notifications} from '../../services/notifications';
 import {RecipeSaveResult, RecipesService} from '../../services/data/recipes-service';
 import {ReferenceService} from '../../services/data/reference-service';
-import {Notifications} from '../../services/notifications';
+import {UsersService} from '../../services/data/users-service';
 
 @autoinject
 export class RecipeDetail {
@@ -15,28 +16,33 @@ export class RecipeDetail {
     recipe:RecipeDocument = new RecipeDocument;
     plants:Plant[];
     zones:Zone[];
+    users:string[];
     title:string = 'New Recipe';
     errors:string[] = [];
 
-    constructor(private service:RecipesService, private referenceService:ReferenceService,
+    constructor(private service:RecipesService, private referenceService:ReferenceService, private usersService:UsersService,
         private router:Router, private dialogService:DialogService) { }
 
     async activate(params) {
         try {
+            const users = await this.usersService.getAll();
+            this.users = users.map(u => u.name).sort();
+
             if(params.id && params.id !== 'new') {
-                this.service.getOne(params.id)
-                    .then(result => {
-                        this.recipe = result;
-                        this.recipeId = this.recipe._id;
-                        this.title = `Recipe for ${this.recipe.zone ? ' Zone ' : ''} ${this.recipe.name}`;
-                        
-                        if(result.plant) {
-                            this.plants = [result.plant];
-                        } else if(result.zone) {
-                            this.zones = [result.zone];
-                        }
-                    })
-                    .catch(Notifications.error);
+                try {
+                    const result = await this.service.getOne(params.id)
+                    this.recipe = result;
+                    this.recipeId = this.recipe._id;
+                    this.title = `Recipe for ${this.recipe.zone ? ' Zone ' : ''} ${this.recipe.name}`;
+                    
+                    if(result.plant) {
+                        this.plants = [result.plant];
+                    } else if(result.zone) {
+                        this.zones = [result.zone];
+                    }                    
+                } catch(e) {
+                    Notifications.error(e);
+                }
             } else {
                 const recipes = await this.service.getAll();
 
@@ -62,6 +68,13 @@ export class RecipeDetail {
                 this.zones = zones.reduce((memo, zone) => {
                     if(!recipes.some(r => r.zone && r.zone.name === zone.name)) {
                         memo.push(zone);
+                    }
+                    return memo;
+                }, []);
+
+                this.users = this.users.reduce((memo, user) => {
+                    if(!recipes.some(r => r.user === user)) {
+                        memo.push(user);
                     }
                     return memo;
                 }, []);
@@ -145,6 +158,13 @@ export class RecipeDetail {
     }
     set hasZone(value:boolean) {
         this.recipe.zone = value ? this.zones[0] : null;
+    }
+    @computedFrom('recipe.user')
+    get hasUser():boolean {
+        return !!this.recipe.user;
+    }
+    set hasUser(value:boolean) {
+        this.recipe.user = value ? this.users[0] : null;
     }
 
     private saveRecipe():Promise<RecipeSaveResult> {

@@ -12,6 +12,8 @@ export interface Task {
     unitOfMeasure?:string;
     recurring:boolean;
     recurrence:Recurrence;
+    zones?:string[] | undefined;
+    groupActivitiesTogether:boolean | undefined;
 }
 
 export class TaskDocument implements Task {
@@ -23,7 +25,9 @@ export class TaskDocument implements Task {
     recordingType:JournalRecordingType = JournalRecordingTypes.CheckList;
     unitOfMeasure?:string = null;
     _recurring:boolean = false;
-    recurrence:Recurrence = null;
+    recurrence:RecurrenceDocument = null;
+    zones?:string[] | undefined = undefined;
+    groupActivitiesTogether:boolean | undefined = false;
 
     constructor(data:Task | {startTime?:Time} = {}, public index:number) {
         Object.assign(this, data);
@@ -67,10 +71,12 @@ export class TaskDocument implements Task {
             recordingType: this.recordingType,
             unitOfMeasure: this.unitOfMeasure,
             recurring: this.recurring,
-            recurrence: null
+            recurrence: null,
+            zones: this.zones,
+            groupActivitiesTogether: !!this.groupActivitiesTogether
         };
         if(this.recurring) {
-            json.recurrence = this.recurrence;
+            json.recurrence = new RecurrenceDocument(this.recurrence).toJSON();
         }
         return json;
     }

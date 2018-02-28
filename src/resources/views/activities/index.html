@@ -8,19 +8,25 @@
                 <i class="plus icon"></i>
                 New Activity
             </a>
-            <a class="basic ui secondary icon button right floated" route-href="route: activities-by-crop">
+            <a class="basic ui secondary icon button right floated hide-mobile" route-href="route: activities-by-crop">
                 <i class="icon tree"></i>
-                <span class="hide-mobile">By Crop</span>
+                <span>By Crop</span>
             </a>
-            <a class="basic ui secondary icon button right floated" route-href="route: activities-by-recipe">
+            <a class="basic ui secondary icon button right floated hide-mobile" route-href="route: activities-by-recipe">
                 <i class="icon address card outline"></i>
-                <span class="hide-mobile">By Recipe</span>
+                <span>By Recipe</span>
             </a>
             <button class="ui icon button basic right floated hide-desktop mini" click.trigger="toggleFiltersExpanded()">
                 <i class="dropdown icon ${filtersExpanded ? 'vertically flipped' : ''}"></i>
             </button>
             <div class="ui clearing divider"></div>
             <div class="filter-grid ui two column grid stackable container">
+                <div class="column">
+                    <div class="ui toggle checkbox">
+                        <input type="checkbox" id="showoverdue" checked.bind="showMyOverdue">
+                        <label for="showoverdue">Show My Overdue items</label>
+                    </div>
+                </div>
                 <div class="column">
                     <div class="ui toggle checkbox">
                         <input type="checkbox" id="showall" checked.bind="showAll">
@@ -39,6 +45,8 @@
                         <label for="showincomplete">Show Incomplete Items</label>
                     </div>
                 </div>
+            </div>
+            <div class="filter-grid ui three column grid stackable container">
                 <div class="column">
                     <span>
                         Work Types:

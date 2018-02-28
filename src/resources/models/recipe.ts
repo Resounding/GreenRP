@@ -10,6 +10,7 @@ export interface Recipe {
     name:string;
     plant?:Plant;
     zone?:Zone;
+    user?:string;
     instructions:string;
     tasks:Task[];
 }
@@ -22,6 +23,7 @@ export class RecipeDocument implements Recipe {
     tasks:TaskDocument[] = [];
     private _plant:Plant = null;
     private _zone:Zone = null;
+    private _user:string = null;
 
     constructor(data:Recipe | {} = {}) {
         Object.assign(this, data);
@@ -32,10 +34,11 @@ export class RecipeDocument implements Recipe {
     }
 
 
-    @computedFrom('_plant', '_zone')
+    @computedFrom('_plant', '_zone', '_user')
     get name():string {
         if(this._plant) return this._plant.name;
         if(this._zone) return this._zone.name;
+        if(this._user) return this._user;
 
         return 'New Recipe';
     }
@@ -53,6 +56,7 @@ export class RecipeDocument implements Recipe {
         this._plant = value;
         if(this._plant) {
             this.zone = null;
+            this.user = null;
         }
     }
 
@@ -66,6 +70,21 @@ export class RecipeDocument implements Recipe {
         this._zone = value;
         if(this._zone) {
             this.plant = null;
+            this.user = null;
+        }
+    }
+
+    @computedFrom('_user')
+    get user():string {
+        return this._user;
+    }
+    set user(value:string) {
+        if(this._user === value) return;
+
+        this._user = value;
+        if(value) {
+            this.plant = null;
+            this.zone = null;
         }
     }
 
@@ -74,25 +93,13 @@ export class RecipeDocument implements Recipe {
         return !this._id;
     }
 
-    getTask(id:string) {
-        return this.tasks.find(t => t._id === id);
-    }
-
-    updateTask(task:TaskDocument) {
-        const index = this.tasks.findIndex(t => t._id === task._id);
-        if(index === -1) {
-            this.tasks.push(task);
-        } else {
-            this.tasks[index] = task;
-        }
-    }
-
     toJSON():Recipe {
         const json:Recipe = {
             type: RecipeDocument.RecipeDocumentType,
             name: this.name,
             plant: this.plant,
             zone: this.zone,
+            user: this.user,
             instructions: this.instructions,
             tasks: null
         };

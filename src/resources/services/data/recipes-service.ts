@@ -45,9 +45,9 @@ export class RecipesService {
                 result.ok = false;
                 result.errors.push('The Recipe Name is required.')
             }
-            if(!doc.plant && !doc.zone) {
+            if(!doc.plant && !doc.zone && !doc.user) {
                 result.ok = false;
-                result.errors.push('Please choose a plant or a zone.')
+                result.errors.push('Please choose a plant, a zone or a person.')
             }
             if(Array.isArray(doc.tasks) && doc.tasks.some(t => !t.name)) {
                 result.ok = false;

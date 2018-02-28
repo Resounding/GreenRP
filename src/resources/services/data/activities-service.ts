@@ -27,11 +27,11 @@ export class ActivitiesService {
         });
     }
 
-    getAll():Promise<ActivityDocument[]> {
+    getAll():Promise<ActivityDocument[]> {        
         return new Promise((resolve, reject) => {
-            this.database.db.find({ selector: { type: ActivityDocument.ActivityDocumentType }})
+            this.database.db.query('filters/activities', { include_docs: true})
                 .then(result => {
-                    const docs = result.docs.map(doc => new ActivityDocument(doc));
+                    const docs = result.rows.map(row => new ActivityDocument(row.doc));
                     resolve(docs);
                 })
                 .catch(reject);
@@ -76,7 +76,7 @@ export class ActivitiesService {
 
             if(!result.ok) {
                 return resolve(result);
-            }   
+            }
 
             if(doc.isNew) {
                 return this.database.db.post(json)
@@ -92,6 +92,9 @@ export class ActivitiesService {
                     })
                     .catch(reject);
             } else {
+                
+                json.changed = true;
+
                 return this.database.db.put(json)
                     .then((response:PouchDB.Core.Response) => {
                         if(response.ok) {
