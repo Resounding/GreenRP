@@ -12,6 +12,7 @@ import {WeekDetail} from "../weeks/week-detail";
 
 @autoinject()
 export class Index {
+    el:Element;
     weeks:Map<string, CapacityWeek>;
     zones:Zone[];
     year:number = new Date().getFullYear();
@@ -36,11 +37,17 @@ export class Index {
 
         this.loadZones();
         this.load();
+
+        window.setTimeout(() => {
+            $('.sticky', this.el).sticky();
+        }, 100);
     }
 
     deactivate() {
         this.orderChangedSubscription.dispose();
         this.ordersSyncChangeSubscription.dispose();
+
+        $('.sticky', this.el).sticky('destroy');
     }
 
     load() {
@@ -95,4 +102,37 @@ export class Index {
     get nextYear() {
         return this.year + 1;
     }
+
+    @computedFrom('zones')
+    get zoneWidth():string {
+        if(!this.zones || !this.zones.length) return '';
+
+        var width = Math.floor(16 / this.zones.length),
+            number = toNumber(width);
+
+        return number;
+        
+    }
+
+    @computedFrom('zones')
+    get weekWidth():string {
+        if(!this.zones || !this.zones.length) return '';
+
+        var weekWidth = Math.floor(16 / this.zones.length),
+            width = 16 - (this.zones.length * weekWidth),
+            number = toNumber(width);
+
+        return number;
+    }
+}
+
+function toNumber(value:number):string {
+    switch(value) {
+        case 1: return 'one';
+        case 2: return 'two';
+        case 3: return 'three';
+        case 4: return 'four';        
+    }
+
+    return '';
 }
