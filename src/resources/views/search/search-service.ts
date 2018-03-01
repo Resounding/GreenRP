@@ -31,8 +31,8 @@ export class SearchOrder {
     stick:moment.Moment;
     flower:moment.Moment;
     ship:moment.Moment;
-    zone:string;    
     rootZone:string;
+    currentWeek:string = moment().toWeekNumberId();
 
     constructor(private order:OrderDocument) {
         this.batch = order.orderNumber;
@@ -42,7 +42,6 @@ export class SearchOrder {
         this.stick = moment(order.stickDate);
         this.flower = moment(order.flowerDate);
         this.ship = moment(order.arrivalDate);
-        this.zone = order.zone.name;
         this.customer = order.customer.name;
 
         const firstWeek = Object.keys(order.weeksInHouse)[0];
@@ -54,6 +53,14 @@ export class SearchOrder {
     @computedFrom('zone', 'rootZone')
     get differentRootZone():boolean {
         return this.zone !== this.rootZone;
+    }
+
+    @computedFrom('order')
+    get zone():string {
+        const week = this.order.weeksInHouse[this.currentWeek],
+            zone = week ? week.zone : this.order.zone.name;
+
+        return zone;
     }
 
     get stickDate():Date {
