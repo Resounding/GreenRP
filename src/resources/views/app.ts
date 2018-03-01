@@ -22,7 +22,8 @@ export class App {
         if(this.auth.isInRole(Roles.ProductionManager) || this.auth.isInRole(Roles.Administrator)) {
             config.map([
                 {route: ['', 'home/:year'], name: 'home', moduleId: 'resources/views/home/index', title: 'Home', nav: true, settings: { auth: true }},
-                {route: 'plants', name: 'plants', moduleId: 'resources/views/plants/index', title: 'Plants', nav: true, settings: { auth: true, roles: [Roles.ProductionManager, Roles.Administrator] }}
+                {route: 'plants', name: 'plants', moduleId: 'resources/views/plants/index', title: 'Plants', nav: true, settings: { auth: true, showInSettings: true, roles: [Roles.ProductionManager, Roles.Administrator] }},
+                {route: 'zones', name: 'zones', moduleId: 'resources/views/zones/index', title: 'Zones', nav: true, settings: { auth: true, showInSettings: true, roles: [Roles.ProductionManager, Roles.Administrator] }}
             ]);
         }
 

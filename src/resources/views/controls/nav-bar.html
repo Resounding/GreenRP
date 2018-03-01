@@ -21,6 +21,9 @@
                     ${userName}
                     <i class="dropdown icon"></i>
                     <div class="menu">
+                        <a repeat.for="item of settingsRoutes" href.bind="item.navModel.href" class="item">
+                            ${item.title}
+                        </a>
                         <button type="button" class="item" click.delegate="changePassword()">
                             <i class="talk outline icon"></i>
                             Change Password

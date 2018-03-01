@@ -3,12 +3,16 @@ import {Database} from '../database';
 import {Customer} from '../../models/customer';
 import {Plant, PlantDocument} from '../../models/plant';
 import {Zone} from '../../models/zone';
+import {ZoneAssignment} from '../../models/zone-assignment';
 import {Season} from '../../models/season';
 import {Week} from "../../models/week";
 import {SeasonTime} from "../../models/season-time";
 import {CapacityWeekZones} from "../../models/capacity-week";
+import {Notifications} from '../../services/notifications';
 
 const PlantsKey:string = 'plants';
+const ZonesKey:string = 'zones';
+const ZoneAssignmentsKey:string = 'zone-assignments';
 const CustomersKey:string = 'customers';
 const SeasonsKey:string = 'seasons';
 const PropagationTimesKey:string = 'propagation-times';
@@ -94,12 +98,50 @@ export class ReferenceService {
     zones():Promise<Zone[]> {
         return new Promise((resolve, reject) => {
 
-            this.database.db.get('zones')
+            this.database.db.get(ZonesKey)
                 .then(result => {
                     resolve(result.zones);
                 })
                 .catch(reject);
         });
+    }
+
+    async getZoneAssignments():Promise<ZoneAssignment> {
+        try {
+
+            const assignment:ZoneAssignment = await this.database.db.get(ZoneAssignmentsKey);
+            return assignment;
+
+        } catch(e) {
+            Notifications.error(e);
+        }
+    }
+
+    async saveZone(zone:Zone, grower:string, labour:string):Promise<boolean> {
+        try {
+        const zonesResult = await this.database.db.get(ZonesKey),
+            zones = <Zone[]>zonesResult.zones, 
+            index = _.findIndex(zones, z => z.name === zone.name);
+                    
+            if(index === -1) {
+                zonesResult.zones.push(zone);
+            } else {
+                zonesResult.zones[index] = zone;
+            }
+
+            const saveResult = await this.database.db.put(zonesResult),
+                assignmentResult = await this.database.db.get(ZoneAssignmentsKey);
+
+            assignmentResult.growers[zone.name] = grower;
+            assignmentResult.labour[zone.name] = labour;
+
+            await this.database.db.put(assignmentResult);
+
+            return true;
+                
+        } catch(e) {
+            Notifications.error(e);
+        }
     }
 
     seasons():Promise<Season[]> {

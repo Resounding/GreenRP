@@ -1,0 +1,36 @@
+<template>
+        <div class="ui segments">
+            <div class="ui secondary segment">
+                <table class="ui single line table">
+                    <thead>
+                        <tr>
+                            <th class="collapsing">Name</th>
+                            <th class="collapsing center aligned">Tables</th>
+                            <th class="collapsing center aligned">Auto Space</th>
+                            <th class="collapsing center aligned">Propagation?</th>
+                            <th class="collapsing center aligned">Grower</th>
+                            <th class="collapsing center aligned">Labour</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr repeat.for="z of zones">
+                            <td>                    
+                                <a click.delegate="detail(z)">${z.name}</a>
+                            </td>
+                            <td class="collapsing center aligned">${z.tables | numericFormat}</td>
+                            <td class="collapsing center aligned">
+                                <i class="icon checkmark" show.bind="z.autoSpace"></i>
+                            </td>
+                            <td class="collapsing center aligned">
+                                <i class="icon checkmark" show.bind="z.isPropagationZone"></i>
+                            </td>
+                            <td>${growerFor(z)}</td>
+                            <td>${labourFor(z)}</td>
+                            <td>&nbsp;</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </template>
