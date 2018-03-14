@@ -7,24 +7,18 @@
 
     <h1>Zone ${model.zone.name} Details</h1>
 
-    <table class="ui table">
-        <thead>
-            <tr>
-                <th>Week</th>
-                <th class="center aligned" repeat.for="plant of model.plants">${plant}</th>
-                <th class="center aligned">Available</th>
-            </tr>
-        </thead>
-    </table>
-    <div class="table-wrapper">
-        <table class="ui table">
-            <tbody>
-                <tr repeat.for="week of model.weeks">
-                    <td>${week.weekNumber}</td>
-                    <td class="center aligned" repeat.for="plant of week.plants">${plant}</td>
-                    <td class="center aligned">${week.available}</td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="ui equal width internally celled grid header">
+        <div class="equal width row">
+            <div class="column">Week</div>
+            <div class="column" class="center aligned" repeat.for="plant of model.plants">${plant}</div>
+            <div class="column" class="center aligned">Available</div>
+        </div>
+    </div>
+    <div class="ui equal width internally celled grid scroller">
+        <div class="equal width row" repeat.for="week of model.weeks">
+            <div class="column">${week.weekNumber}</div>
+            <div class="column" class="center aligned" repeat.for="plant of week.plants">${plant}</div>
+            <div class="column">${week.available}</div>
+        </div>
     </div>
 </template>

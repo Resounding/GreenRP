@@ -1,6 +1,7 @@
-@zone-detail-sidebar-width: 80%;
+@zone-detail-sidebar-width: 95%;
 
 #zone-detail-sidebar {
+
     margin-top: 70px !important;
 
     & > zone-detail {
@@ -18,19 +19,35 @@
             right: 10px;
         }
 
-        & > table {
-            margin-bottom: 0;
-        }
+        .ui.grid.equal.width {
+            &.header {
+                font-size: 80%;
+                font-weight: bold;
+                border-bottom: solid 1px #eee;
+                padding-right: 7px;
 
-        .table-wrapper {
-            height: calc(100vh ~"- 275px");
-            overflow-y: auto;
-        }
-    }
+                .column {
+                    text-align: center;
+                    overflow-x: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+            &.scroller {
+                height: calc(100vh ~"- 275px");
+                overflow-y: auto;
 
-    .ui.table {
-        th,td {
-            width: 75px;
+                .column {
+                    text-align: right;
+                }
+
+                &::-webkit-scrollbar {
+                    width: 7px;
+                }
+            }
+
+            .row {
+                flex-wrap: nowrap;
+            }
         }
     }
 }
