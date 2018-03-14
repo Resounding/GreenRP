@@ -32,6 +32,7 @@ export class SearchOrder {
     flower:moment.Moment;
     ship:moment.Moment;
     rootZone:string;
+    zone:string;
     currentWeek:string = moment().toWeekNumberId();
 
     constructor(private order:OrderDocument) {
@@ -44,23 +45,20 @@ export class SearchOrder {
         this.ship = moment(order.arrivalDate);
         this.customer = order.customer.name;
 
-        const firstWeek = Object.keys(order.weeksInHouse)[0];
+        const weeksInHouseKeys = Object.keys(order.weeksInHouse),
+            firstWeek = weeksInHouseKeys[0],
+            lastWeek = weeksInHouseKeys[weeksInHouseKeys.length-1];
         if(firstWeek) {
             this.rootZone = order.weeksInHouse[firstWeek].zone;
+        }
+        if(lastWeek) {
+            this.zone = order.weeksInHouse[lastWeek].zone;
         }
     }
 
     @computedFrom('zone', 'rootZone')
     get differentRootZone():boolean {
         return this.zone !== this.rootZone;
-    }
-
-    @computedFrom('order')
-    get zone():string {
-        const week = this.order.weeksInHouse[this.currentWeek],
-            zone = week ? week.zone : this.order.zone.name;
-
-        return zone;
     }
 
     get stickDate():Date {
