@@ -92,6 +92,7 @@
                                 <a route-href="route: task-detail; params.bind: {id: recipeId, taskid: $index}" click.delegate="goToTask($index)">
                                     ${task.name || 'Unknown'}
                                 </a>
+                                <span class="small gray" hide.bind="task.enabled">(disabled)</span>
                             </td>
                             <td>${task.workType}</td>
                         </tr>
