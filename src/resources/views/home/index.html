@@ -1,6 +1,7 @@
 <template>
-    <div class="segment">
-        <div class="ui grid">
+    <require from="styles/home.css"></require>
+    <div id="home-container" class="segment" element.ref="el">
+        <div class="ui grid sticky">
             <div class="four column row">
                 <div class="left floated column">
                     <h1 class="ui left aligned header">
@@ -16,13 +17,23 @@
                     </h1>
                 </div>
             </div>
+            <table class="ui striped celled table">
+                <thead>
+                    <tr>
+                        <th class="${weekWidth} wide">Week</th>
+                        <th repeat.for="zone of zones" class="center aligned ${zoneWidth} wide">
+                            <button type="button" class="ui basic button" click.delegate="showZoneDetails(zone)">${zone.name}</button>
+                        </th>
+                    </tr>
+                </thead>
+            </table>
         </div>
 
         <table class="ui striped celled table">
             <thead>
                 <tr>
-                    <th>Week</th>
-                    <th repeat.for="zone of zones" class="center aligned">
+                    <th class="${weekWidth} wide">Week</th>
+                    <th repeat.for="zone of zones" class="center aligned ${zoneWidth} wide">
                         <button type="button" class="ui basic button" click.delegate="showZoneDetails(zone)">${zone.name}</button>
                     </th>
                 </tr>

@@ -3,6 +3,7 @@ import {DialogController, DialogService, DialogCloseResult} from 'aurelia-dialog
 import {OrderDetail} from '../orders/order-detail';
 import {OrdersService} from "../../services/data/orders-service";
 import {ReferenceService} from "../../services/data/reference-service";
+import {Notifications} from "../../services/notifications";
 import {SearchFilter, SearchOrder, SearchService} from './search-service';
 import {Week} from "../../models/week";
 import {OrderDocument} from '../../models/order';
@@ -21,38 +22,40 @@ export class Search {
     filter:SearchFilter = new SearchFilter();
     el:Element;
 
-    constructor(private ordersService:OrdersService, referenceService:ReferenceService, private dialogService:DialogService, private controller:DialogController) {
-        Promise.all([
-            referenceService.zones()
-                .then(result => {
-                    result.unshift({ name: SearchFilter.ALL_ZONES, autoSpace: null, isPropagationZone: null, tables: null })
-                    this.zones = _.pluck(result, 'name');
-                }),
-            referenceService.weeks()
-                .then(result => this.allWeeks = result),
-            referenceService.plants()
-                .then(result => {
-                    result.unshift({ name: SearchFilter.ALL_PLANTS, crop: SearchFilter.ALL_CROPS, abbreviation: null, cuttingsPerPot: null, cuttingsPerTable: null, hasLightsOut: null, id: null, potsPerCase: null, size: null });
-
-                    this.plants = result;
-                    this.crops = result
-                        .map(p => p.crop)
-                        .filter((c, idx, self) => self.indexOf(c) === idx);                                        
-                }),
-            referenceService.customers()
-                .then(result => {
-                    result.unshift({ name: SearchFilter.ALL_CUSTOMERS, abbreviation: null });
-                    this.customers = result.map(c => c.name);
-                }),
-            this.loadOrders()
-        ]).then(this.refresh.bind(this));
-
+    constructor(private ordersService:OrdersService, private referenceService:ReferenceService, private dialogService:DialogService, private controller:DialogController) {
         controller.settings.lock = true;
         controller.settings.position = position;
     }
 
-    activate(year:number) {
-        this.year = year;
+    async activate(year:number) {
+        try {
+        
+            this.year = year;
+
+            const zones = await this.referenceService.zones();
+            zones.unshift({ name: SearchFilter.ALL_ZONES, autoSpace: null, isPropagationZone: null, tables: null });
+            this.zones = _.pluck(zones, 'name');
+
+            this.allWeeks = await this.referenceService.weeks();
+
+            const plants = await this.referenceService.plants();
+            plants.unshift({ name: SearchFilter.ALL_PLANTS, crop: SearchFilter.ALL_CROPS, abbreviation: null, cuttingsPerPot: null, cuttingsPerTable: null, hasLightsOut: null, id: null, potsPerCase: null, size: null });
+            this.plants = plants;
+            this.crops = plants
+                .map(p => p.crop)
+                .filter((c, idx, self) => self.indexOf(c) === idx);
+
+            const customers = await this.referenceService.customers();
+            customers.unshift({ name: SearchFilter.ALL_CUSTOMERS, abbreviation: null });
+            this.customers = customers.map(c => c.name);
+
+            await this.loadOrders();
+
+            await this.refresh();
+
+        } catch(e) {
+            Notifications.error(e);
+        }
     }
 
     attached() {
@@ -80,18 +83,23 @@ export class Search {
         this.dialogService.open({
             viewModel: OrderDetail,
             model: order
-        }).whenClosed((result:DialogCloseResult) => {
+        }).whenClosed(async result => {
             if(result.wasCancelled) return;
 
-            this.loadOrders().then(this.refresh.bind(this));
+            await this.loadOrders();
+            this.refresh();
         });
     }
 
-    loadOrders():Promise<any> {
-        return this.ordersService.getAll()
-            .then(orders => {
-                this.searchService = new SearchService(orders, this.year);
-            });
+    async loadOrders():Promise<any> {
+        try {
+
+            const orders = await this.ordersService.getAll();
+            this.searchService = new SearchService(orders, this.year);
+
+        } catch(e) {
+            Notifications.error(e);
+        }
     }
 
     refresh() {

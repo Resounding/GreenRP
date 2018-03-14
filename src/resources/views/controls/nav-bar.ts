@@ -13,6 +13,7 @@ import {log} from '../../services/log';
 export class NavBar {
     @bindable router:Router;
     authorizedRoutes:RouteConfig[] = [];
+    settingsRoutes:RouteConfig[] = [];
     year:number;
     el:Element;
 
@@ -23,7 +24,11 @@ export class NavBar {
             // prevent duplicates
             if(this.authorizedRoutes.some(ar => r.moduleId === ar.moduleId)) return false;
             if(r.nav && (!Array.isArray(r.settings.roles) || r.settings.roles.some(this.auth.isInRole))) {
-                this.authorizedRoutes.push(r);
+                if(r.settings.showInSettings) {
+                    this.settingsRoutes.push(r);
+                } else {
+                    this.authorizedRoutes.push(r);
+                }
             }
         });
 

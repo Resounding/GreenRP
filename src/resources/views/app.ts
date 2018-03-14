@@ -22,7 +22,8 @@ export class App {
         if(this.auth.isInRole(Roles.ProductionManager) || this.auth.isInRole(Roles.Administrator)) {
             config.map([
                 {route: ['', 'home/:year'], name: 'home', moduleId: 'resources/views/home/index', title: 'Home', nav: true, settings: { auth: true }},
-                {route: 'plants', name: 'plants', moduleId: 'resources/views/plants/index', title: 'Plants', nav: true, settings: { auth: true, roles: [Roles.ProductionManager, Roles.Administrator] }}
+                {route: 'plants', name: 'plants', moduleId: 'resources/views/plants/index', title: 'Plants', nav: true, settings: { auth: true, showInSettings: true, roles: [Roles.ProductionManager, Roles.Administrator] }},
+                {route: 'zones', name: 'zones', moduleId: 'resources/views/zones/index', title: 'Zones', nav: true, settings: { auth: true, showInSettings: true, roles: [Roles.ProductionManager, Roles.Administrator] }}
             ]);
         }
 
@@ -37,7 +38,7 @@ export class App {
                 {route: 'activities/:id', name: 'activity-detail', moduleId: 'resources/views/activities/activity-detail', nav: false, settings: { auth: true }},
                 {route: 'activities/:id/journal', name: 'journal-detail', moduleId: 'resources/views/activities/journal-detail', nav: false, settings: { auth: true }},
                 {route: 'activities/by-crop', name: 'activities-by-crop', moduleId: 'resources/views/activities/activities-by-crop', nav: false, settings: { auth: true }},
-                {route: 'activities/by-recipe', name: 'activities-by-recipe', moduleId: 'resources/views/activities/activities-by-recipe', nav: false, settings: { auth: true }}
+                {route: 'activities/by-recipe', name: 'activities-by-recipe', moduleId: 'resources/views/activities/activities-by-recipe', nav: false, settings: { auth: true }}                
             ]);
         }
 
@@ -46,6 +47,12 @@ export class App {
                 {route: 'recipes', name: 'recipes', moduleId: 'resources/views/recipes/index', title: 'Recipes', nav: true, settings: { auth: true }},
                 {route: 'recipes/:id', name: 'recipe-detail', moduleId: 'resources/views/recipes/detail', settings: { auth: true }},
                 {route: 'recipes/:id/tasks/:taskid', name: 'task-detail', moduleId: 'resources/views/recipes/task-detail', settings: { auth: true }}
+            ]);
+        }
+
+        if(this.auth.isInRole(Roles.Grower) || this.auth.isInRole(Roles.LabourSupervisor)) {
+            config.map([
+                {route: 'home/:year?', name: 'home', href: '#/home', moduleId: 'resources/views/home/index', title: 'Orders', nav: true, settings: { auth: true }}
             ]);
         }
 

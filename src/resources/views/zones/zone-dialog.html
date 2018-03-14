@@ -1,0 +1,56 @@
+<template>
+    <ux-dialog id="zone-detail" ref="el">
+        <ux-dialog-header>
+            <h2>${zone.name}</h2>
+        </ux-dialog-header>
+        <ux-dialog-body>
+            <form class="ui form segment">                
+                <div class="fields row">
+                    <div class="field eight wide">
+                        <label for="name">Name</label>
+                        <input type="text" id="size" value.bind="zone.name" readonly>
+                    </div>
+                </div>
+                <div class="fields row">
+                    <div class="field eight wide">
+                        <!-- spacer -->
+                        <label>&nbsp;</label>
+                        <div class="ui toggle checkbox">
+                            <input type="checkbox" checked.bind="zone.autoSpace">
+                            <label>Auto-Space</label>
+                        </div>
+                    </div>
+                    <div class="field eight wide">
+                        <!-- spacer -->
+                        <label>&nbsp;</label>
+                        <div class="ui toggle checkbox">
+                            <input type="checkbox" checked.bind="zone.isPropagationZone">
+                            <label>Propagation Zone</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="fields row">
+                        <div class="field eight wide">
+                            <label for="grower">Grower:</label>
+                            <select id="grower" value.bind="grower">
+                                <option repeat.for="user of users | sort: 'name'" model.bind="user.name">${user.name}</option>
+                            </select>
+                        </div>
+                        <div class="field eight wide">
+                            <label for="labour">Labour:</label>
+                            <select id="labour" value.bind="labour">
+                                <option repeat.for="user of users | sort: 'name'" model.bind="user.name">${user.name}</option>
+                            </select>
+                        </div>
+                    </div>
+            </form>
+        </ux-dialog-body>
+        <ux-dialog-footer>
+            <button type="button" class="ui basic button" click.delegate="cancel()">Cancel</button>
+            <button type="button" class="ui basic primary button" click.delegate="save()">
+                <i class="save button icon"></i>
+                Save
+            </button>
+        </ux-dialog-footer>
+    </ux-dialog>
+</template>
