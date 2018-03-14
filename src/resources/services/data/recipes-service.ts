@@ -9,31 +9,34 @@ export class RecipesService {
 
     constructor(private database:Database, private events:EventAggregator) { }
 
-    getOne(id:string):Promise<RecipeDocument> {
-        return new Promise((resolve, reject) => {
-            this.database.db.get(id)
-                .then(result => {
-                    const doc = new RecipeDocument(result);
-                    resolve(doc);
-                })
-                .catch(reject);
-        });
+    async getOne(id:string):Promise<RecipeDocument> {
+        try {
+
+            const result = await this.database.db.get(id),
+                doc = new RecipeDocument(result);
+
+            return doc;
+
+        } catch(e) {
+            throw e;
+        }
     }
 
-    getAll():Promise<RecipeDocument[]> {
-        return new Promise((resolve, reject) => {
-            this.database.db.find({ selector: { type: RecipeDocument.RecipeDocumentType }})
-                .then(result => {
-                    const docs = result.docs.map(doc => new RecipeDocument(doc));
-                    resolve(docs);
-                })
-                .catch(reject);
-        });
+    async getAll():Promise<RecipeDocument[]> {
+        try {
+            
+            const result = await this.database.db.query<Recipe>('filters/recipes', { include_docs: true }),
+                docs = result.rows.map(row => new RecipeDocument(row.doc));
+
+            return docs;
+
+        } catch(e) {
+            throw e;
+        }
     }
 
-    save(recipe:Recipe):Promise<RecipeSaveResult> {
-        return new Promise((resolve, reject) => {
-
+    async save(recipe:Recipe):Promise<RecipeSaveResult> {
+        try {
             const doc = new RecipeDocument(recipe),
                 json = doc.toJSON(),
                 result:RecipeSaveResult = {
@@ -59,58 +62,53 @@ export class RecipesService {
             }
 
             if(!result.ok) {
-                return resolve(result);
+                return result;
             }   
 
             if(doc.isNew) {
-                return this.database.db.post(json)
-                    .then((response:PouchDB.Core.Response) => {
-                        if(response.ok) {
-                            doc._id = response.id;
-                            doc._rev = response.rev;
-                            result.recipe = doc;
-                            this.events.publish(RecipesService.RecipesChangedEvent);
-                            resolve(result);
-                        }
-                        return reject(Error('Recipe was not saved.'));
-                    })
-                    .catch(reject);
+                const response = await this.database.db.post(json);
+                
+                if(!response.ok) throw Error('Recipe was not saved.');
+                    
+                doc._id = response.id;
+                doc._rev = response.rev;
+                result.recipe = doc;
+                this.events.publish(RecipesService.RecipesChangedEvent);
+                return result;
+                                                    
             } else {
-                return this.database.db.put(json)
-                    .then((response:PouchDB.Core.Response) => {
-                        if(response.ok) {
-                            doc._rev = response.rev;
-                            result.recipe = doc;
-                            this.events.publish(RecipesService.RecipesChangedEvent);
-                            resolve(result);
-                        }
-                        return reject(Error('Recipe was not saved.'));
-                    })
-                    .catch(reject);
+                const response = await this.database.db.put(json);
+                
+                if(!response.ok) throw Error('Recipe was not saved.');
 
+                doc._rev = response.rev;
+                result.recipe = doc;
+                this.events.publish(RecipesService.RecipesChangedEvent);
+                return result;
             }
-        });
+        } catch(e) {
+            throw e;
+        }
     }
 
-    delete(recipe:RecipeDocument):Promise<RecipeSaveResult> {
-        return new Promise((resolve, reject) => {
+    async delete(recipe:RecipeDocument):Promise<RecipeSaveResult> {
+        try {
             const result:RecipeSaveResult = {
                 ok: true,
                 errors: [],
                 recipe: recipe
             };
 
-            this.database.db.remove(recipe._id, recipe._rev)
-                .then((response:PouchDB.Core.Response) => {
-                    if(response.ok) {
-                        this.events.publish(RecipesService.RecipesChangedEvent);
-                        return resolve(result);
-                    }
+            const response = await this.database.db.remove(recipe._id, recipe._rev);
 
-                    return reject(response);
-                })
-                .catch(reject);
-        });
+            if(!response.ok) throw Error('Recipe was not deleted.');
+            
+            this.events.publish(RecipesService.RecipesChangedEvent);
+            return result;
+
+        } catch(e) {
+            throw e;
+        }
     }
 }
 
