@@ -14,6 +14,7 @@ export interface Task {
     recurrence:Recurrence;
     zones?:string[] | undefined;
     groupActivitiesTogether:boolean | undefined;
+    enabled:boolean;
 }
 
 export class TaskDocument implements Task {
@@ -28,6 +29,7 @@ export class TaskDocument implements Task {
     recurrence:RecurrenceDocument = null;
     zones?:string[] | undefined = undefined;
     groupActivitiesTogether:boolean | undefined = false;
+    enabled:boolean;
 
     constructor(data:Task | {startTime?:Time} = {}, public index:number) {
         Object.assign(this, data);
@@ -38,6 +40,10 @@ export class TaskDocument implements Task {
 
         if(this.recurring && this.recurrence) {
             this.recurrence = new RecurrenceDocument(this.recurrence);
+        }
+
+        if(this.enabled !== false) {
+            this.enabled = true;
         }
     }
 
@@ -73,7 +79,8 @@ export class TaskDocument implements Task {
             recurring: this.recurring,
             recurrence: null,
             zones: this.zones,
-            groupActivitiesTogether: !!this.groupActivitiesTogether
+            groupActivitiesTogether: !!this.groupActivitiesTogether,
+            enabled: !!this.enabled
         };
         if(this.recurring) {
             json.recurrence = new RecurrenceDocument(this.recurrence).toJSON();
