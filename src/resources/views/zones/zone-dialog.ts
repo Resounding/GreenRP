@@ -24,7 +24,7 @@ export class ZoneDialog {
 
         const assignment = await this.referenceService.getZoneAssignments();
         this.grower = assignment.growers[this.zone.name];
-        this.labour = assignment.growers[this.zone.name];
+        this.labour = assignment.labour[this.zone.name];
     }
 
     attached() {
