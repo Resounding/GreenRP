@@ -1,7 +1,7 @@
 export class Configuration {
 
     constructor() {
-        this.remote_database_name = Configuration.isDebug() ? `${this.remote_server}/boekestyn-test` : `${this.remote_server}/boekestyn`;
+        this.remote_database_name = Configuration.isDebug() ? `${this.remote_server}/boekestyn-clean` : `${this.remote_server}/boekestyn`;
     }
 
     app_database_name:string = 'GreenRP';

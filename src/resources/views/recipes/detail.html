@@ -82,24 +82,31 @@
                 <table class="ui table" show.bind="recipe.tasks.length">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Type</th>
+                            <th class="collapsing">Name</th>
+                            <th class="collapsing">Category</th>
+                            <th class="collapsing">Type</th>
+                            <th>&nbsp;</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr repeat.for="task of recipe.tasks">
-                            <td>
+                            <td class="collapsing">
                                 <a route-href="route: task-detail; params.bind: {id: recipeId, taskid: $index}" click.delegate="goToTask($index)">
                                     ${task.name || 'Unknown'}
                                 </a>
                                 <span class="small gray" hide.bind="task.enabled">(disabled)</span>
                             </td>
-                            <td>${task.workType}</td>
+                            <td class="collapsing center aligned" if.bind="task.category">
+                                <div class="ui label ${task.category.colour}">${task.category.name}</div>
+                            </td>
+                            <td class="collapsing" if.bind="!task.category">&nbsp;</td>
+                            <td class="collapsing">${task.workType}</td>
+                            <td>&nbsp;</td>
                         </tr>
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th colspan="2">
+                            <th colspan="4">
                                 <a route-href="route: task-detail; params.bind: {id: recipeId, taskid:'new'}" class="basic ui positive icon button" click.delegate="goToTask()">
                                     <i class="plus icon"></i>
                                     Add Task

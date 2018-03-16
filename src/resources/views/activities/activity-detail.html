@@ -50,6 +50,7 @@
             </div>
             <div class="fields row">
                 <div class="field eight wide">
+                    <label for="assignedTo">Assigned To:</label>
                     <div class="ui search selection dropdown assignedTo">
                         <input type="hidden" id="assignedTo">
                         <i class="dropdown icon"></i>
@@ -95,9 +96,22 @@
                         <label for="recordingType">Record Measurement</label>
                     </div>
                 </div>
-                <div class="field four wide" show.bind="isMeasurement">
-                    <label for="unitOfMeasure">Units:</label>
-                    <input type="text" id="unitOfMeasure" value.bind="activity.unitOfMeasure">
+                <div class="field four wide">
+                    <label for="unitOfMeasure" show.bind="isMeasurement">Units:</label>
+                    <input type="text" id="unitOfMeasure" value.bind="activity.unitOfMeasure" show.bind="isMeasurement">
+                </div>
+                <div class="field eight wide">
+                    <label for="category">Category:</label>
+                    <div class="ui search selection dropdown category">
+                        <input type="hidden" id="category">
+                        <i class="dropdown icon"></i>
+                        <div class="text default">Choose category</div>
+                        <div class="menu">
+                            <div repeat.for="c of categories | sort:'name'" class="item" data-value="${c.name}">
+                                <span class="ui fluid label ${c.colour}">${c.name}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="fields row">

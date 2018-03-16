@@ -1,0 +1,62 @@
+<template>
+    
+    <ux-dialog ref="el">
+        <ux-dialog-header>
+            <h2 show.bind="category.isNew">New Task Category</h2>
+            <h2 hide.bind="category.isNew">${category.name}</h2>
+        </ux-dialog-header>
+        <ux-dialog-body>
+            <form class="ui form segment">                
+                <div class="fields row">
+                    <div class="field sixteen wide">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" value.bind="category.name" attach-focus="true">
+                    </div>
+                </div>
+                <div class="fields row">
+                    <div class="field sixteen wide">
+                        <label for="colour">Colour</label>
+                        <select id="colour" value.bind="category.colour">
+                            <option model.bind="null">Choose Colour</option>
+                            <option class="ui red label" value="red">Red</option>
+                            <option class="ui orange label" value="orange">Orange</option>
+                            <option class="ui yellow label" value="yellow">Yellow</option>
+                            <option class="ui olive label" value="olive">Olive</option>
+                            <option class="ui green label" value="green">Green</option>
+                            <option class="ui teal label" value="teal">Teal</option>
+                            <option class="ui blue label" value="blue">Blue</option>
+                            <option class="ui violet label" value="violet">Violet</option>
+                            <option class="ui purple label" value="purple">Purple</option>
+                            <option class="ui pink label" value="pink">Pink</option>
+                            <option class="ui brown label" value="brown">Brown</option>
+                            <option class="ui grey label" value="grey">Grey</option>
+                            <option class="ui black label" value="black">Black</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="fields row">
+                    <div class="field sixteen wide">
+                        <!-- spacer -->
+                        <label>&nbsp;</label>
+                        <div class="ui toggle checkbox">
+                            <input type="checkbox" checked.bind="category.active">
+                            <label>Category is Active</label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </ux-dialog-body>
+        <ux-dialog-footer>
+            <button type="button" class="ui basic red button left floated" click.delegate="delete()" data-tooltip="Click to Delete this Category" hide.bind="category.isNew">
+                <i class="trash button icon"></i>
+                Delete
+            </button>
+
+            <button type="button" class="ui basic button" click.delegate="cancel()">Cancel</button>
+            <button type="button" class="ui basic primary button" click.delegate="save()">
+                <i class="save button icon"></i>
+                Save
+            </button>
+        </ux-dialog-footer>
+    </ux-dialog>
+</template>

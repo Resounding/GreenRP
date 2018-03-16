@@ -16,6 +16,7 @@ import {
 } from '../../models/activity';
 import {OrderDocument} from '../../models/order';
 import {Recipe} from '../../models/recipe';
+import {TaskCategory} from '../../models/task-category';
 import {Zone} from '../../models/zone';
 import {Authentication, Roles} from '../../services/authentication';
 import {log} from '../../services/log';
@@ -23,8 +24,10 @@ import {ActivitiesService, ActivitySaveResult} from '../../services/data/activit
 import {OrdersService} from '../../services/data/orders-service';
 import {RecipesService} from '../../services/data/recipes-service';
 import {ReferenceService} from '../../services/data/reference-service';
+import {TaskCategoryService} from '../../services/data/task-category-service';
 import {User, UsersService} from '../../services/data/users-service';
 import {Notifications} from '../../services/notifications';
+import {equals} from '../../utilities/equals'
 
 @autoinject
 export class ActivityDetail {
@@ -33,6 +36,7 @@ export class ActivityDetail {
     orders:string[];
     zones:Zone[];
     workTypes:WorkType[];
+    categories:TaskCategory[];
     statuses:ActivityStatus[];
     users:User[];
     journalShowing:boolean = false;
@@ -43,7 +47,8 @@ export class ActivityDetail {
     
     constructor(private service:ActivitiesService, private router:Router, private auth:Authentication,
         private referenceService:ReferenceService, private usersService:UsersService,
-        private ordersService:OrdersService, private recipeService:RecipesService, private dialogService:DialogService) { }
+        private ordersService:OrdersService, private recipeService:RecipesService, private taskCategoryService:TaskCategoryService,
+        private dialogService:DialogService) { }
 
     async activate(params) {
         try {
@@ -116,7 +121,8 @@ export class ActivityDetail {
             }
 
             this.workTypes = WorkTypes.getAll();
-            this.journalRecordingTypes = JournalRecordingTypes.getAll();        
+            this.journalRecordingTypes = JournalRecordingTypes.getAll();
+            this.categories = await this.taskCategoryService.getAll();
 
             if(!this.activity.done || this.auth.isInRole(Roles.ProductionManager)) {
                 this.statuses = [
@@ -153,6 +159,12 @@ export class ActivityDetail {
             $('.dropdown.crop', this.el).on('click', 'a.ui', this.onCropClick.bind(this));
             if(this.activity.zones && this.activity.zones.length) {
                 $zone.dropdown('set selected', this.activity.zones.map(z => z.name));
+            }
+            const $category = $('.dropdown.category', this.el)
+                .dropdown({ onChange: this.onCategoryChange.bind(this) });
+
+            if(this.activity.category) {
+                $category.dropdown('set selected', this.activity.category.name);
             }
             $('.calendar.due-date', this.el).calendar({
                 type: 'date',
@@ -270,6 +282,10 @@ export class ActivityDetail {
     }
     onWorkTypeChange(value:WorkType) {
         this.activity.workType = value;
+    }
+     onCategoryChange(value:string) {
+        const category = this.categories.find(c => equals(value, c.name));
+        this.activity.category = category;
     }
     onCropChange(values:string[]) {
         this.activity.crops = values;

@@ -20,7 +20,7 @@
                 <i class="dropdown icon ${filtersExpanded ? 'vertically flipped' : ''}"></i>
             </button>
             <div class="ui clearing divider"></div>
-            <div class="filter-grid ui two column grid stackable container">
+            <div class="filter-grid ui three column grid stackable container">
                 <div class="column">
                     <div class="ui toggle checkbox">
                         <input type="checkbox" id="showoverdue" checked.bind="showMyOverdue">
@@ -31,6 +31,12 @@
                     <div class="ui toggle checkbox">
                         <input type="checkbox" id="showall" checked.bind="showAll">
                         <label for="showall">Show All Users</label>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="ui toggle checkbox">
+                        <input type="checkbox" id="categorize" checked.bind="categorize">
+                        <label for="categorize">Group by Category</label>
                     </div>
                 </div>
                 <div class="column">
@@ -81,10 +87,24 @@
                 </div>
             </div>
         </div>
+        <div show.bind="categories.length">
+            <template repeat.for="c of categories | sort:'name'">
+                <div class="ui dividing header">
+                    <span class="ui label ${c.colour}">${c.name}&nbsp;(${c.activities.length})</span>
+                    <a click.delegate="toggleShowCategory(c.name)">
+                        <i class="angle icon ${hideCategory[c.name] ? 'down' : 'up'}"></i>
+                    </a>
+                </div>
+                <div class="ui cards" hide.bind="hideCategory[c.name]">                    
+                    <activity-card users.bind="users" activity.bind="a" repeat.for="a of c.activities | sort:'date'"></activity-card>
+                </div>
+                <div class="ui separator"></div>
+            </template>
+        </div>
         <div class="ui cards" show.bind="activities.length">
             <activity-card users.bind="users" activity.bind="a" repeat.for="a of activities | sort:'date'"></activity-card>
         </div>
-        <div class="ui message" hide.bind="activities.length">
+        <div class="ui message" hide.bind="activities.length || categories.length">
             <div class="header">No Activities</div>
             <p>
                 There aren't any Activities. You can change the filters above, or

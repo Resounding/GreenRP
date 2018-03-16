@@ -7,10 +7,13 @@ import {WorkType,WorkTypes,JournalRecordingTypes} from '../../models/activity';
 import {RecipeDocument} from '../../models/recipe';
 import {TimeDocument} from '../../models/recurrence';
 import {TaskDocument} from '../../models/task';
+import {TaskCategory} from '../../models/task-category';
 import {Notifications} from '../../services/notifications';
 import {ActivitiesService} from '../../services/data/activities-service';
 import {RecipeSaveResult, RecipesService} from '../../services/data/recipes-service';
 import {ReferenceService} from '../../services/data/reference-service';
+import {TaskCategoryService} from '../../services/data/task-category-service';
+import {equals} from '../../utilities/equals';
 
 @autoinject
 export class TaskDetail {
@@ -20,6 +23,7 @@ export class TaskDetail {
     isPlant:boolean = false;
     weeks:WeekSelection[] = [];
     workTypes:WorkType[];
+    categories:TaskCategory[];
     periods:Periods = Periods;
     endingTypes:EndingTypes = EndingTypes;
     events:Event[] = [
@@ -46,12 +50,14 @@ export class TaskDetail {
     el:Element;
     private _specificZones:boolean;
 
-    constructor(private service:RecipesService, private activityService:ActivitiesService, private referenceService:ReferenceService,
+    constructor(private service:RecipesService, private activityService:ActivitiesService,
+            private referenceService:ReferenceService, private taskCategoryService:TaskCategoryService,
             private router:Router, private dialogService:DialogService) { }
 
     async activate(params) {
         try {
             this.workTypes = WorkTypes.getAll();
+            this.categories = await this.taskCategoryService.getAll();
 
             const recipeId = params.id,
                 taskId = params.taskid,
@@ -108,6 +114,13 @@ export class TaskDetail {
 
         if(this.task.workType) {
             $workType.dropdown('set selected', this.task.workType);
+        }
+
+        const $category = $('.dropdown.category', this.el)
+            .dropdown({ onChange: this.onCategoryChange.bind(this) });
+
+        if(this.task.category) {
+            $category.dropdown('set selected', this.task.category.name);
         }
 
         const $startWeek = $('.dropdown.start-week', this.el)
@@ -222,6 +235,11 @@ export class TaskDetail {
 
     private onWorkTypeChange(value:WorkType) {
         this.task.workType = value;
+    }
+
+    private onCategoryChange(value:string) {
+        const category = this.categories.find(c => equals(value, c.name));
+        this.task.category = category;
     }
 
     private onStartWeekChange(value:number) {

@@ -23,7 +23,8 @@ export class App {
             config.map([
                 {route: ['', 'home/:year'], name: 'home', moduleId: 'resources/views/home/index', title: 'Home', nav: true, settings: { auth: true }},
                 {route: 'plants', name: 'plants', moduleId: 'resources/views/plants/index', title: 'Plants', nav: true, settings: { auth: true, showInSettings: true, roles: [Roles.ProductionManager, Roles.Administrator] }},
-                {route: 'zones', name: 'zones', moduleId: 'resources/views/zones/index', title: 'Zones', nav: true, settings: { auth: true, showInSettings: true, roles: [Roles.ProductionManager, Roles.Administrator] }}
+                {route: 'zones', name: 'zones', moduleId: 'resources/views/zones/index', title: 'Zones', nav: true, settings: { auth: true, showInSettings: true, roles: [Roles.ProductionManager, Roles.Administrator] }},
+                {route: 'task-categories', name: 'task-categories', moduleId: 'resources/views/task-categories/index', title: 'Task Categories', nav: true, settings: { auth: true, showInSettings: true }}
             ]);
         }
 
@@ -46,7 +47,8 @@ export class App {
             config.map([
                 {route: 'recipes', name: 'recipes', moduleId: 'resources/views/recipes/index', title: 'Recipes', nav: true, settings: { auth: true }},
                 {route: 'recipes/:id', name: 'recipe-detail', moduleId: 'resources/views/recipes/detail', settings: { auth: true }},
-                {route: 'recipes/:id/tasks/:taskid', name: 'task-detail', moduleId: 'resources/views/recipes/task-detail', settings: { auth: true }}
+                {route: 'recipes/:id/tasks/:taskid', name: 'task-detail', moduleId: 'resources/views/recipes/task-detail', settings: { auth: true }},
+                {route: 'task-categories', name: 'task-categories', moduleId: 'resources/views/task-categories/index', title: 'Task Categories', nav: true, settings: { auth: true, showInSettings: true }}
             ]);
         }
 

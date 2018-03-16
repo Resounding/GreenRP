@@ -85,7 +85,10 @@ export class OrdersService {
                     const docs = result.rows.map(row => new OrderDocument(row.doc));
                     return resolve(docs);
                 })
-                .catch(reject);
+                .catch(err => {
+                    console.log(err);
+                    return reject(err);
+                });
         });
     }
 

@@ -1,6 +1,7 @@
 import {computedFrom} from 'aurelia-framework';
 import {ActivityStatus, JournalRecordingType, JournalRecordingTypes, WorkType, WorkTypes} from './activity';
 import {Recurrence, RecurrenceDocument, Time, TimeDocument} from './recurrence';
+import { TaskCategory, TaskCategoryDoc } from './task-category';
 
 export interface Task {
     type:string;
@@ -15,6 +16,7 @@ export interface Task {
     zones?:string[] | undefined;
     groupActivitiesTogether:boolean | undefined;
     enabled:boolean;
+    category:TaskCategory | undefined | null;
 }
 
 export class TaskDocument implements Task {
@@ -30,6 +32,7 @@ export class TaskDocument implements Task {
     zones?:string[] | undefined = undefined;
     groupActivitiesTogether:boolean | undefined = false;
     enabled:boolean;
+    category:TaskCategory | undefined | null;
 
     constructor(data:Task | {startTime?:Time} = {}, public index:number) {
         Object.assign(this, data);
@@ -80,8 +83,12 @@ export class TaskDocument implements Task {
             recurrence: null,
             zones: this.zones,
             groupActivitiesTogether: !!this.groupActivitiesTogether,
-            enabled: !!this.enabled
+            enabled: !!this.enabled,
+            category: null
         };
+        if(this.category) {
+            json.category = new TaskCategoryDoc(this.category).toJSON();
+        }
         if(this.recurring) {
             json.recurrence = new RecurrenceDocument(this.recurrence).toJSON();
         }

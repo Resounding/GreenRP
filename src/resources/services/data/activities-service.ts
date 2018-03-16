@@ -3,6 +3,7 @@ import {EventAggregator} from 'aurelia-event-aggregator';
 import {Database} from '../database';
 import {Activity, ActivityDocument, ActivityStatuses} from '../../models/activity';
 import {Recipe, RecipeDocument} from '../../models/recipe';
+import { contains } from '../../utilities/equals';
 
 export interface ActivitySaveResult {
     ok:boolean;
@@ -12,7 +13,6 @@ export interface ActivitySaveResult {
 
 @autoinject
 export class ActivitiesService {
-    public static ActivitiesChangedEvent:string = 'Activities changed';
 
     constructor(private database:Database, private events:EventAggregator) { }
 
@@ -43,7 +43,7 @@ export class ActivitiesService {
 
             const result = await this.database.db.find(filter),
                 docs = result.docs.map(doc => new ActivityDocument(doc));
-            
+
             return docs;
 
         } catch(e) {
@@ -85,7 +85,6 @@ export class ActivitiesService {
                             doc._id = response.id;
                             doc._rev = response.rev;
                             result.activity = doc;
-                            this.events.publish(ActivitiesService.ActivitiesChangedEvent);
                             resolve(result);
                         }
                         return reject(Error('Activity was not saved.'));
@@ -100,7 +99,6 @@ export class ActivitiesService {
                         if(response.ok) {
                             doc._rev = response.rev;
                             result.activity = doc;
-                            this.events.publish(ActivitiesService.ActivitiesChangedEvent);
                             resolve(result);
                         }
                         return reject(Error('Activity was not saved.'));
@@ -122,7 +120,6 @@ export class ActivitiesService {
             this.database.db.remove(activity._id, activity._rev)
                 .then((response:PouchDB.Core.Response) => {
                     if(response.ok) {
-                        this.events.publish(ActivitiesService.ActivitiesChangedEvent);
                         return resolve(result);
                     }
 

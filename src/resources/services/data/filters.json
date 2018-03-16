@@ -1,0 +1,41 @@
+{
+  "_id": "_design/filters",
+  "views": {
+    "activities": {
+      "map": "function (doc) {\n  if(doc.type === 'activity') {\n    emit(doc._id);  \n  }\n  \n}"
+    },
+    "orders": {
+      "map": "function (doc) {\n  if(doc.type === 'order') {\n    emit(doc._id);  \n  }\n  \n}"
+    },
+    "recipes": {
+      "map": "function (doc) {\n  if(doc.type === 'recipe') {\n    emit(doc._id);  \n  }\n  \n}"
+    },
+    "zone-activities": {
+      "map": "function (doc) {\n  if(doc.type === 'activity' && doc.recipeId && doc.zones && doc.zones.length) {\n    emit(doc._id);\n  }\n}"
+    },
+    "crop-activities": {
+      "map": "function (doc) {\n  if(doc.type === 'activity' && doc.recipeId && doc.crops && doc.crops.length) {\n    emit(doc._id);\n  }\n}"
+    },
+    "activities-by-crop": {
+      "reduce": "function (keys, values, rereduce) {\n  var result = { };\n  if (rereduce) {\n    values.forEach(function(value) {\n        var keys = Object.keys(value);\n        keys.forEach(function(key) {\n          if(!result[key]) result[key] = [];\n          var crops = value[key];\n          crops.forEach(function(crop){\n            if(result[key].indexOf(crop) === -1) {\n              result[key].push(crop);\n            }\n          });\n        });\n    });\n  } else {\n    for(var i=0; i<keys.length; i++) {\n      var key = keys[i];\n      if(!result[key[0]]) result[key[0]] = [];\n      \n      result[key[0]].push(values[i]);\n    }\n  }\n  \n  return result;\n}",
+      "map": "function (doc) {\n  if(doc.type === 'activity' && isArray(doc.crops)) {\n    for(var i = 0; i < doc.crops.length; i++) {\n      emit(doc.crops[i], doc);\n    }\n  }\n}"
+    },
+    "activities-by-recipe": {
+      "reduce": "function (keys, values, rereduce) {\n  var result = { };\n  if (rereduce) {\n    values.forEach(function(value) {\n        var keys = Object.keys(value);\n        keys.forEach(function(key) {\n          if(!result[key]) result[key] = [];\n          var recipes = value[key];\n          recipes.forEach(function(recipe){\n            if(result[key].indexOf(recipe) === -1) {\n              result[key].push(recipe);\n            }\n          });\n        });\n    });\n  } else {\n    for(var i=0; i<keys.length; i++) {\n      var key = keys[i];\n      if(!result[key[0]]) result[key[0]] = [];\n      \n      result[key[0]].push(values[i]);\n    }\n  }\n  \n  return result;\n}",
+      "map": "function (doc) {\n  if(doc.type === 'activity' && doc.recipeId) {\n    emit(doc.recipeId, doc);\n  }\n}"
+    },
+    "orders-by-stick-date": {
+      "map": "function (doc) {\n    if (doc.type === 'order') {\n        emit(doc.stickDate, null);\n    }\n}"
+    },
+    "task-categories": {
+      "map": "function (doc) {\n  if(doc.type === 'task-category') {\n    emit(doc._id);  \n  }\n  \n}"
+    }
+  },
+  "filters": {
+    "activities": "function (doc) {\n  return doc.type === 'activity'\n }",
+    "orders": "function (doc) {\n  return doc.type === 'order'\n }",
+    "recipes": "function (doc) {\n  return doc.type === 'recipe'\n }",
+    "task-categories": "function (doc) {\n  return doc.type === 'task-category'\n }"
+  },
+  "language": "javascript"
+}

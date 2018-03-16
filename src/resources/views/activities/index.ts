@@ -4,6 +4,7 @@ import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {DialogService} from 'aurelia-dialog';
 import {ActivityDetail} from './activity-detail';
 import {ActivityDocument, ActivityStatus, ActivityStatuses, WorkType, WorkTypes} from '../../models/activity';
+import {TaskCategory, TaskCategoryDoc} from '../../models/task-category';
 import {Authentication, Roles} from '../../services/authentication';
 import {Database} from '../../services/database';
 import {log} from "../../services/log";
@@ -26,18 +27,20 @@ export class ActivityIndex implements FilterSettings {
     zones:string[] = [];
     orders:OrderDocument[] = [];
     activitySyncChangeSubscription:Subscription;
-    activitiesChangedSubscription:Subscription;
     filtersExpanded:boolean = false;
     customFilter:any = {};
     el:Element;
     week:string = moment().toWeekNumberId();
     workType:WorkType = WorkTypes.ALL_WORK_TYPES;
     zone:string = ALL_ZONES;
-    private _showMyOverdue:boolean = true;
-    private _showAll:boolean = false;
-    private _showCompleted:boolean = false;
-    private _showIncomplete:boolean = false;
-    private filtering:boolean = false;
+    _showMyOverdue:boolean = true;
+    _showAll:boolean = false;
+    _showCompleted:boolean = false;
+    _showIncomplete:boolean = false;
+    filtering:boolean = false;
+    _categorize:boolean = false;
+    categories:TaskCategoryWithActivities[];
+    hideCategory:{[index:string]: boolean} = {};
 
     constructor(private dialogService:DialogService, private service:ActivitiesService,
         private usersService:UsersService, private referenceService:ReferenceService, private ordersService:OrdersService,
@@ -50,7 +53,6 @@ export class ActivityIndex implements FilterSettings {
             this.loadFilterSettings();
             
             this.activitySyncChangeSubscription = this.events.subscribe(Database.ActivitiesSyncChangedEvent, this.load.bind(this));        
-            this.activitiesChangedSubscription = this.events.subscribe(ActivitiesService.ActivitiesChangedEvent, this.load.bind(this));
 
             this.orders = await this.ordersService.getAll();
             this.workTypes = [WorkTypes.ALL_WORK_TYPES].concat(WorkTypes.getAll());
@@ -92,24 +94,31 @@ export class ActivityIndex implements FilterSettings {
 
     deactivate() {
         this.activitySyncChangeSubscription.dispose();
-        this.activitiesChangedSubscription.dispose();
 
         this.saveFilterSettings();
     }
 
     attached() {
-        $('.dropdown.work-type', this.el).dropdown({
-            forceSelection: true,
-            onChange: this.onWorkTypeChange.bind(this)
-        }).dropdown('set selected', this.workType);
-        $('.dropdown.week', this.el).dropdown({
-            forceSelection: true,
-            onChange: this.onWeekChange.bind(this)
-        }).dropdown('set selected', this.week);
-        $('.dropdown.zone', this.el).dropdown({
-            forceSelection: true,
-            onChange: this.onZoneChange.bind(this)
-        }).dropdown('set selected', this.zone);
+        $('.dropdown.work-type', this.el)
+            .dropdown({
+                forceSelection: true            
+            })
+            .dropdown('set selected', this.workType)
+            .dropdown({ onChange: this.onWorkTypeChange.bind(this) });
+
+        $('.dropdown.week', this.el)
+            .dropdown({
+                forceSelection: true,            
+            })
+            .dropdown('set selected', this.week)
+            .dropdown({ onChange: this.onWeekChange.bind(this) });
+
+        $('.dropdown.zone', this.el)
+            .dropdown({
+                forceSelection: true,            
+            })
+            .dropdown('set selected', this.zone)
+            .dropdown({ onChange: this.onZoneChange.bind(this) });
     }
 
     detached() {
@@ -128,6 +137,10 @@ export class ActivityIndex implements FilterSettings {
 
     toggleFiltersExpanded() {
         this.filtersExpanded = !this.filtersExpanded;
+    }
+
+    toggleShowCategory(category:string) {
+        this.hideCategory[category] = !this.hideCategory[category];
     }
 
     detail(activity:ActivityDocument) {
@@ -179,7 +192,16 @@ export class ActivityIndex implements FilterSettings {
         this.filter();
     }
 
-    private async load() {
+    @computedFrom('_categorize')
+    get categorize():boolean {
+        return this._categorize;
+    }
+    set categorize(value:boolean) {
+        this._categorize = value;
+        this.filter();
+    }
+
+    private load() {
         this.filter();
     }
 
@@ -298,7 +320,25 @@ export class ActivityIndex implements FilterSettings {
                 }
             }
 
-            this.activities = results;
+            this.activities = [];
+            this.categories = [];
+
+            if(this.categorize) {                
+                results.forEach(a => {
+                    const category:TaskCategory = a.category || new TaskCategoryDoc({name: ' Unassigned', colour: 'white'});
+                        
+                    let existing = this.categories.find(c => c.name === category.name);
+
+                    if(!existing) {
+                        existing = Object.assign({}, category, { activities: []});
+                        this.categories.push(existing);
+                    }
+
+                    existing.activities.push(a);
+                });
+            } else {
+                this.activities = results;
+            }
 
         } catch(e) {
             if(e instanceof TypeError && e.message === 'Cannot read property \'type\' of undefined') {
@@ -327,24 +367,19 @@ export class ActivityIndex implements FilterSettings {
     }
 
     private loadFilterSettings() {
-        try {
-            this.filtering = true;
-
-            const settingsJSON = sessionStorage.getItem(FILTER_SETTINGS_KEY);
-            if(settingsJSON) {
-                const defaults = {
-                        week: moment().toWeekNumberId(),
-                        workType: WorkTypes.ALL_WORK_TYPES,
-                        showAll: false,
-                        showCompleted: false,
-                        showIncomplete: false,
-                        zone: ALL_ZONES
-                    },
-                    settings:FilterSettings = JSON.parse(settingsJSON);
-                Object.assign(this, defaults, settings);
-            }
-        } finally {
-            this.filtering = false;
+        const settingsJSON = sessionStorage.getItem(FILTER_SETTINGS_KEY);
+        if(settingsJSON) {
+            const defaults = {
+                    week: moment().toWeekNumberId(),
+                    workType: WorkTypes.ALL_WORK_TYPES,
+                    _showAll: false,
+                    _showCompleted: false,
+                    _showIncomplete: false,
+                    zone: ALL_ZONES,
+                    _categorize: false
+                },
+                settings:FilterSettings = JSON.parse(settingsJSON);
+            Object.assign(this, defaults, settings);
         }
     }
 
@@ -352,10 +387,11 @@ export class ActivityIndex implements FilterSettings {
         const settings:FilterSettings = {
                 week: this.week,
                 workType: this.workType,
-                showAll: this.showAll,
-                showCompleted: this.showCompleted,
-                showIncomplete: this.showIncomplete,
-                zone: this.zone
+                _showAll: this.showAll,
+                _showCompleted: this.showCompleted,
+                _showIncomplete: this.showIncomplete,
+                zone: this.zone,
+                _categorize:this.categorize
             },
             json = JSON.stringify(settings);
         
@@ -371,13 +407,18 @@ interface WeekItem {
 interface FilterSettings {
     week:string;
     workType:WorkType;
-    showAll:boolean;
-    showCompleted:boolean;
-    showIncomplete:boolean;
+    _showAll:boolean;
+    _showCompleted:boolean;
+    _showIncomplete:boolean;
     zone:string;
+    _categorize:boolean;
 }
 
 function equals(a:string, b:string) {
     if(a == null || b == null) return false;
     return a.toLowerCase() === b.toLowerCase();
+}
+
+interface TaskCategoryWithActivities extends TaskCategory {
+    activities:ActivityDocument[];
 }

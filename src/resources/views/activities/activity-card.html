@@ -15,6 +15,9 @@
                     </div>
                 </div>
             </div>
+            <div class="meta" show.bind="activity.category">
+                <div class="ui label ${activity.category.colour}">${activity.category.name}</div>
+            </div>
             <div class="description">
                 <p show.bind="activity.description">Description: ${activity.description}</p>
                 <p show.bind="activity.crops.length">Crop${activity.crops.length > 1 ? 's' : ''}: ${cropNames}</p>

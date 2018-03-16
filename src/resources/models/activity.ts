@@ -1,5 +1,6 @@
 import {computedFrom} from 'aurelia-framework';
-import { Zone } from './zone';
+import {TaskCategory, TaskCategoryDoc} from './task-category';
+import {Zone} from './zone';
 
 export interface Activity {
     _id?:string;
@@ -19,6 +20,7 @@ export interface Activity {
     journal?:Journal;
     changed:boolean | undefined;
     groupActivitiesTogether:boolean | undefined;
+    category:TaskCategory | null;
 }
 
 export interface Journal {
@@ -45,6 +47,7 @@ export class ActivityDocument implements Activity {
     journal?:JournalDocument = null;
     changed:boolean = false;
     groupActivitiesTogether:boolean | undefined;
+    category:TaskCategory | null;
 
     constructor(args?:Activity) {
         if(args) {
@@ -94,7 +97,8 @@ export class ActivityDocument implements Activity {
             recordingType: this.recordingType,
             unitOfMeasure: this.unitOfMeasure,
             changed: this.changed,
-            groupActivitiesTogether: this.groupActivitiesTogether
+            groupActivitiesTogether: this.groupActivitiesTogether,
+            category: null
         };
         if(Array.isArray(this.crops) && this.crops.length) {
             json.crops = this.crops;
@@ -104,6 +108,9 @@ export class ActivityDocument implements Activity {
         }
         if(this.journal) {
             json.journal = this.journal.toJSON();
+        }
+        if(this.category) {
+            json.category = new TaskCategoryDoc(this.category).toJSON()
         }
         if(!this.isNew) {
             json._id = this._id;

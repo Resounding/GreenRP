@@ -5,18 +5,21 @@ import {Configuration} from './configuration';
 import {Authentication} from './authentication';
 import {log} from './log';
 import {OrderDocument} from "../models/order";
+import { Notifications } from './notifications';
 
-let localDB: PouchDB = null;
-let remoteDB: PouchDB = null;
+let localDB: PouchDB.Database = null;
+let remoteDB: PouchDB.Database = null;
 
 @autoinject()
 export class Database {
     constructor(private auth: Authentication, private config: Configuration, private events: EventAggregator) {
-        this.init();
-        this.events.subscribe(Authentication.AuthenticatedEvent, this.init.bind(this));
+        this.init()
+            .then(() => {
+                this.events.subscribe(Authentication.AuthenticatedEvent, this.init.bind(this));
+            });
     }
 
-    init(localOps?:PouchDB.Configuration.DatabaseConfiguration, remoteOps?:PouchDB.Configuration.DatabaseConfiguration) {
+    async init(localOps?:PouchDB.Configuration.DatabaseConfiguration) {
         if (localDB === null) {
             if(localOps) {
                 localDB = new PouchDB(this.config.app_database_name, localOps);
@@ -31,41 +34,38 @@ export class Database {
                     skip_setup: true,
                     auth: {username: userInfo.name, password: userInfo.password}
                 };
-            if(remoteOps) {
-                _.extend(opts, remoteOps);
-            }
 
             remoteDB = new PouchDB(this.config.remote_database_name, opts);
 
             // batch_size option comes from https://stackoverflow.com/a/26555009
-            const sync = localDB.sync(remoteDB, {live: true, batch_size: 1000})
+            const sync = await localDB.sync(remoteDB, {live: true, batch_size: 1000})
                 .on('complete', () => {
                     log.debug('Sync complete');
                 })
                 .on('error', err => {
                     log.error('Sync error');
                     log.error(err);
-                    const values = _.values(err);
+                    const values = Object.keys(err).map(k => err[k]);
                     // this happens on iOS 10/Safari. Use the API keys...
                     if(values.indexOf('_reader access is required for this request') !== -1) {
                         try {
-                            sync.cancel();
+                            sync
                         } catch (e) { }
 
                         localDB = null;
-                        this.init(undefined, this.apiKeyOptions);
+                        Notifications.error('Invalid permissions');
                     }
                 })
                 .on('change', change => {
                     log.info('Sync change');
                     log.debug(change);
-                    if(change.direction === 'pull' && _.isArray(change.change.docs)) {
+                    if(change.direction === 'pull' && Array.isArray(change.change.docs)) {
 
-                        let deleted = _.any(change.change.docs, doc => doc._deleted),
-                            ordersSynced:boolean = deleted || _.any(change.change.docs, doc => doc.type === OrderDocument.OrderDocumentType),
-                            zonesSynced:boolean = deleted || _.any(change.change.docs, doc => doc._id === 'zones'),
-                            plantsSynced:boolean = deleted || _.any(change.change.docs, doc => doc._id === 'plants'),
-                            activitiesSynced:boolean = deleted || _.any(change.change.docs, doc => doc.type === ActivityDocument.ActivityDocumentType);
+                        let deleted = change.change.docs.some(doc => doc._deleted),
+                            ordersSynced:boolean = deleted || change.change.docs.some(doc => doc.type === OrderDocument.OrderDocumentType),
+                            zonesSynced:boolean = deleted || change.change.docs.some(doc => doc._id === 'zones'),
+                            plantsSynced:boolean = deleted || change.change.docs.some(doc => doc._id === 'plants'),
+                            activitiesSynced:boolean = deleted || change.change.docs.some(doc => doc.type === ActivityDocument.ActivityDocumentType);
 
                         if(ordersSynced) {
                             this.events.publish(Database.OrdersSyncChangeEvent);
@@ -88,6 +88,13 @@ export class Database {
                     log.info('Sync paused');
                     log.debug(info);
                 })
+                .catch(err => {
+                    log.error('sync error', err);
+                });
+
+            return sync;
+        } else {
+            return Promise.resolve(null);
         }
     }
 
