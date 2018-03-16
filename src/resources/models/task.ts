@@ -45,6 +45,10 @@ export class TaskDocument implements Task {
             this.recurrence = new RecurrenceDocument(this.recurrence);
         }
 
+        if(this.category) {
+            this.category = new TaskCategoryDoc(this.category);
+        }
+
         if(this.enabled !== false) {
             this.enabled = true;
         }

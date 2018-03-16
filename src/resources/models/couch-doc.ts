@@ -1,5 +1,5 @@
 import {ISerializable} from './serializable'
-import {IValidatable} from './validation'
+import {IValidatable, ValidationResult} from './validation'
 
 export interface CouchDoc extends PouchDB.Core.IdMeta, PouchDB.Core.RevisionIdMeta, PouchDB.Core.TypeMeta { }
 
@@ -16,7 +16,7 @@ export abstract class CouchDocBase<T extends CouchDoc> implements CouchDoc, IVal
         }, data);
     }
 
-    validate() {
+    validate():ValidationResult {
         return {
             ok: true,
             errors: []

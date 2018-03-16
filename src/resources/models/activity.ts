@@ -63,6 +63,10 @@ export class ActivityDocument implements Activity {
             if(args.journal) {
                 this.journal = new JournalDocument(args.journal);
             }
+
+            if(args.category) {
+                this.category = new TaskCategoryDoc(args.category);
+            }
         }
 
     }
